@@ -11,6 +11,7 @@ export const COMMON_INTOLERANCES = [
   "Horčica",
   "Sezam",
   "Siričitany",
+  "Histamín",
   "Vlčí bôb",
   "Mäkkýše"
 ];

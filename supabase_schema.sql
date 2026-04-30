@@ -2,7 +2,7 @@
 CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
     full_name TEXT,
-    preferences JSONB DEFAULT '{"intolerances": [], "disliked_ingredients": [], "liked_ingredients": []}'::jsonb,
+    preferences JSONB DEFAULT '{"intolerances": [], "diet": [], "goals": {"calories": "0", "protein": "0", "carbs": "0", "fat": "0"}}'::jsonb,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
@@ -53,6 +53,55 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
-CREATE OR REPLACE TRIGGER on_auth_user_created
+-- Ak trigger už existuje, odstránime ho pre čistý re-štart
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- 4. Tabuľka pre recepty
+CREATE TABLE IF NOT EXISTS public.recipes (
+    id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+    user_id UUID REFERENCES auth.users ON DELETE CASCADE NOT NULL,
+    household_id UUID REFERENCES public.households ON DELETE SET NULL,
+    title TEXT NOT NULL,
+    description TEXT,
+    prep_time TEXT,
+    cook_time TEXT,
+    servings INTEGER DEFAULT 1,
+    difficulty TEXT,
+    calories INTEGER DEFAULT 0,
+    nutrition JSONB DEFAULT '{"protein": 0, "carbs": 0, "fat": 0}'::jsonb,
+    ingredients JSONB DEFAULT '[]'::jsonb,
+    instructions JSONB DEFAULT '[]'::jsonb,
+    image_url TEXT,
+    is_favorite BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- RLS pre recepty: vidia ich vlastníci alebo členovia rovnakej domácnosti
+ALTER TABLE public.recipes ENABLE ROW LEVEL SECURITY;
+
+-- Odstránenie starých politik, ak existujú, aby sme predišli chybám pri duplikovaní
+DROP POLICY IF EXISTS "Users can view own or household recipes" ON public.recipes;
+DROP POLICY IF EXISTS "Users can insert own recipes" ON public.recipes;
+DROP POLICY IF EXISTS "Users can update own recipes" ON public.recipes;
+DROP POLICY IF EXISTS "Users can delete own recipes" ON public.recipes;
+
+CREATE POLICY "Users can view own or household recipes" ON public.recipes
+    FOR SELECT USING (
+        auth.uid() = user_id OR 
+        (household_id IS NOT NULL AND EXISTS (
+            SELECT 1 FROM public.household_members 
+            WHERE household_id = public.recipes.household_id AND user_id = auth.uid()
+        ))
+    );
+
+CREATE POLICY "Users can insert own recipes" ON public.recipes
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+CREATE POLICY "Users can update own recipes" ON public.recipes
+    FOR UPDATE USING (auth.uid() = user_id);
+
+CREATE POLICY "Users can delete own recipes" ON public.recipes
+    FOR DELETE USING (auth.uid() = user_id);
