@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ČoUvarím</string>
+    <string name="title_activity_main">ČoUvarím</string>
+    <string name="package_name">sk.couvarim.app</string>
+    <string name="custom_url_scheme">sk.couvarim.app</string>
+</resources>
