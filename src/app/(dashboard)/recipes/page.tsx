@@ -35,6 +35,7 @@ export default function RecipesPage() {
   const [userGoals, setUserGoals] = useState<any>(null);
   const [recipes, setRecipes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -93,6 +94,11 @@ export default function RecipesPage() {
     return Math.min(Math.round((value / goal) * 100), 100);
   };
 
+  const filteredRecipes = recipes.filter(recipe => 
+    recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    recipe.description?.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   if (isLoading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
@@ -129,6 +135,8 @@ export default function RecipesPage() {
                 <input 
                   type="text" 
                   placeholder="Hľadať recept..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   className="w-full pl-11 pr-4 py-4 bg-white border border-transparent focus:border-sage-500 rounded-3xl focus:outline-none focus:ring-4 focus:ring-sage-500/10 transition-all shadow-sm text-gray-700 font-medium"
                 />
               </div>
@@ -137,22 +145,28 @@ export default function RecipesPage() {
               </button>
             </div>
 
-            {recipes.length === 0 ? (
+            {filteredRecipes.length === 0 ? (
               <div className="bg-white rounded-[24px] p-12 text-center space-y-6 border border-gray-100 shadow-sm">
                 <div className="w-20 h-20 bg-sage-50 text-sage-500 rounded-3xl flex items-center justify-center mx-auto">
                    <Utensils size={40} />
                 </div>
                 <div className="space-y-2">
-                  <h3 className="text-xl font-bold text-gray-800">Vaša kuchárka je prázdna</h3>
-                  <p className="text-gray-400 text-sm font-medium">Pridajte svoj prvý recept manuálne alebo si ho nechajte vygenerovať od AI.</p>
+                  <h3 className="text-xl font-bold text-gray-800">
+                    {searchQuery ? "Nenašli sa žiadne recepty" : "Vaša kuchárka je prázdna"}
+                  </h3>
+                  <p className="text-gray-400 text-sm font-medium">
+                    {searchQuery ? `Pre výraz "${searchQuery}" sme nič nenašli.` : "Pridajte svoj prvý recept manuálne alebo si ho nechajte vygenerovať od AI."}
+                  </p>
                 </div>
-                <Link href="/generate" className="inline-block px-8 py-4 bg-sage-500 text-white rounded-2xl font-bold shadow-xl active:scale-95 transition-all">
-                  Vytvoriť prvý recept
-                </Link>
+                {!searchQuery && (
+                  <Link href="/generate" className="inline-block px-8 py-4 bg-sage-500 text-white rounded-2xl font-bold shadow-xl active:scale-95 transition-all">
+                    Vytvoriť prvý recept
+                  </Link>
+                )}
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {recipes.map((recipe) => (
+                {filteredRecipes.map((recipe) => (
                   <div key={recipe.id} className="group bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden active:scale-[0.98] transition-all duration-300 relative">
                     <div className="relative h-60 overflow-hidden bg-sage-50">
                       {/* Floating More Options Button */}

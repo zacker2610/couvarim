@@ -4,11 +4,18 @@ import {
   ArrowRight, 
   Clock, 
   ChevronRight,
-  Camera
+  Camera,
+  Utensils,
+  Flame,
+  ChefHat
 } from "lucide-react";
 import Link from "next/link";
+import { getLatestRecipesAction } from "@/app/actions/recipes";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const result = await getLatestRecipesAction();
+  const recipes = result.success && result.recipes ? result.recipes : [];
+
   return (
     <div className="space-y-10">
       <header>
@@ -45,24 +52,68 @@ export default function DashboardPage() {
         </Link>
       </div>
 
-      {/* Recent Recipes Placeholder */}
+      {/* Recent Recipes */}
       <section>
         <div className="flex justify-between items-center mb-6">
           <h3 className="text-2xl font-semibold text-gray-800">Posledné recepty</h3>
-          <Link href="/recipes" className="text-sage-500 hover:text-sage-600 font-medium flex items-center gap-1 transition-colors">
+          <Link href="/recipes" className="text-sage-500 hover:text-sage-600 font-medium flex items-center gap-1 transition-colors text-sm">
             Zobraziť všetky <ChevronRight size={16} />
           </Link>
         </div>
         
-        <div className="bg-white rounded-xl border border-sage-100 p-12 text-center shadow-sm">
-          <div className="inline-flex items-center justify-center w-16 h-16 bg-sage-50 text-sage-200 rounded-full mb-4">
-            <Clock size={32} />
+        {recipes.length === 0 ? (
+          <div className="bg-white rounded-xl border border-sage-100 p-12 text-center shadow-sm">
+            <div className="inline-flex items-center justify-center w-16 h-16 bg-sage-50 text-sage-200 rounded-full mb-4">
+              <Clock size={32} />
+            </div>
+            <p className="text-gray-500 text-lg">Zatiaľ si neuložil žiadne recepty.</p>
+            <Link href="/generate" className="inline-flex mt-6 px-6 py-3 bg-sage-500 text-sage-50 rounded-xl font-semibold hover:bg-sage-600 transition-colors shadow-sm">
+              Vytvoriť prvý recept
+            </Link>
           </div>
-          <p className="text-gray-500 text-lg">Zatiaľ si neuložil žiadne recepty.</p>
-          <Link href="/generate" className="inline-flex mt-6 px-6 py-3 bg-sage-500 text-sage-50 rounded-xl font-semibold hover:bg-sage-600 transition-colors shadow-sm">
-            Vytvoriť prvý recept
-          </Link>
-        </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {recipes.map((recipe: any) => (
+              <Link 
+                key={recipe.id} 
+                href="/recipes"
+                className="group bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col"
+              >
+                <div className="relative h-48 overflow-hidden bg-sage-50">
+                  {recipe.image_url ? (
+                    <img 
+                      src={recipe.image_url} 
+                      alt={recipe.title}
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-sage-200">
+                      <ChefHat size={48} />
+                    </div>
+                  )}
+                  <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-md rounded-lg text-[10px] font-bold text-gray-600 uppercase tracking-wider shadow-sm border border-white/50">
+                    {recipe.difficulty}
+                  </div>
+                </div>
+                <div className="p-5 flex-1 flex flex-col">
+                  <h4 className="text-lg font-bold text-gray-800 mb-4 line-clamp-1 group-hover:text-sage-600 transition-colors leading-tight">
+                    {recipe.title}
+                  </h4>
+                  <div className="mt-auto flex justify-between items-center text-gray-400 text-[10px] font-bold uppercase tracking-widest px-1">
+                    <div className="flex items-center gap-1.5">
+                      <Clock size={14} className="text-sage-400" />
+                      {recipe.prep_time} min
+                    </div>
+                    <div className="flex items-center gap-1.5 text-amber-500">
+                      <Flame size={14} />
+                      {recipe.calories || 0} kcal
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
       </section>
     </div>
   );

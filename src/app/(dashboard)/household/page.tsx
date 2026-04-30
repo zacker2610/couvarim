@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Users, 
   UserPlus,
@@ -10,22 +10,46 @@ import {
   Plus,
   X,
   AlertCircle,
-  Check
+  Check,
+  Loader2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { COMMON_INTOLERANCES } from "@/lib/constants";
-
-const initialMembers = [
-  { id: "1", name: "Andrej (Vy)", role: "owner", type: "registered", email: "andrej@priklad.sk" },
-  { id: "2", name: "Lucka", role: "member", type: "registered", email: "lucka@priklad.sk" },
-  { id: "3", name: "Malý Peťko", role: "member", type: "virtual", preferences: "Alergia na arašidy" },
-];
+import { 
+  getOrCreateHouseholdAction, 
+  getHouseholdMembersAction,
+  addHouseholdMemberAction,
+  removeHouseholdMemberAction
+} from "@/app/actions/recipes";
 
 export default function HouseholdPage() {
-  const [members, setMembers] = useState(initialMembers);
+  const [household, setHousehold] = useState<any>(null);
+  const [members, setMembers] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteType, setInviteType] = useState<"email" | "manual">("email");
+  const [newMemberName, setNewMemberName] = useState("");
+  const [newMemberEmail, setNewMemberEmail] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    setIsLoading(true);
+    const hResult = await getOrCreateHouseholdAction();
+    if (hResult.success && hResult.household) {
+      setHousehold(hResult.household);
+      const mResult = await getHouseholdMembersAction(hResult.household.id);
+      if (mResult.success && mResult.members) {
+        setMembers(mResult.members);
+      }
+    }
+    setIsLoading(false);
+  };
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev => 
@@ -33,11 +57,66 @@ export default function HouseholdPage() {
     );
   };
 
+  const handleAddMember = async () => {
+    if (!household) return;
+    if (inviteType === "manual" && !newMemberName) return;
+    if (inviteType === "email" && !newMemberEmail) return;
+
+    setIsSubmitting(true);
+    const result = await addHouseholdMemberAction(household.id, {
+      type: inviteType,
+      name: newMemberName,
+      email: newMemberEmail,
+      intolerances: selectedTags
+    });
+
+    if (result.success) {
+      await fetchData();
+      setShowInviteModal(false);
+      setNewMemberName("");
+      setNewMemberEmail("");
+      setSelectedTags([]);
+    } else {
+      alert(result.error);
+    }
+    setIsSubmitting(false);
+  };
+
+  const handleRemoveMember = async (memberId: string) => {
+    if (!confirm("Naozaj chcete odstrániť tohto člena?")) return;
+    
+    const result = await removeHouseholdMemberAction(memberId);
+    if (result.success) {
+      setMembers(members.filter(m => m.id !== memberId));
+    } else {
+      alert(result.error);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <Loader2 className="w-12 h-12 text-sage-500 animate-spin" />
+        <p className="text-gray-400 font-medium animate-pulse">Načítavam vašu rodinu...</p>
+      </div>
+    );
+  }
+
+  // Calculate common intolerances from both virtual and registered members
+  const allIntolerances = Array.from(new Set(
+    members.flatMap(m => {
+      const virtualIntolerances = m.preferences?.intolerances || [];
+      const registeredIntolerances = m.profiles?.preferences?.intolerances || [];
+      return [...virtualIntolerances, ...registeredIntolerances];
+    })
+  ));
+
   return (
     <div className="pb-12 space-y-6">
       <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center justify-between py-4 px-2 -mx-2 mb-2">
-        <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Moja Rodina</h2>
-        {/* Desktop only button */}
+        <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
+          {household?.name || "Moja Rodina"}
+        </h2>
         <button 
           onClick={() => setShowInviteModal(true)}
           className="hidden sm:flex bg-sage-500 text-sage-50 px-5 py-2.5 rounded-full font-bold text-sm shadow-md active:scale-95 transition-all items-center gap-2 hover:bg-sage-600"
@@ -47,7 +126,7 @@ export default function HouseholdPage() {
         </button>
       </header>
 
-      {/* Mobile Floating Action Button (Circle FAB with UserPlus icon) */}
+      {/* Mobile Floating Action Button */}
       <button 
         onClick={() => setShowInviteModal(true)}
         className="sm:hidden fixed bottom-24 right-6 w-16 h-16 bg-sage-500 text-sage-50 rounded-full z-40 flex items-center justify-center active:scale-90 transition-all shadow-[0_15px_30px_-5px_rgba(77,96,71,0.5)] hover:bg-sage-600"
@@ -69,25 +148,29 @@ export default function HouseholdPage() {
             <span className="font-bold text-[10px] uppercase tracking-wider">Obmedzenia</span>
           </div>
           <div className="flex flex-wrap gap-1">
-            <span className="w-2 h-2 bg-amber-400 rounded-full"></span>
-            <span className="w-2 h-2 bg-amber-400 rounded-full opacity-60"></span>
-            <span className="w-2 h-2 bg-amber-400 rounded-full opacity-30"></span>
+            {allIntolerances.map((_, i) => (
+              <span key={i} className="w-2 h-2 bg-amber-400 rounded-full" style={{ opacity: 1 - (i * 0.2) }}></span>
+            ))}
+            {allIntolerances.length === 0 && <span className="text-[10px] text-gray-400 font-bold uppercase">Žiadne</span>}
           </div>
         </div>
       </div>
 
-      <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
-         <div className="flex items-center gap-2 mb-4">
-            <div className="w-8 h-8 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center">
-              <AlertCircle size={18} />
+      {allIntolerances.length > 0 && (
+        <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+           <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center">
+                <AlertCircle size={18} />
+              </div>
+              <h3 className="font-bold text-gray-800">Spoločné obmedzenia</h3>
             </div>
-            <h3 className="font-bold text-gray-800">Spoločné obmedzenia</h3>
-          </div>
-          <div className="flex flex-wrap gap-2">
-            <span className="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-xs font-bold">Bez lepku</span>
-            <span className="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-xs font-bold">Alergia na arašidy</span>
-          </div>
-      </section>
+            <div className="flex flex-wrap gap-2">
+              {allIntolerances.map(item => (
+                <span key={item} className="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-100 rounded-full text-xs font-bold">{item}</span>
+              ))}
+            </div>
+        </section>
+      )}
 
       <section className="space-y-3">
         <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Zoznam členov</h3>
@@ -95,21 +178,31 @@ export default function HouseholdPage() {
           {members.map((member: any) => (
             <div key={member.id} className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
               <div className="flex items-center gap-4">
-                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${member.type === 'registered' ? 'bg-sage-100 text-sage-600' : 'bg-blue-100 text-blue-600'}`}>
-                  {member.type === 'registered' ? <User size={24} /> : <Users size={24} />}
+                <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${member.user_id ? 'bg-sage-100 text-sage-600' : 'bg-blue-100 text-blue-600'}`}>
+                  {member.user_id ? <User size={24} /> : <Users size={24} />}
                 </div>
                 <div>
                   <div className="flex items-center gap-2">
-                    <h4 className="font-bold text-gray-800">{member.name}</h4>
+                    <h4 className="font-bold text-gray-800">
+                      {member.user_id ? (member.profiles?.full_name || "Registrovaný používateľ") : member.display_name}
+                      {member.user_id === household?.owner_id && " (Vy)"}
+                    </h4>
                     {member.role === 'owner' && (
                       <span className="px-1.5 py-0.5 bg-sage-100 text-sage-700 text-[8px] font-bold uppercase rounded-md">Správca</span>
                     )}
                   </div>
-                  <p className="text-gray-400 text-[11px] font-medium">{member.type === 'registered' ? member.email : member.preferences}</p>
+                  <p className="text-gray-400 text-[11px] font-medium">
+                    {member.user_id ? "Registrovaný člen" : (member.preferences?.intolerances?.join(", ") || "Bez obmedzení")}
+                  </p>
                 </div>
               </div>
               {member.role !== 'owner' && (
-                <button className="p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"><Trash2 size={18} /></button>
+                <button 
+                  onClick={() => handleRemoveMember(member.id)}
+                  className="p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                >
+                  <Trash2 size={18} />
+                </button>
               )}
             </div>
           ))}
@@ -147,26 +240,43 @@ export default function HouseholdPage() {
                 <button onClick={() => setInviteType("manual")} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${inviteType === 'manual' ? 'bg-white shadow-sm text-sage-700' : 'text-gray-500'}`}>Manuálne</button>
               </div>
 
-              <form className="space-y-5">
+              <form onSubmit={(e) => { e.preventDefault(); handleAddMember(); }} className="space-y-5">
                 {inviteType === 'email' ? (
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Emailová adresa</label>
                     <div className="relative">
                       <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-                      <input type="email" placeholder="rodina@priklad.sk" className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 outline-none text-gray-800 font-medium" />
+                      <input 
+                        type="email" 
+                        value={newMemberEmail}
+                        onChange={(e) => setNewMemberEmail(e.target.value)}
+                        placeholder="rodina@priklad.sk" 
+                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 outline-none text-gray-800 font-medium" 
+                      />
                     </div>
                   </div>
                 ) : (
                   <>
                     <div className="space-y-1.5">
                       <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Meno člena</label>
-                      <input type="text" placeholder="napr. Stará mama" className="w-full px-5 py-4 rounded-2xl bg-gray-50 outline-none text-gray-800 font-medium" />
+                      <input 
+                        type="text" 
+                        value={newMemberName}
+                        onChange={(e) => setNewMemberName(e.target.value)}
+                        placeholder="napr. Stará mama" 
+                        className="w-full px-5 py-4 rounded-2xl bg-gray-50 outline-none text-gray-800 font-medium" 
+                      />
                     </div>
                     <div className="space-y-3">
                       <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Alergie</label>
                       <div className="flex flex-wrap gap-2">
                         {COMMON_INTOLERANCES.map((item) => (
-                          <button key={item} type="button" onClick={() => toggleTag(item)} className={`px-3 py-1.5 rounded-full border text-[11px] font-bold transition-all ${selectedTags.includes(item) ? 'bg-sage-600 border-sage-600 text-white' : 'bg-white border-gray-100 text-gray-500'}`}>
+                          <button 
+                            key={item} 
+                            type="button" 
+                            onClick={() => toggleTag(item)} 
+                            className={`px-3 py-1.5 rounded-full border text-[11px] font-bold transition-all ${selectedTags.includes(item) ? 'bg-sage-600 border-sage-600 text-white' : 'bg-white border-gray-100 text-gray-500'}`}
+                          >
                             {item}
                           </button>
                         ))}
@@ -175,9 +285,11 @@ export default function HouseholdPage() {
                   </>
                 )}
                 <button 
-                  type="button"
-                  className="w-full py-5 bg-sage-500 text-sage-50 rounded-2xl font-bold shadow-xl active:scale-[0.98] transition-all hover:bg-sage-600 mt-4"
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="w-full py-5 bg-sage-500 text-sage-50 rounded-2xl font-bold shadow-xl active:scale-[0.98] transition-all hover:bg-sage-600 mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
+                  {isSubmitting && <Loader2 size={18} className="animate-spin" />}
                   {inviteType === 'email' ? 'Odoslať pozvánku' : 'Pridať do skupiny'}
                 </button>
               </form>

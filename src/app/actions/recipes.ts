@@ -108,6 +108,34 @@ async function getServerSupabase() {
 }
 
 /**
+ * Server Action to get the latest 3 recipes for the user.
+ */
+export async function getLatestRecipesAction() {
+  try {
+    const supabase = await getServerSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+      return { success: false, error: "Musíte byť prihlásený." };
+    }
+
+    const { data, error } = await supabase
+      .from("recipes")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    if (error) throw error;
+
+    return { success: true, recipes: data };
+  } catch (error: any) {
+    console.error("Get Latest Recipes Error:", error);
+    return { success: false, error: error.message || "Nepodarilo sa načítať recepty." };
+  }
+}
+
+/**
  * Server Action to save a recipe to Supabase.
  */
 export async function saveRecipeAction(recipeData: any) {
@@ -302,5 +330,125 @@ export async function parseRecipeTextAction(rawText: string) {
   } catch (error: any) {
     console.error("Parse Text Error:", error);
     return { success: false, error: "AI sa nepodarilo tento text spracovať. Skúste vložiť jasnejší text." };
+  }
+}
+
+/**
+ * Household Actions
+ */
+
+export async function getOrCreateHouseholdAction() {
+  try {
+    const supabase = await getServerSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return { success: false, error: "Musíte byť prihlásený." };
+
+    // Try to find if user is already in a household (as owner)
+    const { data: household } = await supabase
+      .from("households")
+      .select("*")
+      .eq("owner_id", user.id)
+      .maybeSingle();
+
+    if (household) {
+      return { success: true, household };
+    }
+
+    // Try to find if user is a member of any household
+    const { data: memberOf } = await supabase
+      .from("household_members")
+      .select("household_id, households(*)")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (memberOf) {
+      return { success: true, household: memberOf.households };
+    }
+
+    // If not, create a default one
+    const { data: newHousehold, error: hError } = await supabase
+      .from("households")
+      .insert({
+        name: "Moja Domácnosť",
+        owner_id: user.id
+      })
+      .select()
+      .single();
+
+    if (hError) throw hError;
+
+    // Add owner as a member
+    await supabase.from("household_members").insert({
+      household_id: newHousehold.id,
+      user_id: user.id,
+      role: "owner"
+    });
+
+    return { success: true, household: newHousehold };
+  } catch (error: any) {
+    console.error("Household Error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getHouseholdMembersAction(householdId: string) {
+  try {
+    const supabase = await getServerSupabase();
+    
+    const { data, error } = await supabase
+      .from("household_members")
+      .select(`
+        *,
+        profiles:user_id (full_name, preferences)
+      `)
+      .eq("household_id", householdId);
+
+    if (error) throw error;
+
+    return { success: true, members: data };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function addHouseholdMemberAction(householdId: string, memberData: any) {
+  try {
+    const supabase = await getServerSupabase();
+
+    if (memberData.type === "registered") {
+      return { success: false, error: "Pridávanie podľa emailu bude dostupné čoskoro." };
+    } else {
+      const { data, error } = await supabase
+        .from("household_members")
+        .insert({
+          household_id: householdId,
+          display_name: memberData.name,
+          preferences: { intolerances: memberData.intolerances || [] },
+          role: "member"
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { success: true, member: data };
+    }
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function removeHouseholdMemberAction(memberId: string) {
+  try {
+    const supabase = await getServerSupabase();
+    const { error } = await supabase
+      .from("household_members")
+      .delete()
+      .eq("id", memberId);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
   }
 }
