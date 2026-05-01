@@ -23,7 +23,8 @@ import {
   RefreshCw,
   Plus,
   Loader2,
-  Check
+  Check,
+  Users
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -53,6 +54,7 @@ export default function GeneratePage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [refineError, setRefineError] = useState<string | null>(null);
   const [lastActionType, setLastActionType] = useState<"dish" | "ingredients" | "random" | null>(null);
+  const [useHousehold, setUseHousehold] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -106,7 +108,7 @@ export default function GeneratePage() {
       setLastActionType(type);
       setStep("loading");
       setIsLoading(true);
-      const result = await generateRecipeAction(inputText, type);
+      const result = await generateRecipeAction(inputText, type, null, useHousehold);
       if (result.success) {
         setGeneratedRecipe(result.recipe);
         setStep("result");
@@ -167,6 +169,31 @@ export default function GeneratePage() {
               <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Nový nápad</h2>
               <p className="text-gray-500 text-sm mt-1">Čo si dnes uvaríme?</p>
             </header>
+
+            <div className="bg-white p-1.5 rounded-[24px] border border-gray-100 shadow-sm flex items-center mb-2">
+              <button 
+                onClick={() => setUseHousehold(false)} 
+                className={`flex-1 py-3.5 px-4 rounded-[18px] text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                  !useHousehold 
+                    ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                <Zap size={14} />
+                Len pre mňa
+              </button>
+              <button 
+                onClick={() => setUseHousehold(true)} 
+                className={`flex-1 py-3.5 px-4 rounded-[18px] text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                  useHousehold 
+                    ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                <Users size={14} />
+                Celá rodina
+              </button>
+            </div>
 
             <div className="flex flex-col gap-4">
               <Link href="/scan" className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm flex items-center gap-5 group transition-all active:scale-[0.98]">

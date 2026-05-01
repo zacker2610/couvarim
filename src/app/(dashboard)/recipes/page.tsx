@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { 
   Search, 
   Users,
@@ -20,14 +21,28 @@ import {
   Pencil,
   MoreVertical,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Share2
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
-import { deleteRecipeAction } from "@/app/actions/recipes";
+import { deleteRecipeAction, toggleRecipeShareAction } from "@/app/actions/recipes";
 import Link from "next/link";
 
 export default function RecipesPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
+        <Loader2 className="w-12 h-12 text-sage-500 animate-spin" />
+        <p className="text-gray-400 font-medium animate-pulse">Pripravujem vašu kuchárku...</p>
+      </div>
+    }>
+      <RecipesContent />
+    </Suspense>
+  );
+}
+
+function RecipesContent() {
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [deleteConfirmRecipe, setDeleteConfirmRecipe] = useState<any | null>(null);
   const [view, setView] = useState<"list" | "detail">("list");
@@ -36,6 +51,9 @@ export default function RecipesPage() {
   const [recipes, setRecipes] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  
+  const searchParams = useSearchParams();
+  const recipeIdFromUrl = searchParams.get("id");
 
   useEffect(() => {
     const fetchData = async () => {
@@ -69,9 +87,35 @@ export default function RecipesPage() {
     fetchData();
   }, []);
 
+  // Handle URL ID parameter
+  useEffect(() => {
+    if (recipeIdFromUrl && recipes.length > 0) {
+      const recipe = recipes.find(r => r.id === recipeIdFromUrl);
+      if (recipe) {
+        handleOpenRecipe(recipe);
+      }
+    }
+  }, [recipeIdFromUrl, recipes]);
+
   const handleOpenRecipe = (recipe: any) => {
     setSelectedRecipe(recipe);
     setView("detail");
+    setActiveMenuId(null);
+  };
+
+  const handleToggleShare = async (recipe: any) => {
+    const shouldShare = !recipe.household_id;
+    const result = await toggleRecipeShareAction(recipe.id, shouldShare);
+    if (result.success && result.recipe) {
+      setRecipes(recipes.map((r: any) => 
+        r.id === recipe.id ? { ...r, household_id: result.recipe.household_id } : r
+      ));
+      if (selectedRecipe?.id === recipe.id) {
+        setSelectedRecipe({ ...selectedRecipe, household_id: result.recipe.household_id });
+      }
+    } else {
+      console.error(result.error);
+    }
     setActiveMenuId(null);
   };
 
@@ -84,7 +128,7 @@ export default function RecipesPage() {
       setRecipes(recipes.filter(r => r.id !== id));
       setDeleteConfirmRecipe(null);
     } else {
-      alert(result.error);
+      console.error(result.error);
     }
     setActiveMenuId(null);
   };
@@ -187,7 +231,7 @@ export default function RecipesPage() {
                               initial={{ opacity: 0, scale: 0.9, y: -10 }}
                               animate={{ opacity: 1, scale: 1, y: 0 }}
                               exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                              className="absolute right-0 mt-2 w-36 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden py-2"
+                              className="absolute right-0 mt-2 w-44 bg-white rounded-2xl shadow-xl border border-gray-100 overflow-hidden py-2"
                             >
                               <Link 
                                 href={`/recipes/edit/${recipe.id}`}
@@ -195,6 +239,15 @@ export default function RecipesPage() {
                               >
                                 <Pencil size={14} /> Upraviť
                               </Link>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleToggleShare(recipe);
+                                }}
+                                className={`w-full px-4 py-2 text-left text-sm font-bold flex items-center gap-2 transition-colors border-t border-gray-50 ${recipe.household_id ? 'text-amber-600 hover:bg-amber-50' : 'text-sage-600 hover:bg-sage-50'}`}
+                              >
+                                <Share2 size={14} /> {recipe.household_id ? "Nezdieľať" : "Zdieľať s rodinou"}
+                              </button>
                               <button 
                                 onClick={(e) => {
                                   e.stopPropagation();
@@ -231,7 +284,7 @@ export default function RecipesPage() {
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Flame size={14} className="text-amber-400" />
-                          {recipe.cook_time ? `${recipe.cook_time} min` : "—"}
+                          {recipe.calories} kcal
                         </div>
                         <div className="flex items-center gap-1.5">
                           <Utensils size={14} className="text-blue-400" />
@@ -266,12 +319,20 @@ export default function RecipesPage() {
                 <ChevronLeft size={22} />
               </button>
               <h2 className="text-2xl font-bold text-gray-800 tracking-tight text-center flex-1">Detail</h2>
-              <Link 
-                href={`/recipes/edit/${selectedRecipe.id}`}
-                className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-sage-600 active:scale-90 transition-all"
-              >
-                <Pencil size={22} />
-              </Link>
+              <div className="flex gap-2">
+                <button 
+                  onClick={() => handleToggleShare(selectedRecipe)}
+                  className={`p-3 rounded-2xl shadow-sm border border-gray-100 active:scale-90 transition-all ${selectedRecipe.household_id ? 'bg-sage-500 text-white border-sage-500' : 'bg-white text-gray-400'}`}
+                >
+                  <Share2 size={22} />
+                </button>
+                <Link 
+                  href={`/recipes/edit/${selectedRecipe.id}`}
+                  className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-sage-600 active:scale-90 transition-all"
+                >
+                  <Pencil size={22} />
+                </Link>
+              </div>
             </header>
 
             <div className="bg-white rounded-[24px] overflow-hidden shadow-sm border border-gray-100 mb-20">

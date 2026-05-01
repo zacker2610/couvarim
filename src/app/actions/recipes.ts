@@ -11,23 +11,105 @@ import { revalidatePath } from "next/cache";
 export async function generateRecipeAction(
   promptText: string, 
   type: "dish" | "ingredients" | "random" | "refine",
-  previousRecipe?: any
+  previousRecipe?: any,
+  useHousehold: boolean = true
 ) {
   try {
+    const supabase = await getServerSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    let constraintsPrompt = "";
+    
+    if (user && useHousehold) {
+      // 1. Get Household to find all members
+      const { data: household } = await supabase
+        .from("households")
+        .select("id")
+        .or(`owner_id.eq.${user.id}`)
+        .maybeSingle();
+      
+      if (household) {
+        const { data: members } = await supabase
+          .from("household_members")
+          .select(`
+            *,
+            profiles:user_id (preferences)
+          `)
+          .eq("household_id", household.id);
+        
+        if (members) {
+          const allIntolerances = new Set<string>();
+          const allDiets = new Set<string>();
+          const allDislikes = new Set<string>();
+          
+          members.forEach((m: any) => {
+            const prefs = m.user_id ? m.profiles?.preferences : m.preferences;
+            if (prefs) {
+              (prefs.intolerances || []).forEach((i: string) => allIntolerances.add(i));
+              (prefs.diet || []).forEach((d: string) => allDiets.add(d));
+              (prefs.disliked_ingredients || []).forEach((di: string) => allDislikes.add(di));
+            }
+          });
+          
+          if (allIntolerances.size > 0 || allDiets.size > 0 || allDislikes.size > 0) {
+            constraintsPrompt = `
+              DÔLEŽITÉ OBMEDZENIA (RODINNÝ REŽIM):
+              ${allIntolerances.size > 0 ? `- Alergie/Intolerancie: ${Array.from(allIntolerances).join(", ")}` : ""}
+              ${allDiets.size > 0 ? `- Stravovacie štýly: ${Array.from(allDiets).join(", ")}` : ""}
+              ${allDislikes.size > 0 ? `- Tieto suroviny NEPOUŽÍVAJ: ${Array.from(allDislikes).join(", ")}` : ""}
+              Recept musí byť bezpečný a chutný pre všetkých členov s týmito požiadavkami.
+            `;
+          }
+        }
+      }
+    } else if (user && !useHousehold) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("preferences")
+        .eq("id", user.id)
+        .single();
+      
+      if (profile?.preferences) {
+        const p = profile.preferences;
+        if (p.intolerances?.length > 0 || p.diet?.length > 0 || p.disliked_ingredients?.length > 0) {
+          constraintsPrompt = `
+            DÔLEŽITÉ OBMEDZENIA (LEN PRE MŇA):
+            ${p.intolerances?.length > 0 ? `- Alergie/Intolerancie: ${p.intolerances.join(", ")}` : ""}
+            ${p.diet?.length > 0 ? `- Stravovacie štýly: ${p.diet.join(", ")}` : ""}
+            ${p.disliked_ingredients?.length > 0 ? `- Tieto suroviny NEPOUŽÍVAJ: ${p.disliked_ingredients.join(", ")}` : ""}
+          `;
+        }
+      }
+    }
+
     let finalPrompt = "";
 
     if (type === "dish") {
       finalPrompt = `Generuj podrobný a chutný recept pre konkrétne jedlo: "${promptText}". 
-      Tento recept by mal byť v jeho tradičnej/originálnej forme.`;
+      Tento recept by mal byť v jeho tradičnej/originálnej forme.
+      ${constraintsPrompt}`;
     } else if (type === "ingredients") {
       finalPrompt = `Mám tieto suroviny: "${promptText}". 
-      Vymysli z nich najlepší možný recept. Môžeš pridať bežné základné suroviny ako soľ, korenie, olej, vodu atď.`;
+      Vymysli z nich najlepší možný recept. Môžeš pridať bežné základné suroviny ako soľ, korenie, olej, vodu atď.
+      ${constraintsPrompt}`;
     } else if (type === "refine") {
       finalPrompt = `Mám tento existujúci recept: ${JSON.stringify(previousRecipe)}.
       Používateľ chce urobiť túto zmenu: "${promptText}".
-      Uprav recept (množstvá, ingrediencie, postup, kalórie a nutričné hodnoty) podľa tejto požiadavky tak, aby dával zmysel.`;
+      Uprav recept (množstvá, ingrediencie, postup, kalórie a nutričné hodnoty) podľa tejto požiadavky tak, aby dával zmysel.
+      ${constraintsPrompt}`;
     } else {
-      finalPrompt = `Vymysli náhodný, inšpiratívny a chutný recept pre dnešný deň.`;
+      const themes = [
+        "Talianska kuchyňa", "Ázijské stir-fry", "Mexické tacos alebo fajitas", 
+        "Moderná slovenská kuchyňa", "Stredomorská ryba alebo morské plody", "Blízky východ (hummus, shakshuka)",
+        "Francúzske bistro jedlo", "Indické curry", "Zdravý bowl so superpotravinami",
+        "Pomalé varenie (ragú, guláš)", "Ľahký letný šalát s proteínom", "Tradičný nedeľný obed v novom šate"
+      ];
+      const randomTheme = themes[Math.floor(Math.random() * themes.length)];
+      
+      finalPrompt = `Vymysli náhodný, inšpiratívny a chutný recept pre dnešný deň. 
+      Téma pre dnešok: ${randomTheme}.
+      Skús vymyslieť niečo originálne, čo bežne človeka nenapadne.
+      ${constraintsPrompt}`;
     }
 
     const systemInstruction = `
@@ -59,7 +141,7 @@ export async function generateRecipeAction(
       1. JAZYK A JEDNOTKY: Celý text musí byť v SLOVENČINE. Používaj výhradne slovenské jednotky: PL (polievková lyžica), ČL (čajová lyžička), ks (kus), g, kg, ml, l. NIKDY nepoužívaj anglické tbsp, tsp a pod.
       2. LOGICKÁ KONZISTENCIA: Každá surovina spomenutá v postupe (napr. voda, olej, soľ) MUSÍ byť uvedená v zozname ingrediencií s konkrétnym množstvom.
       3. KOMPLETNOSŤ: Nikdy nevynechávaj základné suroviny potrebné pre daný typ jedla (tekutiny pre guláše, tuk na smaženie atď.).
-      4. ČÍSLA A NUTRIČNÉ HODNOTY: "calories" a "value" musia byť ČÍSLA (Integer/Float). DÔLEŽITÉ: Nutričné hodnoty (calories, nutrition) počítaj VŽDY na JEDNU PORCIU (teda vydel celkové hodnoty surovin počtom "servings").
+      4. ČÍSLA A NUTRIČNÉ HODNOTY: "calories" a "value" must be numbers (Integer/Float). DÔLEŽITÉ: Nutričné hodnoty (calories, nutrition) počítaj VŽDY na JEDNU PORCIU.
       
       Návrat len čistý JSON, žiadne kecy okolo. NIKDY nepoužívaj žiadne citácie ani značky typu [cite: 1].
     `;
@@ -424,7 +506,11 @@ export async function addHouseholdMemberAction(householdId: string, memberData: 
         .insert({
           household_id: householdId,
           display_name: memberData.name,
-          preferences: { intolerances: memberData.intolerances || [] },
+          preferences: { 
+            intolerances: memberData.intolerances || [],
+            diet: memberData.diet || [],
+            disliked_ingredients: memberData.disliked_ingredients || []
+          },
           role: "member"
         })
         .select()
@@ -449,6 +535,110 @@ export async function removeHouseholdMemberAction(memberId: string) {
     if (error) throw error;
     return { success: true };
   } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function updateHouseholdMemberAction(memberId: string, memberData: any) {
+  try {
+    const supabase = await getServerSupabase();
+    
+    const updateData: any = {
+      display_name: memberData.name,
+      preferences: { 
+        intolerances: memberData.intolerances || [],
+        diet: memberData.diet || [],
+        disliked_ingredients: memberData.disliked_ingredients || []
+      }
+    };
+
+    const { data, error } = await supabase
+      .from("household_members")
+      .update(updateData)
+      .eq("id", memberId)
+      .select()
+      .single();
+
+    if (error) throw error;
+    return { success: true, member: data };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
+export async function toggleRecipeShareAction(recipeId: string, shouldShare: boolean) {
+  try {
+    const supabase = await getServerSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return { success: false, error: "Musíte byť prihlásený." };
+
+    let householdId = null;
+    if (shouldShare) {
+      const hResult = await getOrCreateHouseholdAction();
+      if (!hResult.success) throw new Error(hResult.error);
+      householdId = hResult.household.id;
+      console.log(`DEBUG: Sharing recipe ${recipeId} to household ${householdId}`);
+    } else {
+      console.log(`DEBUG: Unsharing recipe ${recipeId}`);
+    }
+
+    const { data: updatedRecipe, error } = await supabase
+      .from("recipes")
+      .update({ household_id: householdId })
+      .eq("id", recipeId)
+      .eq("user_id", user.id)
+      .select()
+      .single();
+
+    if (error) throw error;
+    
+    console.log(`DEBUG: Successfully updated recipe ${recipeId}. New household_id: ${updatedRecipe.household_id}`);
+
+    revalidatePath("/recipes");
+    revalidatePath("/household");
+    return { success: true, recipe: updatedRecipe };
+  } catch (error: any) {
+    console.error("Toggle Share Error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function getHouseholdSharedRecipesAction(householdId: string) {
+  try {
+    const supabase = await getServerSupabase();
+    
+    // Get recipes shared to this household
+    const { data: recipes, error } = await supabase
+      .from("recipes")
+      .select("*")
+      .eq("household_id", householdId)
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      console.error("DEBUG: Shared Recipes Error:", error);
+      throw error;
+    }
+
+    // Attach author profiles manually for better reliability
+    if (recipes && recipes.length > 0) {
+      const userIds = [...new Set(recipes.map(r => r.user_id))];
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+        
+      if (profiles) {
+        const profileMap = Object.fromEntries(profiles.map(p => [p.id, p]));
+        recipes.forEach(r => {
+          r.profiles = profileMap[r.user_id];
+        });
+      }
+    }
+
+    return { success: true, recipes: recipes || [] };
+  } catch (error: any) {
+    console.error("Get Shared Recipes Error:", error);
     return { success: false, error: error.message };
   }
 }
