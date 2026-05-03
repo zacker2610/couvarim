@@ -42,7 +42,7 @@ export default function BottomNav() {
             )}
           >
             <div className={cn(
-              "p-1 rounded-lg transition-all",
+              "p-1 rounded-2xl transition-all",
               isActive ? "bg-sage-100/50" : ""
             )}>
               <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />

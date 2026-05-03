@@ -3,6 +3,7 @@ CREATE TABLE IF NOT EXISTS public.profiles (
     id UUID REFERENCES auth.users ON DELETE CASCADE PRIMARY KEY,
     full_name TEXT,
     preferences JSONB DEFAULT '{"intolerances": [], "diet": [], "goals": {"calories": "0", "protein": "0", "carbs": "0", "fat": "0"}}'::jsonb,
+    pantry JSONB DEFAULT '[]'::jsonb,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 

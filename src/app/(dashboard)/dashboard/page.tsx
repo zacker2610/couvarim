@@ -29,9 +29,9 @@ export default async function DashboardPage() {
 
       {/* Quick Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Link href="/generate" className="group p-6 bg-white rounded-xl shadow-sm border border-sage-100 hover:shadow-md transition-all duration-300">
+        <Link href="/generate" className="group p-6 bg-white rounded-2xl shadow-sm border border-sage-100 hover:shadow-md transition-all duration-300">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-sage-100 text-sage-500 rounded-xl group-hover:bg-sage-500 group-hover:text-sage-50 transition-colors duration-300">
+            <div className="p-3 bg-sage-100 text-sage-500 rounded-2xl group-hover:bg-sage-500 group-hover:text-sage-50 transition-colors duration-300">
               <Sparkles size={24} />
             </div>
             <ArrowRight className="text-gray-300 group-hover:text-sage-500 group-hover:translate-x-1 transition-all duration-300" />
@@ -40,9 +40,9 @@ export default async function DashboardPage() {
           <p className="text-gray-500 mt-2">Zadaj suroviny, ktoré máš v chladničke a nechaj sa prekvapiť.</p>
         </Link>
 
-        <Link href="/scan" className="group p-6 bg-white rounded-xl shadow-sm border border-sage-100 hover:shadow-md transition-all duration-300">
+        <Link href="/scan" className="group p-6 bg-white rounded-2xl shadow-sm border border-sage-100 hover:shadow-md transition-all duration-300">
           <div className="flex justify-between items-start mb-4">
-            <div className="p-3 bg-sage-100 text-sage-500 rounded-xl group-hover:bg-sage-500 group-hover:text-sage-50 transition-colors duration-300">
+            <div className="p-3 bg-sage-100 text-sage-500 rounded-2xl group-hover:bg-sage-500 group-hover:text-sage-50 transition-colors duration-300">
               <Camera size={24} />
             </div>
             <ArrowRight className="text-gray-300 group-hover:text-sage-500 group-hover:translate-x-1 transition-all duration-300" />
@@ -62,12 +62,12 @@ export default async function DashboardPage() {
         </div>
         
         {recipes.length === 0 ? (
-          <div className="bg-white rounded-xl border border-sage-100 p-12 text-center shadow-sm">
+          <div className="bg-white rounded-2xl border border-sage-100 p-12 text-center shadow-sm">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-sage-50 text-sage-200 rounded-full mb-4">
               <Clock size={32} />
             </div>
             <p className="text-gray-500 text-lg">Zatiaľ si neuložil žiadne recepty.</p>
-            <Link href="/generate" className="inline-flex mt-6 px-6 py-3 bg-sage-500 text-sage-50 rounded-xl font-semibold hover:bg-sage-600 transition-colors shadow-sm">
+            <Link href="/generate" className="inline-flex mt-6 px-6 py-3 bg-sage-500 text-sage-50 rounded-2xl font-semibold hover:bg-sage-600 transition-colors shadow-sm">
               Vytvoriť prvý recept
             </Link>
           </div>
@@ -77,7 +77,7 @@ export default async function DashboardPage() {
               <Link 
                 key={recipe.id} 
                 href="/recipes"
-                className="group bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col"
+                className="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col"
               >
                 <div className="relative h-48 overflow-hidden bg-sage-50">
                   {recipe.image_url ? (
@@ -91,7 +91,7 @@ export default async function DashboardPage() {
                       <ChefHat size={48} />
                     </div>
                   )}
-                  <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-md rounded-lg text-[10px] font-bold text-gray-600 uppercase tracking-wider shadow-sm border border-white/50">
+                  <div className="absolute top-3 left-3 px-3 py-1 bg-white/90 backdrop-blur-md rounded-2xl text-[10px] font-bold text-gray-600 uppercase tracking-wider shadow-sm border border-white/50">
                     {recipe.difficulty}
                   </div>
                 </div>

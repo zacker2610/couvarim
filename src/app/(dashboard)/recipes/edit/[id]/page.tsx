@@ -205,7 +205,7 @@ export default function EditRecipePage() {
 
       <div className="space-y-6">
         {/* Image Upload Section */}
-        <section className="relative h-64 w-full bg-white rounded-[24px] border-2 border-dashed border-sage-200 overflow-hidden group shadow-sm">
+        <section className="relative h-64 w-full bg-white rounded-2xl border-2 border-dashed border-sage-200 overflow-hidden group shadow-sm">
           {image ? (
             <>
               <img src={image} alt="Preview" className="w-full h-full object-cover" />
@@ -227,9 +227,9 @@ export default function EditRecipePage() {
             </label>
           )}
         </section>
-        <section className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100/50 space-y-5">
+        <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50 space-y-5">
           <div className="flex items-center gap-2 mb-2">
-            <div className="w-8 h-8 bg-sage-50 text-sage-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-sage-50 text-sage-600 rounded-2xl flex items-center justify-center">
               <Info size={18} />
             </div>
             <h3 className="font-bold text-gray-800">Základné informácie</h3>
@@ -324,7 +324,7 @@ export default function EditRecipePage() {
                 type="number" 
                 value={calories}
                 onChange={(e) => setCalories(Number(e.target.value))}
-                className="w-full px-1 py-3 rounded-xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center"
+                className="w-full px-1 py-3 rounded-2xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center"
               />
             </div>
             <div className="space-y-1">
@@ -333,7 +333,7 @@ export default function EditRecipePage() {
                 type="number" 
                 value={nutrition.protein}
                 onChange={(e) => setNutrition(prev => ({ ...prev, protein: Number(e.target.value) }))}
-                className="w-full px-1 py-3 rounded-xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center text-blue-600"
+                className="w-full px-1 py-3 rounded-2xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center text-blue-600"
               />
             </div>
             <div className="space-y-1">
@@ -342,7 +342,7 @@ export default function EditRecipePage() {
                 type="number" 
                 value={nutrition.carbs}
                 onChange={(e) => setNutrition(prev => ({ ...prev, carbs: Number(e.target.value) }))}
-                className="w-full px-1 py-3 rounded-xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center text-amber-600"
+                className="w-full px-1 py-3 rounded-2xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center text-amber-600"
               />
             </div>
             <div className="space-y-1">
@@ -351,23 +351,23 @@ export default function EditRecipePage() {
                 type="number" 
                 value={nutrition.fat}
                 onChange={(e) => setNutrition(prev => ({ ...prev, fat: Number(e.target.value) }))}
-                className="w-full px-1 py-3 rounded-xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center text-rose-500"
+                className="w-full px-1 py-3 rounded-2xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center text-rose-500"
               />
             </div>
           </div>
         </section>
 
-        <section className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100/50">
+        <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-sage-50 text-sage-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-sage-50 text-sage-600 rounded-2xl flex items-center justify-center">
                 <Plus size={18} />
               </div>
               <h3 className="font-bold text-gray-800">Suroviny</h3>
             </div>
             <button 
               onClick={addIngredient}
-              className="text-sage-600 text-xs font-bold flex items-center gap-1 hover:bg-sage-50 px-2 py-1 rounded-lg transition-colors"
+              className="text-sage-600 text-xs font-bold flex items-center gap-1 hover:bg-sage-50 px-2 py-1 rounded-2xl transition-colors"
             >
               <Plus size={14} /> Pridať surovinu
             </button>
@@ -381,12 +381,12 @@ export default function EditRecipePage() {
                   placeholder="250"
                   value={ing.amount}
                   onChange={(e) => updateIngredient(index, "amount", e.target.value)}
-                  className="w-16 px-2 py-3.5 rounded-xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-bold text-gray-800 text-center text-sm"
+                  className="w-16 px-2 py-3.5 rounded-2xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-bold text-gray-800 text-center text-sm"
                 />
                 <select 
                   value={ing.unit}
                   onChange={(e) => updateIngredient(index, "unit", e.target.value)}
-                  className="w-16 px-1 py-3.5 rounded-xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-bold text-sage-600 text-[10px] text-center appearance-none cursor-pointer"
+                  className="w-16 px-1 py-3.5 rounded-2xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-bold text-sage-600 text-[10px] text-center appearance-none cursor-pointer"
                 >
                   <option>g</option>
                   <option>kg</option>
@@ -401,7 +401,7 @@ export default function EditRecipePage() {
                   placeholder="Názov suroviny..."
                   value={ing.name}
                   onChange={(e) => updateIngredient(index, "name", e.target.value)}
-                  className="flex-1 min-w-0 px-3 py-3.5 rounded-xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-medium text-gray-800 text-sm"
+                  className="flex-1 min-w-0 px-3 py-3.5 rounded-2xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-medium text-gray-800 text-sm"
                 />
                 {ingredients.length > 1 && (
                   <button 
@@ -416,17 +416,17 @@ export default function EditRecipePage() {
           </div>
         </section>
 
-        <section className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100/50">
+        <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-sage-50 text-sage-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-sage-50 text-sage-600 rounded-2xl flex items-center justify-center">
                 <ChefHat size={18} />
               </div>
               <h3 className="font-bold text-gray-800">Postup</h3>
             </div>
             <button 
               onClick={addStep}
-              className="text-sage-600 text-xs font-bold flex items-center gap-1 hover:bg-sage-50 px-2 py-1 rounded-lg transition-colors"
+              className="text-sage-600 text-xs font-bold flex items-center gap-1 hover:bg-sage-50 px-2 py-1 rounded-2xl transition-colors"
             >
               <Plus size={14} /> Pridať krok
             </button>
@@ -435,7 +435,7 @@ export default function EditRecipePage() {
           <div className="space-y-4">
             {steps.map((step, index) => (
               <div key={index} className="flex gap-4 animate-in fade-in slide-in-from-bottom-2">
-                <div className="w-8 h-8 bg-gray-50 text-gray-400 rounded-lg flex items-center justify-center flex-shrink-0 font-bold text-xs mt-1">
+                <div className="w-8 h-8 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center flex-shrink-0 font-bold text-xs mt-1">
                   {index + 1}
                 </div>
                 <textarea 

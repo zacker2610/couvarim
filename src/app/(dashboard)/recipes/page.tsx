@@ -22,7 +22,8 @@ import {
   MoreVertical,
   Trash2,
   AlertTriangle,
-  Share2
+  Share2,
+  ExternalLink
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
@@ -49,6 +50,7 @@ function RecipesContent() {
   const [selectedRecipe, setSelectedRecipe] = useState<any>(null);
   const [userGoals, setUserGoals] = useState<any>(null);
   const [recipes, setRecipes] = useState<any[]>([]);
+  const [userPantry, setUserPantry] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   
@@ -61,15 +63,19 @@ function RecipesContent() {
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
-        // Fetch goals
-        const { data: profile } = await supabase
+        // Fetch profile (goals and pantry)
+        const { data: profileData } = await supabase
           .from("profiles")
-          .select("preferences")
+          .select("preferences, pantry")
           .eq("id", user.id)
           .single();
         
-        if (profile?.preferences?.goals) {
-          setUserGoals(profile.preferences.goals);
+        if (profileData?.preferences?.goals) {
+          setUserGoals(profileData.preferences.goals);
+        }
+        
+        if (profileData?.pantry) {
+          setUserPantry((profileData.pantry as string[]).map(p => p.toLowerCase()));
         }
 
         // Fetch recipes
@@ -119,6 +125,32 @@ function RecipesContent() {
     setActiveMenuId(null);
   };
 
+  const handleExternalShare = (recipe?: any) => {
+    const targetRecipe = recipe || selectedRecipe;
+    if (!targetRecipe) return;
+    
+    const ingredientsText = targetRecipe.ingredients
+      .map((ing: any) => `- ${ing.item}: ${ing.amount} ${ing.unit}`)
+      .join("\n");
+      
+    const instructionsText = targetRecipe.instructions
+      .map((inst: string, i: number) => `${i + 1}. ${inst}`)
+      .join("\n");
+      
+    const text = `👨‍🍳 Recept: ${targetRecipe.title}\n\n📝 Popis: ${targetRecipe.description}\n\n🛒 Ingrediencie:\n${ingredientsText}\n\n🥣 Postup:\n${instructionsText}\n\nPoslané z ČoUvarím.sk`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: targetRecipe.title,
+        text: text,
+      }).catch(console.error);
+    } else {
+      const mailUrl = `mailto:?subject=${encodeURIComponent(targetRecipe.title)}&body=${encodeURIComponent(text)}`;
+      window.open(mailUrl, "_blank");
+    }
+    setActiveMenuId(null);
+  };
+
   const handleDeleteRecipe = async () => {
     if (!deleteConfirmRecipe) return;
     
@@ -138,10 +170,53 @@ function RecipesContent() {
     return Math.min(Math.round((value / goal) * 100), 100);
   };
 
-  const filteredRecipes = recipes.filter(recipe => 
+  const filteredRecipes = recipes.filter((recipe: any) => 
     recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     recipe.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleShareShoppingList = () => {
+    if (!selectedRecipe) return;
+    
+    // Logic for "freshness" - if recipe is older than 24 hours, assume user doesn't have the ingredients anymore (except staples)
+    const createdAt = new Date(selectedRecipe.created_at);
+    const now = new Date();
+    const hoursSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+    const isStale = hoursSinceCreation > 24;
+
+    const missingIngredients = selectedRecipe.ingredients
+      .filter((ing: any) => {
+        const name = ing.item.toLowerCase();
+        // Always skip water
+        if (name.includes("voda")) return false;
+        
+        // Skip if it's in pantry
+        if (userPantry.some(p => name.includes(p) || p.includes(name))) return false;
+        
+        // If recipe is fresh, respect the "owned" flag from AI/photo
+        // If recipe is stale, treat everything as missing
+        return isStale ? true : !ing.owned;
+      })
+      .map((ing: any) => `- ${ing.item}: ${ing.amount} ${ing.unit}`)
+      .join("\n");
+      
+    if (missingIngredients.length === 0) {
+      alert("Máte všetky suroviny doma alebo v špajzi! 🎉");
+      return;
+    }
+    
+    const text = `🛒 Nákupný zoznam pre: ${selectedRecipe.title}\n\n${missingIngredients}\n\nPoslané z ČoUvarím.sk 👨‍🍳`;
+    
+    if (navigator.share) {
+      navigator.share({
+        title: `Nákupný zoznam - ${selectedRecipe.title}`,
+        text: text,
+      }).catch(console.error);
+    } else {
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
+      window.open(whatsappUrl, "_blank");
+    }
+  };
 
   if (isLoading) {
     return (
@@ -181,17 +256,17 @@ function RecipesContent() {
                   placeholder="Hľadať recept..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-4 py-4 bg-white border border-transparent focus:border-sage-500 rounded-3xl focus:outline-none focus:ring-4 focus:ring-sage-500/10 transition-all shadow-sm text-gray-700 font-medium"
+                  className="w-full pl-11 pr-4 py-4 bg-white border border-transparent focus:border-sage-500 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sage-500/10 transition-all shadow-sm text-gray-700 font-medium"
                 />
               </div>
-              <button className="p-4 bg-white text-gray-400 rounded-3xl border border-transparent hover:border-sage-100 hover:text-sage-600 transition-all shadow-sm active:scale-95">
+              <button className="p-4 bg-white text-gray-400 rounded-2xl border border-transparent hover:border-sage-100 hover:text-sage-600 transition-all shadow-sm active:scale-95">
                 <Filter size={20} />
               </button>
             </div>
 
             {filteredRecipes.length === 0 ? (
-              <div className="bg-white rounded-[24px] p-12 text-center space-y-6 border border-gray-100 shadow-sm">
-                <div className="w-20 h-20 bg-sage-50 text-sage-500 rounded-3xl flex items-center justify-center mx-auto">
+              <div className="bg-white rounded-2xl p-12 text-center space-y-6 border border-gray-100 shadow-sm">
+                <div className="w-20 h-20 bg-sage-50 text-sage-500 rounded-2xl flex items-center justify-center mx-auto">
                    <Utensils size={40} />
                 </div>
                 <div className="space-y-2">
@@ -211,7 +286,7 @@ function RecipesContent() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredRecipes.map((recipe) => (
-                  <div key={recipe.id} className="group bg-white rounded-[24px] border border-gray-100 shadow-sm overflow-hidden active:scale-[0.98] transition-all duration-300 relative">
+                  <div key={recipe.id} className="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden active:scale-[0.98] transition-all duration-300 relative">
                     <div className="relative h-60 overflow-hidden bg-sage-50">
                       {/* Floating More Options Button */}
                       <div className="absolute top-4 right-4 z-20">
@@ -220,7 +295,7 @@ function RecipesContent() {
                             e.stopPropagation();
                             setActiveMenuId(activeMenuId === recipe.id ? null : recipe.id);
                           }}
-                          className="p-2.5 bg-white/90 backdrop-blur-md text-gray-400 rounded-xl flex items-center justify-center hover:text-sage-500 transition-all active:scale-90 shadow-sm border border-white/50"
+                          className="p-2.5 bg-white/90 backdrop-blur-md text-gray-400 rounded-2xl flex items-center justify-center hover:text-sage-500 transition-all active:scale-90 shadow-sm border border-white/50"
                         >
                           <MoreVertical size={18} />
                         </button>
@@ -246,7 +321,16 @@ function RecipesContent() {
                                 }}
                                 className={`w-full px-4 py-2 text-left text-sm font-bold flex items-center gap-2 transition-colors border-t border-gray-50 ${recipe.household_id ? 'text-amber-600 hover:bg-amber-50' : 'text-sage-600 hover:bg-sage-50'}`}
                               >
-                                <Share2 size={14} /> {recipe.household_id ? "Nezdieľať" : "Zdieľať s rodinou"}
+                                <Users size={14} /> {recipe.household_id ? "Nezdieľať" : "Zdieľať s rodinou"}
+                              </button>
+                              <button 
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleExternalShare(recipe);
+                                }}
+                                className="w-full px-4 py-2 text-left text-sm font-bold text-gray-600 hover:bg-sage-50 hover:text-sage-600 flex items-center gap-2 transition-colors border-t border-gray-50"
+                              >
+                                <Share2 size={14} /> Zdieľať externe
                               </button>
                               <button 
                                 onClick={(e) => {
@@ -319,10 +403,10 @@ function RecipesContent() {
                 <ChevronLeft size={22} />
               </button>
               <h2 className="text-2xl font-bold text-gray-800 tracking-tight text-center flex-1">Detail</h2>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-3">
                 <button 
-                  onClick={() => handleToggleShare(selectedRecipe)}
-                  className={`p-3 rounded-2xl shadow-sm border border-gray-100 active:scale-90 transition-all ${selectedRecipe.household_id ? 'bg-sage-500 text-white border-sage-500' : 'bg-white text-gray-400'}`}
+                  onClick={handleExternalShare}
+                  className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-400 active:scale-90 transition-all hover:text-sage-500"
                 >
                   <Share2 size={22} />
                 </button>
@@ -335,7 +419,7 @@ function RecipesContent() {
               </div>
             </header>
 
-            <div className="bg-white rounded-[24px] overflow-hidden shadow-sm border border-gray-100 mb-20">
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-20">
               <div className="h-72 relative bg-sage-50 flex items-center justify-center overflow-hidden">
                 {selectedRecipe.image_url ? (
                   <img 
@@ -348,6 +432,15 @@ function RecipesContent() {
                     <ChefHat size={80} />
                   </div>
                 )}
+                <div className="absolute top-4 left-4 z-10">
+                   <button 
+                    onClick={() => handleToggleShare(selectedRecipe)}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg active:scale-90 border-2 ${selectedRecipe.household_id ? 'bg-sage-500 text-white border-white' : 'bg-white/80 backdrop-blur-sm text-gray-500 border-transparent hover:bg-white'}`}
+                    title={selectedRecipe.household_id ? "Zdieľané s rodinou" : "Zdieľať s rodinou"}
+                  >
+                    <Users size={18} />
+                  </button>
+                </div>
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 <div className="absolute bottom-8 left-8 right-8 text-center">
                    <h3 className="text-3xl font-bold text-white leading-tight drop-shadow-md">{selectedRecipe.title}</h3>
@@ -392,7 +485,7 @@ function RecipesContent() {
                   </div>
                 </div>
 
-                <div className="bg-gray-50/50 rounded-[24px] p-6 space-y-6 border border-gray-100/50 shadow-sm">
+                <div className="bg-gray-50/50 rounded-2xl p-6 space-y-6 border border-gray-100/50 shadow-sm">
                   <div className="grid grid-cols-2 gap-y-8 gap-x-4">
                     <div className="space-y-3">
                       <div className="flex items-center gap-2 text-amber-600">
@@ -461,13 +554,24 @@ function RecipesContent() {
                 </div>
 
                 <div className="space-y-6 pt-4">
-                  <h4 className="text-lg font-bold text-gray-800 flex items-center gap-3">
-                    <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
-                    Ingrediencie
-                  </h4>
+                  <div className="flex items-center justify-between">
+                    <h4 className="text-lg font-bold text-gray-800 flex items-center gap-3">
+                      <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
+                      Ingrediencie
+                    </h4>
+                    <button 
+                      onClick={handleShareShoppingList}
+                      className="flex items-center gap-2 px-4 py-2 bg-sage-50 text-sage-600 rounded-2xl text-xs font-bold hover:bg-sage-100 transition-all active:scale-95 border border-sage-100"
+                    >
+                      <Share2 size={14} /> Zdieľať nákup
+                    </button>
+                  </div>
                   <div className="space-y-3">
                     {selectedRecipe.ingredients?.map((ing: any, i: number) => (
-                      <div key={i} className="flex justify-between items-center bg-gray-50/50 p-5 rounded-2xl border border-gray-100/50 hover:bg-white transition-colors">
+                      <div 
+                        key={i} 
+                        className="flex justify-between items-center bg-gray-50/50 p-5 rounded-2xl border border-gray-100/50 hover:bg-white transition-colors"
+                      >
                         <span className="font-medium text-gray-700">{ing.item}</span>
                         <span className="text-sage-600 font-bold">{ing.amount} {ing.unit}</span>
                       </div>
@@ -483,7 +587,7 @@ function RecipesContent() {
                   <div className="space-y-6">
                     {selectedRecipe.instructions?.map((step: string, i: number) => (
                       <div key={i} className="flex gap-5">
-                        <div className="w-7 h-7 bg-sage-50 text-sage-600 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-xs border border-sage-100">
+                        <div className="w-7 h-7 bg-sage-50 text-sage-600 rounded-2xl flex items-center justify-center flex-shrink-0 font-bold text-xs border border-sage-100">
                           {i + 1}
                         </div>
                         <p className="text-sm font-medium text-gray-600 leading-relaxed pt-0.5">{step}</p>
@@ -512,7 +616,7 @@ function RecipesContent() {
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="relative w-full max-w-sm bg-white rounded-[24px] shadow-2xl overflow-hidden"
+              className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden"
             >
               <div className="p-8 text-center space-y-6">
                 <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto">

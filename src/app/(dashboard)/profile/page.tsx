@@ -40,10 +40,12 @@ export default function ProfilePage() {
         carbs: "",
         fat: ""
       }
-    }
+    },
+    pantry: [] as string[]
   });
   
   const [tagInput, setTagInput] = useState("");
+  const [pantryInput, setPantryInput] = useState("");
 
   useEffect(() => {
     const fetchProfile = async () => {
@@ -69,7 +71,8 @@ export default function ProfilePage() {
                 carbs: "",
                 fat: ""
               }
-            }
+            },
+            pantry: profileData.pantry || []
           });
         }
       }
@@ -148,6 +151,25 @@ export default function ProfilePage() {
     }));
   };
 
+  const addPantryItem = (e?: React.FormEvent) => {
+    if (e) e.preventDefault();
+    const tag = pantryInput.trim().toLowerCase();
+    if (tag && !profile.pantry.includes(tag)) {
+      setProfile(prev => ({
+        ...prev,
+        pantry: [...prev.pantry, tag]
+      }));
+    }
+    setPantryInput("");
+  };
+
+  const removePantryItem = (tag: string) => {
+    setProfile(prev => ({
+      ...prev,
+      pantry: prev.pantry.filter(t => t !== tag)
+    }));
+  };
+
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -166,7 +188,8 @@ export default function ProfilePage() {
 
       const result = await updateProfileAction({
         full_name: profile.full_name,
-        preferences: profile.preferences
+        preferences: profile.preferences,
+        pantry: profile.pantry
       });
 
       if (result.success) {
@@ -222,9 +245,9 @@ export default function ProfilePage() {
       </AnimatePresence>
 
       <div className="space-y-6">
-        <section className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100/50">
+        <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50">
           <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-sage-50 text-sage-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-sage-50 text-sage-600 rounded-2xl flex items-center justify-center">
               <User size={18} />
             </div>
             <h3 className="font-bold text-gray-800">Osobné údaje</h3>
@@ -245,9 +268,9 @@ export default function ProfilePage() {
         </section>
 
         {/* Nutritional Goals Section */}
-        <section className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100/50">
+        <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50">
           <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
               <Target size={18} />
             </div>
             <h3 className="font-bold text-gray-800">Denné nutričné ciele</h3>
@@ -312,9 +335,9 @@ export default function ProfilePage() {
           </p>
         </section>
 
-        <section className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100/50">
+        <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50">
           <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center">
               <AlertCircle size={18} />
             </div>
             <h3 className="font-bold text-gray-800">Moje intolerancie</h3>
@@ -339,10 +362,75 @@ export default function ProfilePage() {
             })}
           </div>
         </section>
-
-        <section className="bg-white rounded-[24px] p-6 shadow-sm border border-gray-100/50">
+        
+        <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50">
           <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-rose-50 text-rose-500 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-sage-50 text-sage-600 rounded-2xl flex items-center justify-center">
+              <Plus size={18} />
+            </div>
+            <h3 className="font-bold text-gray-800">Moja špajza (Základné zásoby)</h3>
+          </div>
+          
+          <div className="space-y-4">
+            <p className="text-xs text-gray-400 mb-2 leading-relaxed">
+              Pridajte suroviny, ktoré máte doma **prakticky vždy** (napr. soľ, olej, cukor, múka). Tieto položky sa automaticky vynechajú z nákupného zoznamu.
+            </p>
+            
+            <div className="flex flex-wrap gap-2 mb-2">
+              <AnimatePresence>
+                {profile.pantry.map((tag) => (
+                  <motion.span
+                    key={tag}
+                    initial={{ scale: 0.8, opacity: 0 }}
+                    animate={{ scale: 1, opacity: 1 }}
+                    exit={{ scale: 0.8, opacity: 0 }}
+                    className="px-3 py-1.5 bg-sage-50 text-sage-600 rounded-2xl text-xs font-bold flex items-center gap-1.5 border border-sage-100"
+                  >
+                    {tag}
+                    <button 
+                      onClick={() => removePantryItem(tag)}
+                      className="p-0.5 hover:bg-sage-100 rounded-2xl transition-colors"
+                    >
+                      <CloseIcon size={12} />
+                    </button>
+                  </motion.span>
+                ))}
+              </AnimatePresence>
+            </div>
+            
+            <div className="relative">
+              <input 
+                type="text" 
+                value={pantryInput}
+                onChange={(e) => {
+                  if (e.target.value.endsWith(" ")) {
+                    addPantryItem();
+                  } else {
+                    setPantryInput(e.target.value);
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    addPantryItem();
+                  }
+                }}
+                placeholder="Pridajte surovinu (napr. olej)..."
+                className="w-full px-4 py-3.5 rounded-2xl bg-gray-50 border-transparent focus:bg-white focus:ring-2 focus:ring-sage-400 outline-none transition-all text-gray-800 text-sm"
+              />
+              <button 
+                onClick={() => addPantryItem()}
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-sage-500 text-white rounded-2xl flex items-center justify-center shadow-sm active:scale-90 transition-all"
+              >
+                <Plus size={18} />
+              </button>
+            </div>
+          </div>
+        </section>
+
+        <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50">
+          <div className="flex items-center gap-2 mb-6">
+            <div className="w-8 h-8 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center">
               <CloseIcon size={18} />
             </div>
             <h3 className="font-bold text-gray-800">Čo nemám rád / Čo mi nechutí</h3>
@@ -357,12 +445,12 @@ export default function ProfilePage() {
                     initial={{ scale: 0.8, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     exit={{ scale: 0.8, opacity: 0 }}
-                    className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-xl text-xs font-bold flex items-center gap-1.5 border border-gray-200"
+                    className="px-3 py-1.5 bg-gray-100 text-gray-600 rounded-2xl text-xs font-bold flex items-center gap-1.5 border border-gray-200"
                   >
                     {tag}
                     <button 
                       onClick={() => removeDislikedIngredient(tag)}
-                      className="p-0.5 hover:bg-gray-200 rounded-md transition-colors"
+                      className="p-0.5 hover:bg-gray-200 rounded-2xl transition-colors"
                     >
                       <CloseIcon size={12} />
                     </button>
@@ -393,7 +481,7 @@ export default function ProfilePage() {
               />
               <button 
                 onClick={() => addDislikedIngredient()}
-                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-sage-500 text-white rounded-xl flex items-center justify-center shadow-sm active:scale-90 transition-all"
+                className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-sage-500 text-white rounded-2xl flex items-center justify-center shadow-sm active:scale-90 transition-all"
               >
                 <Plus size={18} />
               </button>
@@ -404,9 +492,9 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <section className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100/50">
+        <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50">
           <div className="flex items-center gap-2 mb-6">
-            <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center">
+            <div className="w-8 h-8 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center">
               <ChefHat size={18} />
             </div>
             <h3 className="font-bold text-gray-800">Stravovacie návyky</h3>
@@ -435,7 +523,7 @@ export default function ProfilePage() {
         <section className="pt-8 pb-12 text-center">
           <button 
             onClick={handleLogout}
-            className="w-full py-4 bg-white text-red-400 rounded-[24px] font-medium flex items-center justify-center gap-2 active:bg-red-50 transition-all border border-gray-100 shadow-sm"
+            className="w-full py-4 bg-white text-red-400 rounded-2xl font-medium flex items-center justify-center gap-2 active:bg-red-50 transition-all border border-gray-100 shadow-sm"
           >
             <LogOut size={18} />
             Odhlásiť sa

@@ -6,6 +6,25 @@ import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
 
 /**
+ * Generate a unique AI image for the recipe using Pollinations.ai
+ */
+function getAiGeneratedImage(prompt: string) {
+  const cleanPrompt = encodeURIComponent(`${prompt}, professional food photography, high resolution, delicious, plated, 8k, bokeh background`);
+  // Using Pollinations.ai for real-time image generation based on the recipe description
+  return `https://pollinations.ai/p/${cleanPrompt}?width=1000&height=800&seed=${Math.floor(Math.random() * 100000)}&nologo=true&model=flux`;
+}
+
+function getCategoryImage(category: string) {
+  // Deprecated in favor of AI generation, but kept as fallback
+  return getAiGeneratedImage(category);
+}
+
+function getRandomFoodImage(keyword: string) {
+  // Deprecated in favor of getCategoryImage
+  return getCategoryImage(keyword);
+}
+
+/**
  * Server Action to generate a recipe based on user input.
  */
 export async function generateRecipeAction(
@@ -87,6 +106,7 @@ export async function generateRecipeAction(
     if (type === "dish") {
       finalPrompt = `Generuj podrobný a chutný recept pre konkrétne jedlo: "${promptText}". 
       Tento recept by mal byť v jeho tradičnej/originálnej forme.
+      DÔLEŽITÉ: Predpokladaj, že používateľ nemá ingrediencie doma (okrem úplných základov ako voda/soľ), takže nastav väčšinu na "owned": false.
       ${constraintsPrompt}`;
     } else if (type === "ingredients") {
       finalPrompt = `Mám tieto suroviny: "${promptText}". 
@@ -109,6 +129,7 @@ export async function generateRecipeAction(
       finalPrompt = `Vymysli náhodný, inšpiratívny a chutný recept pre dnešný deň. 
       Téma pre dnešok: ${randomTheme}.
       Skús vymyslieť niečo originálne, čo bežne človeka nenapadne.
+      DÔLEŽITÉ: Keďže používateľ nezadal žiadne vlastné suroviny, nastav pri VŠETKÝCH ingredienciách "owned": false.
       ${constraintsPrompt}`;
     }
 
@@ -124,24 +145,27 @@ export async function generateRecipeAction(
         "difficulty": "Jednoduchá" | "Stredná" | "Náročná",
         "calories": 450, 
         "nutrition": {
-          "protein": { "value": 25, "unit": "g" },
-          "carbs": { "value": 40, "unit": "g" },
-          "fat": { "value": 15, "unit": "g" }
+          "protein": 25,
+          "carbs": 40,
+          "fat": 15
         },
         "ingredients": [
-          { "item": "názov suroviny", "amount": "100", "unit": "g" }
+          { "item": "názov suroviny", "amount": "100", "unit": "g", "owned": true | false }
         ],
         "instructions": [
           "1. krok postupu...",
           "2. krok postupu..."
         ],
-        "imageUrl": "pork stew with cabbage"
+        "imagePrompt": "Detailed English description of the dish for AI image generation (e.g. 'Creamy pesto pasta with roasted cherry tomatoes and walnuts')"
       }
       DÔLEŽITÉ PRAVIDLÁ:
-      1. JAZYK A JEDNOTKY: Celý text musí byť v SLOVENČINE. Používaj výhradne slovenské jednotky: PL (polievková lyžica), ČL (čajová lyžička), ks (kus), g, kg, ml, l. NIKDY nepoužívaj anglické tbsp, tsp a pod.
-      2. LOGICKÁ KONZISTENCIA: Každá surovina spomenutá v postupe (napr. voda, olej, soľ) MUSÍ byť uvedená v zozname ingrediencií s konkrétnym množstvom.
-      3. KOMPLETNOSŤ: Nikdy nevynechávaj základné suroviny potrebné pre daný typ jedla (tekutiny pre guláše, tuk na smaženie atď.).
-      4. ČÍSLA A NUTRIČNÉ HODNOTY: "calories" a "value" must be numbers (Integer/Float). DÔLEŽITÉ: Nutričné hodnoty (calories, nutrition) počítaj VŽDY na JEDNU PORCIU.
+      1. JAZYK: Celý text musí byť v SLOVENČINE, OKREM poľa "imagePrompt", ktoré musí byť v ANGLIČTINE (podrobný popis pre generátor obrázkov).
+      2. ČÍSLA A ČASY: "calories", "prep_time" a "cook_time" MUSIA byť vždy vyplnené (aj keby len odhad). "prep_time" a "cook_time" vracaj ako string obsahujúci iba číslo v minútach (napr. "15").
+      3. LOGICKÁ KONZISTENCIA: Každá surovina spomenutá v postupe MUSÍ byť v ingredienciách.
+      3. OWNED PROPERTY (NÁKUPNÝ ZOZNAM): Nastav "owned": true, ak surovina bola v pôvodnom zadaní užívateľa (na fotke alebo v texte). Nastav "owned": false, ak je to surovina, ktorú recept vyžaduje navyše a užívateľ ju pravdepodobne nemá (napr. korenie, príloha, chýbajúci základ).
+      4. KOMPLETNOSŤ: Nikdy nevynechávaj základné suroviny potrebné pre daný typ jedla.
+      5. ČÍSLA A NUTRIČNÉ HODNOTY: "calories" a nutričné hodnoty (protein, carbs, fat) MUSIA byť čísla (Integer/Float). Nutričné hodnoty počítaj VŽDY na JEDNU PORCIU.
+      6. LOGIKA PORCIÍ: Množstvá surovín MUSIA zodpovedať počtu porcií. Ak je "servings" 1, množstvá musia byť primerané pre jednu osobu (napr. 150-200g mäsa). Ak sú množstvá veľké (napr. 600g mäsa), nastav "servings" na zodpovedajúci počet (napr. 3-4).
       
       Návrat len čistý JSON, žiadne kecy okolo. NIKDY nepoužívaj žiadne citácie ani značky typu [cite: 1].
     `;
@@ -159,6 +183,10 @@ export async function generateRecipeAction(
     text = text.replace(/```json/g, "").replace(/```/g, "").replace(/\[cite: \d+\]/g, "").trim();
     
     const recipe = JSON.parse(text);
+    
+    // Generate a unique AI image based on the descriptive prompt
+    recipe.image_url = getAiGeneratedImage(recipe.imagePrompt || recipe.title);
+    
     return { success: true, recipe };
   } catch (error) {
     console.error("AI Generation Error:", error);
@@ -244,7 +272,7 @@ export async function saveRecipeAction(recipeData: any) {
           nutrition: recipeData.nutrition || {},
           ingredients: recipeData.ingredients,
           instructions: recipeData.instructions,
-          image_url: recipeData.image_url || null
+          image_url: recipeData.image_url || getAiGeneratedImage(recipeData.title)
         }
       ])
       .select()
@@ -285,7 +313,7 @@ export async function updateRecipeAction(id: string, recipeData: any) {
         nutrition: recipeData.nutrition || {},
         ingredients: recipeData.ingredients,
         instructions: recipeData.instructions,
-        image_url: recipeData.image_url || null
+        image_url: recipeData.image_url || getAiGeneratedImage(recipeData.title)
       })
       .eq("id", id)
       .eq("user_id", user.id) // Security check: only owner can update
@@ -348,6 +376,7 @@ export async function updateProfileAction(profileData: any) {
         id: user.id,
         full_name: profileData.full_name,
         preferences: profileData.preferences,
+        pantry: profileData.pantry || [],
         updated_at: new Date().toISOString()
       }, { onConflict: 'id' });
 

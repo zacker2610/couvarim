@@ -133,13 +133,13 @@ export default function GeneratePage() {
         difficulty: generatedRecipe.difficulty,
         calories: generatedRecipe.calories,
         nutrition: {
-          protein: generatedRecipe.nutrition.protein.value,
-          carbs: generatedRecipe.nutrition.carbs.value,
-          fat: generatedRecipe.nutrition.fat.value
+          protein: generatedRecipe.nutrition.protein,
+          carbs: generatedRecipe.nutrition.carbs,
+          fat: generatedRecipe.nutrition.fat
         },
         ingredients: generatedRecipe.ingredients,
         instructions: generatedRecipe.instructions,
-        image_url: `https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=2080&auto=format&fit=crop&sig=${encodeURIComponent(generatedRecipe.imageUrl || generatedRecipe.title)}&food`
+        image_url: generatedRecipe.image_url
       };
 
       const result = await saveRecipeAction(recipeData);
@@ -170,10 +170,10 @@ export default function GeneratePage() {
               <p className="text-gray-500 text-sm mt-1">Čo si dnes uvaríme?</p>
             </header>
 
-            <div className="bg-white p-1.5 rounded-[24px] border border-gray-100 shadow-sm flex items-center mb-2">
+            <div className="bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm flex items-center mb-2">
               <button 
                 onClick={() => setUseHousehold(false)} 
-                className={`flex-1 py-3.5 px-4 rounded-[18px] text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                className={`flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
                   !useHousehold 
                     ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
                     : 'text-gray-400 hover:text-gray-600'
@@ -184,7 +184,7 @@ export default function GeneratePage() {
               </button>
               <button 
                 onClick={() => setUseHousehold(true)} 
-                className={`flex-1 py-3.5 px-4 rounded-[18px] text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                className={`flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
                   useHousehold 
                     ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
                     : 'text-gray-400 hover:text-gray-600'
@@ -196,7 +196,7 @@ export default function GeneratePage() {
             </div>
 
             <div className="flex flex-col gap-4">
-              <Link href="/scan" className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm flex items-center gap-5 group transition-all active:scale-[0.98]">
+              <Link href="/scan" className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5 group transition-all active:scale-[0.98]">
                 <div className="w-14 h-14 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Camera size={28} />
                 </div>
@@ -207,7 +207,7 @@ export default function GeneratePage() {
                 <ArrowRight size={20} className="text-gray-200 group-hover:text-sage-500 transition-colors" />
               </Link>
 
-              <Link href="/recipes/new" className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm flex items-center gap-5 group transition-all active:scale-[0.98]">
+              <Link href="/recipes/new" className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5 group transition-all active:scale-[0.98]">
                 <div className="w-14 h-14 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
                   <PenLine size={28} />
                 </div>
@@ -218,7 +218,7 @@ export default function GeneratePage() {
                 <ArrowRight size={20} className="text-gray-200 group-hover:text-sage-500 transition-colors" />
               </Link>
 
-              <button onClick={() => setStep("ai_ingredients")} className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm flex items-center gap-5 group transition-all text-left active:scale-[0.98]">
+              <button onClick={() => setStep("ai_ingredients")} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5 group transition-all text-left active:scale-[0.98]">
                 <div className="w-14 h-14 bg-sage-50 text-sage-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
                   <ChefHat size={28} />
                 </div>
@@ -229,7 +229,7 @@ export default function GeneratePage() {
                 <ArrowRight size={20} className="text-gray-200 group-hover:text-sage-500 transition-colors" />
               </button>
 
-              <button onClick={() => setStep("ai_dish")} className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm flex items-center gap-5 group transition-all text-left active:scale-[0.98]">
+              <button onClick={() => setStep("ai_dish")} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5 group transition-all text-left active:scale-[0.98]">
                 <div className="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Search size={28} />
                 </div>
@@ -240,7 +240,7 @@ export default function GeneratePage() {
                 <ArrowRight size={20} className="text-gray-200 group-hover:text-sage-500 transition-colors" />
               </button>
 
-              <button onClick={() => handleGenerate("random")} className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm flex items-center gap-5 group transition-all text-left active:scale-[0.98]">
+              <button onClick={() => handleGenerate("random")} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5 group transition-all text-left active:scale-[0.98]">
                 <div className="w-14 h-14 bg-purple-50 text-purple-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Dices size={28} />
                 </div>
@@ -278,10 +278,10 @@ export default function GeneratePage() {
               <h2 className="text-2xl font-bold text-gray-800 tracking-tight text-center flex-1 pr-10">Váš recept</h2>
             </header>
 
-            <div className="bg-white rounded-[40px] overflow-hidden shadow-sm border border-gray-100">
+            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
               <div className="h-72 relative bg-sage-50 flex items-center justify-center overflow-hidden">
                 <img 
-                  src={`https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=2080&auto=format&fit=crop&sig=${encodeURIComponent(generatedRecipe.imageUrl || generatedRecipe.title)}&food`} 
+                  src={generatedRecipe.image_url} 
                   alt={generatedRecipe.title}
                   className="w-full h-full object-cover"
                 />
@@ -314,7 +314,7 @@ export default function GeneratePage() {
                   </div>
                 </div>
 
-                <div className="bg-gray-50/50 rounded-[32px] p-6 space-y-6 border border-gray-100/50 shadow-sm">
+                <div className="bg-gray-50/50 rounded-2xl p-6 space-y-6 border border-gray-100/50 shadow-sm">
                   <div className="grid grid-cols-2 gap-y-8 gap-x-4">
                     <div className="space-y-3">
                       <div className="flex items-center gap-2 text-amber-600">
@@ -337,7 +337,7 @@ export default function GeneratePage() {
                         <span className="text-[10px] font-bold uppercase tracking-wider">Bielkoviny</span>
                       </div>
                       <p className="text-xl font-bold text-gray-800 leading-none">
-                        {generatedRecipe.nutrition.protein.value} <span className="text-xs font-medium text-gray-400 tracking-normal">g</span>
+                        {generatedRecipe.nutrition.protein} <span className="text-xs font-medium text-gray-400 tracking-normal">g</span>
                       </p>
                       {userGoals?.protein > 0 && (
                         <div className="h-1 bg-gray-200/50 rounded-full overflow-hidden mr-4">
@@ -352,7 +352,7 @@ export default function GeneratePage() {
                         <span className="text-[10px] font-bold uppercase tracking-wider">Sacharidy</span>
                       </div>
                       <p className="text-xl font-bold text-gray-800 leading-none">
-                        {generatedRecipe.nutrition.carbs.value} <span className="text-xs font-medium text-gray-400 tracking-normal">g</span>
+                        {generatedRecipe.nutrition.carbs} <span className="text-xs font-medium text-gray-400 tracking-normal">g</span>
                       </p>
                       {userGoals?.carbs > 0 && (
                         <div className="h-1 bg-gray-200/50 rounded-full overflow-hidden mr-4">
@@ -367,7 +367,7 @@ export default function GeneratePage() {
                         <span className="text-[10px] font-bold uppercase tracking-wider">Tuky</span>
                       </div>
                       <p className="text-xl font-bold text-gray-800 leading-none">
-                        {generatedRecipe.nutrition.fat.value} <span className="text-xs font-medium text-gray-400 tracking-normal">g</span>
+                        {generatedRecipe.nutrition.fat} <span className="text-xs font-medium text-gray-400 tracking-normal">g</span>
                       </p>
                       {userGoals?.fat > 0 && (
                         <div className="h-1 bg-gray-200/50 rounded-full overflow-hidden mr-4">
@@ -401,7 +401,7 @@ export default function GeneratePage() {
                   <div className="space-y-6">
                     {generatedRecipe.instructions.map((step: string, i: number) => (
                       <div key={i} className="flex gap-5">
-                        <div className="w-7 h-7 bg-sage-50 text-sage-600 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-xs border border-sage-100">
+                        <div className="w-7 h-7 bg-sage-50 text-sage-600 rounded-2xl flex items-center justify-center flex-shrink-0 font-bold text-xs border border-sage-100">
                           {i + 1}
                         </div>
                         <p className="text-sm font-medium text-gray-600 leading-relaxed pt-0.5">{step}</p>
@@ -413,7 +413,7 @@ export default function GeneratePage() {
                 <button 
                   onClick={handleSaveToCollection}
                   disabled={isSaving || saveSuccess}
-                  className={`w-full py-5 rounded-[24px] font-bold shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all mt-10 ${
+                  className={`w-full py-5 rounded-2xl font-bold shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all mt-10 ${
                     saveSuccess ? "bg-green-500 text-white" : "bg-sage-500 text-sage-50 hover:bg-sage-600"
                   } disabled:opacity-70`}
                 >
@@ -444,7 +444,7 @@ export default function GeneratePage() {
                 )}
               </AnimatePresence>
 
-              <div className="bg-white/90 backdrop-blur-xl p-3 rounded-[32px] border border-sage-100 shadow-2xl flex items-center gap-3 pr-2 ring-1 ring-black/5">
+              <div className="bg-white/90 backdrop-blur-xl p-3 rounded-2xl border border-sage-100 shadow-2xl flex items-center gap-3 pr-2 ring-1 ring-black/5">
                 <div className="w-10 h-10 bg-sage-50 text-sage-600 rounded-2xl flex items-center justify-center shrink-0">
                   <MessageSquare size={20} />
                 </div>
@@ -476,7 +476,7 @@ export default function GeneratePage() {
               </button>
               <h2 className="text-xl font-bold text-gray-800 tracking-tight">Čo máte v kuchyni?</h2>
             </header>
-            <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 space-y-4">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
               <textarea 
                 value={inputText} 
                 onChange={(e) => setInputText(e.target.value)} 
@@ -499,7 +499,7 @@ export default function GeneratePage() {
               </button>
               <h2 className="text-xl font-bold text-gray-800 tracking-tight">Na čo máte chuť?</h2>
             </header>
-            <div className="bg-white rounded-[32px] p-6 shadow-sm border border-gray-100 space-y-4">
+            <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
               <input 
                 type="text"
                 value={inputText} 
@@ -517,7 +517,7 @@ export default function GeneratePage() {
 
         {step === "error" && (
           <motion.div key="error" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="min-h-[70vh] flex flex-col items-center justify-center text-center space-y-8 px-8">
-            <div className="w-24 h-24 bg-red-50 text-red-500 rounded-3xl flex items-center justify-center shadow-inner">
+            <div className="w-24 h-24 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center shadow-inner">
                <Zap size={48} className="text-red-400" />
             </div>
             <div className="space-y-3">
@@ -527,7 +527,7 @@ export default function GeneratePage() {
             <button 
               onClick={() => lastActionType && handleGenerate(lastActionType)} 
               disabled={isLoading}
-              className="w-full py-5 bg-gray-800 text-white rounded-3xl font-bold shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all text-sm disabled:opacity-70"
+              className="w-full py-5 bg-gray-800 text-white rounded-2xl font-bold shadow-xl flex items-center justify-center gap-3 active:scale-95 transition-all text-sm disabled:opacity-70"
             >
               <RefreshCw size={20} className={isLoading ? "animate-spin" : ""} /> 
               Skúsiť znova

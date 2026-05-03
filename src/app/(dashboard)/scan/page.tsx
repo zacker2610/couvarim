@@ -76,21 +76,21 @@ export default function ScanPage() {
         <p className="text-gray-500 mt-2">Stačí jedna fotka a Gemini zistí, čo máš v chladničke.</p>
       </header>
 
-      <div className="bg-white p-8 rounded-xl border border-sage-100 shadow-sm flex flex-col items-center">
+      <div className="bg-white p-8 rounded-2xl border border-sage-100 shadow-sm flex flex-col items-center">
         {image ? (
           <div className="w-full max-w-md space-y-6">
-            <img src={image} alt="Suroviny" className="w-full h-64 object-cover rounded-xl shadow-md border border-sage-50" />
+            <img src={image} alt="Suroviny" className="w-full h-64 object-cover rounded-2xl shadow-md border border-sage-50" />
             <div className="flex gap-4">
               <button 
                 onClick={() => setImage(null)}
-                className="flex-1 py-3 border border-gray-200 text-gray-600 rounded-xl font-semibold hover:bg-gray-50 transition-all"
+                className="flex-1 py-3 border border-gray-200 text-gray-600 rounded-2xl font-semibold hover:bg-gray-50 transition-all"
               >
                 Iná fotka
               </button>
               <button 
                 onClick={analyzeAndGenerate}
                 disabled={loading}
-                className="flex-[2] py-3 bg-sage-400 text-white rounded-xl font-bold shadow-lg hover:bg-sage-500 transition-all flex items-center justify-center gap-2"
+                className="flex-[2] py-3 bg-sage-400 text-white rounded-2xl font-bold shadow-lg hover:bg-sage-500 transition-all flex items-center justify-center gap-2"
               >
                 {loading ? <Loader2 className="animate-spin" /> : <Sparkles />}
                 Analyzovať a variť
@@ -100,7 +100,7 @@ export default function ScanPage() {
         ) : (
           <div 
             onClick={() => fileInputRef.current?.click()}
-            className="w-full max-w-md h-64 border-2 border-dashed border-sage-200 rounded-xl flex flex-col items-center justify-center cursor-pointer hover:bg-sage-50 hover:border-sage-300 transition-all group"
+            className="w-full max-w-md h-64 border-2 border-dashed border-sage-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-sage-50 hover:border-sage-300 transition-all group"
           >
             <div className="w-16 h-16 bg-sage-50 text-sage-400 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
               <Camera size={32} />
@@ -126,7 +126,7 @@ export default function ScanPage() {
       )}
 
       {recipe && (
-        <div className="bg-white rounded-xl border border-sage-100 shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="bg-white rounded-2xl border border-sage-100 shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
           <div className="bg-sage-400 p-8 text-white flex justify-between items-start">
             <div>
               <h3 className="text-3xl font-bold mb-2">{recipe.nazov}</h3>
@@ -139,7 +139,7 @@ export default function ScanPage() {
                 </span>
               </div>
             </div>
-            <button className="p-3 bg-white/20 hover:bg-white/30 rounded-xl transition-colors">
+            <button className="p-3 bg-white/20 hover:bg-white/30 rounded-2xl transition-colors">
               <Save size={24} />
             </button>
           </div>
@@ -166,7 +166,7 @@ export default function ScanPage() {
               <div className="space-y-6">
                 {recipe.postup.map((step, i) => (
                   <div key={i} className="flex gap-4">
-                    <div className="flex-shrink-0 w-8 h-8 bg-sage-50 text-sage-600 rounded-lg flex items-center justify-center font-bold">
+                    <div className="flex-shrink-0 w-8 h-8 bg-sage-50 text-sage-600 rounded-2xl flex items-center justify-center font-bold">
                       {i + 1}
                     </div>
                     <p className="text-gray-600 leading-relaxed pt-1">{step}</p>

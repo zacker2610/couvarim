@@ -202,14 +202,14 @@ export default function NewRecipePage() {
       <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-4 py-4 px-2 -mx-2 mb-6">
         <button 
           onClick={() => router.back()}
-          className="p-2 bg-white rounded-xl shadow-sm border border-gray-100 text-gray-600 active:scale-90 transition-all"
+          className="p-2 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-600 active:scale-90 transition-all"
         >
           <ArrowLeft size={20} />
         </button>
         <h2 className="text-xl font-bold text-gray-800 tracking-tight flex-1">Nový recept</h2>
         <button 
           onClick={() => setIsImportModalOpen(true)}
-          className="p-2.5 bg-sage-500 text-white rounded-xl shadow-lg active:scale-90 transition-all flex items-center gap-2"
+          className="p-2.5 bg-sage-500 text-white rounded-2xl shadow-lg active:scale-90 transition-all flex items-center gap-2"
         >
           <Sparkles size={18} />
           <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Inteligentný import</span>
@@ -218,7 +218,7 @@ export default function NewRecipePage() {
 
       <div className="space-y-8">
         {/* Image Upload Section */}
-        <section className="relative h-64 w-full bg-white rounded-[24px] border-2 border-dashed border-sage-200 overflow-hidden group">
+        <section className="relative h-64 w-full bg-white rounded-2xl border-2 border-dashed border-sage-200 overflow-hidden group">
           {image ? (
             <>
               <img src={image} alt="Preview" className="w-full h-full object-cover" />
@@ -332,7 +332,7 @@ export default function NewRecipePage() {
                 type="number" 
                 value={calories}
                 onChange={(e) => setCalories(Number(e.target.value))}
-                className="w-full px-1 py-3 rounded-xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center"
+                className="w-full px-1 py-3 rounded-2xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center"
               />
             </div>
             <div className="space-y-1">
@@ -341,7 +341,7 @@ export default function NewRecipePage() {
                 type="number" 
                 value={nutrition.protein}
                 onChange={(e) => setNutrition(prev => ({ ...prev, protein: Number(e.target.value) }))}
-                className="w-full px-1 py-3 rounded-xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center text-blue-600"
+                className="w-full px-1 py-3 rounded-2xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center text-blue-600"
               />
             </div>
             <div className="space-y-1">
@@ -350,7 +350,7 @@ export default function NewRecipePage() {
                 type="number" 
                 value={nutrition.carbs}
                 onChange={(e) => setNutrition(prev => ({ ...prev, carbs: Number(e.target.value) }))}
-                className="w-full px-1 py-3 rounded-xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center text-amber-600"
+                className="w-full px-1 py-3 rounded-2xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center text-amber-600"
               />
             </div>
             <div className="space-y-1">
@@ -359,7 +359,7 @@ export default function NewRecipePage() {
                 type="number" 
                 value={nutrition.fat}
                 onChange={(e) => setNutrition(prev => ({ ...prev, fat: Number(e.target.value) }))}
-                className="w-full px-1 py-3 rounded-xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center text-rose-500"
+                className="w-full px-1 py-3 rounded-2xl bg-white border-transparent focus:border-sage-500 outline-none shadow-sm text-xs font-bold text-center text-rose-500"
               />
             </div>
           </div>
@@ -385,12 +385,12 @@ export default function NewRecipePage() {
                   placeholder="250"
                   value={ing.amount}
                   onChange={(e) => updateIngredient(index, "amount", e.target.value)}
-                  className="w-16 px-2 py-3.5 rounded-xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-bold text-gray-800 text-center text-sm"
+                  className="w-16 px-2 py-3.5 rounded-2xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-bold text-gray-800 text-center text-sm"
                 />
                 <select 
                   value={ing.unit}
                   onChange={(e) => updateIngredient(index, "unit", e.target.value)}
-                  className="w-16 px-1 py-3.5 rounded-xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-bold text-sage-600 text-[10px] text-center appearance-none cursor-pointer"
+                  className="w-16 px-1 py-3.5 rounded-2xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-bold text-sage-600 text-[10px] text-center appearance-none cursor-pointer"
                 >
                   <option>g</option>
                   <option>kg</option>
@@ -405,7 +405,7 @@ export default function NewRecipePage() {
                   placeholder="Názov suroviny..."
                   value={ing.name}
                   onChange={(e) => updateIngredient(index, "name", e.target.value)}
-                  className="flex-1 min-w-0 px-3 py-3.5 rounded-xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-medium text-gray-800 text-sm"
+                  className="flex-1 min-w-0 px-3 py-3.5 rounded-2xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-medium text-gray-800 text-sm"
                 />
                 {ingredients.length > 1 && (
                   <button 
@@ -467,7 +467,7 @@ export default function NewRecipePage() {
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className="w-full py-5 bg-sage-500 text-sage-50 rounded-[24px] font-bold shadow-2xl flex items-center justify-center gap-3 active:scale-[0.98] transition-all hover:bg-sage-600 disabled:opacity-70"
+          className="w-full py-5 bg-sage-500 text-sage-50 rounded-2xl font-bold shadow-2xl flex items-center justify-center gap-3 active:scale-[0.98] transition-all hover:bg-sage-600 disabled:opacity-70"
         >
           {isSaving ? (
             <div className="w-6 h-6 border-2 border-white/30 border-t-white rounded-full animate-spin" />
@@ -493,7 +493,7 @@ export default function NewRecipePage() {
               initial={{ opacity: 0, y: 100 }} 
               animate={{ opacity: 1, y: 0 }} 
               exit={{ opacity: 0, y: 100 }}
-              className="relative w-full max-w-xl bg-[#F8F5F2] rounded-[24px] overflow-hidden shadow-2xl"
+              className="relative w-full max-w-xl bg-[#F8F5F2] rounded-2xl overflow-hidden shadow-2xl"
             >
               <div className="p-8 space-y-6">
                 <div className="flex items-center justify-between">
@@ -520,7 +520,7 @@ export default function NewRecipePage() {
                   />
                   
                   {importError && (
-                    <div className="bg-red-50 text-red-500 p-4 rounded-xl text-xs font-bold flex items-center gap-2 animate-pulse">
+                    <div className="bg-red-50 text-red-500 p-4 rounded-2xl text-xs font-bold flex items-center gap-2 animate-pulse">
                       <AlertCircle size={16} />
                       {importError}
                     </div>

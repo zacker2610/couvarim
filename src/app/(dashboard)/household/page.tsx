@@ -216,7 +216,7 @@ export default function HouseholdPage() {
       </button>
 
       <div className="grid grid-cols-1 gap-4">
-        <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
+        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="w-12 h-12 bg-sage-50 text-sage-600 rounded-2xl flex items-center justify-center">
               <Users size={24} />
@@ -230,16 +230,16 @@ export default function HouseholdPage() {
         </div>
       </div>
 
-      <section className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm">
+      <section className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
          <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-amber-50 text-amber-600 rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-amber-50 text-amber-600 rounded-2xl flex items-center justify-center">
                 <AlertCircle size={18} />
               </div>
               <h3 className="font-bold text-gray-800">Spoločné obmedzenia</h3>
             </div>
             {allConstraints.length > 0 && (
-              <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md uppercase tracking-wider">
+              <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-2xl uppercase tracking-wider">
                 {allConstraints.length} Aktívne
               </span>
             )}
@@ -273,7 +273,7 @@ export default function HouseholdPage() {
             ];
 
             return (
-              <div key={member.id} className="bg-white p-4 rounded-3xl border border-gray-100 shadow-sm flex items-center justify-between">
+              <div key={member.id} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${member.user_id ? 'bg-sage-100 text-sage-600' : 'bg-blue-100 text-blue-600'}`}>
                     {member.user_id ? <User size={24} /> : <Users size={24} />}
@@ -285,7 +285,7 @@ export default function HouseholdPage() {
                         {member.user_id === household?.owner_id && " (Vy)"}
                       </h4>
                       {member.role === 'owner' && (
-                        <span className="px-1.5 py-0.5 bg-sage-100 text-sage-700 text-[8px] font-bold uppercase rounded-md">Správca</span>
+                        <span className="px-1.5 py-0.5 bg-sage-100 text-sage-700 text-[8px] font-bold uppercase rounded-2xl">Správca</span>
                       )}
                     </div>
                     <p className="text-gray-400 text-[11px] font-medium leading-tight max-w-[200px] truncate">
@@ -297,7 +297,7 @@ export default function HouseholdPage() {
                   {member.user_id !== household?.owner_id && (
                     <button 
                       onClick={() => handleOpenEdit(member)}
-                      className="p-2.5 text-gray-300 hover:text-sage-500 hover:bg-sage-50 rounded-xl transition-all"
+                      className="p-2.5 text-gray-300 hover:text-sage-500 hover:bg-sage-50 rounded-2xl transition-all"
                     >
                       <Pencil size={18} />
                     </button>
@@ -305,7 +305,7 @@ export default function HouseholdPage() {
                   {member.role !== 'owner' && (
                     <button 
                       onClick={() => handleRemoveMember(member.id)}
-                      className="p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                      className="p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
                     >
                       <Trash2 size={18} />
                     </button>
@@ -330,7 +330,7 @@ export default function HouseholdPage() {
         </div>
 
         {sharedRecipes.length === 0 ? (
-          <div className="bg-white rounded-[24px] p-10 text-center border border-dashed border-gray-200 shadow-sm">
+          <div className="bg-white rounded-2xl p-10 text-center border border-dashed border-gray-200 shadow-sm">
             <div className="w-16 h-16 bg-gray-50 text-gray-300 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <ChefHat size={32} />
             </div>
@@ -346,7 +346,7 @@ export default function HouseholdPage() {
                 href={`/recipes?id=${recipe.id}`}
                 className="group bg-white rounded-2xl border border-gray-100 shadow-sm p-4 flex gap-4 hover:border-sage-200 transition-all active:scale-[0.98]"
               >
-                <div className="w-24 h-24 rounded-xl overflow-hidden bg-sage-50 flex-shrink-0">
+                <div className="w-24 h-24 rounded-2xl overflow-hidden bg-sage-50 flex-shrink-0">
                   {recipe.image_url ? (
                     <img src={recipe.image_url} alt={recipe.title} className="w-full h-full object-cover transition-transform group-hover:scale-110" />
                   ) : (
@@ -391,7 +391,7 @@ export default function HouseholdPage() {
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: "100%", opacity: 0 }}
               transition={{ type: "spring", damping: 25, stiffness: 300 }}
-              className="relative w-full sm:max-w-md bg-white rounded-t-[32px] sm:rounded-3xl p-6 sm:p-8 shadow-2xl z-50 overflow-hidden mb-[env(safe-area-inset-bottom)] sm:mb-0"
+              className="relative w-full sm:max-w-md bg-white rounded-t-2xl sm:rounded-2xl p-6 sm:p-8 shadow-2xl z-50 overflow-hidden mb-[env(safe-area-inset-bottom)] sm:mb-0"
             >
               <div className="w-12 h-1.5 bg-gray-100 rounded-full mx-auto mb-6 sm:hidden" />
               <div className="flex justify-between items-center mb-6">
@@ -405,8 +405,8 @@ export default function HouseholdPage() {
 
               {!editingMember && (
                 <div className="flex p-1 bg-gray-100 rounded-2xl mb-6">
-                  <button onClick={() => setInviteType("email")} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${inviteType === 'email' ? 'bg-white shadow-sm text-sage-700' : 'text-gray-500'}`}>Email</button>
-                  <button onClick={() => setInviteType("manual")} className={`flex-1 py-3 text-sm font-bold rounded-xl transition-all ${inviteType === 'manual' ? 'bg-white shadow-sm text-sage-700' : 'text-gray-500'}`}>Manuálne</button>
+                  <button onClick={() => setInviteType("email")} className={`flex-1 py-3 text-sm font-bold rounded-2xl transition-all ${inviteType === 'email' ? 'bg-white shadow-sm text-sage-700' : 'text-gray-500'}`}>Email</button>
+                  <button onClick={() => setInviteType("manual")} className={`flex-1 py-3 text-sm font-bold rounded-2xl transition-all ${inviteType === 'manual' ? 'bg-white shadow-sm text-sage-700' : 'text-gray-500'}`}>Manuálne</button>
                 </div>
               )}
 
@@ -475,9 +475,9 @@ export default function HouseholdPage() {
                       <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Čo nemá rád / Čo mi nechutí</label>
                       <div className="flex flex-wrap gap-2 mb-2">
                         {dislikedIngredients.map((tag) => (
-                          <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-600 rounded-xl text-[10px] font-bold flex items-center gap-1 border border-gray-200">
+                          <span key={tag} className="px-3 py-1 bg-gray-100 text-gray-600 rounded-2xl text-[10px] font-bold flex items-center gap-1 border border-gray-200">
                             {tag}
-                            <button type="button" onClick={() => removeDislikedIngredient(tag)} className="p-0.5 hover:bg-gray-200 rounded-md">
+                            <button type="button" onClick={() => removeDislikedIngredient(tag)} className="p-0.5 hover:bg-gray-200 rounded-2xl">
                               <X size={10} />
                             </button>
                           </span>
@@ -506,7 +506,7 @@ export default function HouseholdPage() {
                         <button 
                           type="button"
                           onClick={addDislikedIngredient}
-                          className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-sage-500 text-white rounded-xl flex items-center justify-center"
+                          className="absolute right-2 top-1/2 -translate-y-1/2 w-8 h-8 bg-sage-500 text-white rounded-2xl flex items-center justify-center"
                         >
                           <Plus size={18} />
                         </button>
