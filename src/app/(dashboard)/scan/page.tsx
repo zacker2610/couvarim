@@ -2,19 +2,32 @@
 
 import React, { useState, useRef, useEffect } from "react";
 import { 
-  Camera, 
-  Upload, 
-  Loader2, 
-  Sparkles, 
-  Utensils, 
-  ListChecks, 
-  Save, 
-  ChefHat, 
-  X, 
-  BookOpen, 
+  Users, 
+  UserPlus,
+  Mail, 
+  Trash2, 
+  User,
+  Plus,
+  X,
+  AlertCircle,
+  Check,
+  Loader2,
+  Pencil,
+  Clock,
+  Flame,
+  Utensils,
+  ChevronRight,
+  ChefHat,
+  Share2,
+  LogOut,
+  Sparkles,
+  Save,
+  BookOpen,
   FileText,
   CheckCircle2,
-  ArrowRight
+  ArrowRight,
+  Upload,
+  Camera
 } from "lucide-react";
 import { geminiVisionModel } from "@/lib/gemini";
 import { motion, AnimatePresence } from "framer-motion";
