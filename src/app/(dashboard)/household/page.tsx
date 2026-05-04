@@ -40,7 +40,7 @@ export default function HouseholdPage() {
   
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [editingMember, setEditingMember] = useState<any>(null);
-  const [inviteType, setInviteType] = useState<"email" | "manual">("email");
+  const [inviteType, setInviteType] = useState<"email" | "manual" | "link">("email");
   const [newMemberName, setNewMemberName] = useState("");
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -143,11 +143,32 @@ export default function HouseholdPage() {
         disliked_ingredients: dislikedIngredients
       });
 
-      if (result.success) {
+      if (result.success && result.member) {
+        if (inviteType === 'link') {
+          const baseUrl = window.location.origin;
+          const inviteUrl = `${baseUrl}/invite/${result.member.id}`;
+          
+          if (navigator.share) {
+            try {
+              await navigator.share({
+                title: 'Pozvánka do ČoUvarím.sk',
+                text: `Ahoj! Pozývam ťa do našej spoločnej domácnosti v aplikácii ČoUvarím.sk. Pridaj sa tu:`,
+                url: inviteUrl
+              });
+            } catch (err) {
+              // Share was cancelled or failed, copy to clipboard as fallback
+              await navigator.clipboard.writeText(inviteUrl);
+              alert("Odkaz bol skopírovaný do schránky.");
+            }
+          } else {
+            await navigator.clipboard.writeText(inviteUrl);
+            alert("Odkaz bol skopírovaný do schránky.");
+          }
+        }
         await fetchData();
         handleCloseModal();
       } else {
-        console.error(result.error);
+        console.error(result?.error || "Neznáma chyba");
       }
     }
     setIsSubmitting(false);
@@ -450,8 +471,9 @@ export default function HouseholdPage() {
 
               {!editingMember && (
                 <div className="flex p-1 bg-gray-100 rounded-2xl mb-6">
-                  <button onClick={() => setInviteType("email")} className={`flex-1 py-3 text-sm font-bold rounded-2xl transition-all ${inviteType === 'email' ? 'bg-white shadow-sm text-sage-700' : 'text-gray-500'}`}>Email</button>
-                  <button onClick={() => setInviteType("manual")} className={`flex-1 py-3 text-sm font-bold rounded-2xl transition-all ${inviteType === 'manual' ? 'bg-white shadow-sm text-sage-700' : 'text-gray-500'}`}>Manuálne</button>
+                  <button onClick={() => setInviteType("email")} className={`flex-1 py-3 text-[10px] font-bold rounded-2xl transition-all ${inviteType === 'email' ? 'bg-white shadow-sm text-sage-700' : 'text-gray-500'}`}>Email</button>
+                  <button onClick={() => setInviteType("link")} className={`flex-1 py-3 text-[10px] font-bold rounded-2xl transition-all ${inviteType === 'link' ? 'bg-white shadow-sm text-sage-700' : 'text-gray-500'}`}>Odkaz</button>
+                  <button onClick={() => setInviteType("manual")} className={`flex-1 py-3 text-[10px] font-bold rounded-2xl transition-all ${inviteType === 'manual' ? 'bg-white shadow-sm text-sage-700' : 'text-gray-500'}`}>Manuálne</button>
                 </div>
               )}
 
@@ -566,7 +588,7 @@ export default function HouseholdPage() {
                   className="w-full py-5 bg-sage-500 text-sage-50 rounded-2xl font-bold shadow-xl active:scale-[0.98] transition-all hover:bg-sage-600 mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {isSubmitting && <Loader2 size={18} className="animate-spin" />}
-                  {editingMember ? 'Uložiť zmeny' : (inviteType === 'email' ? 'Odoslať pozvánku' : 'Pridať do skupiny')}
+                  {editingMember ? 'Uložiť zmeny' : (inviteType === 'email' ? 'Odoslať pozvánku' : (inviteType === 'link' ? 'Zdieľať odkaz' : 'Pridať do skupiny'))}
                 </button>
               </form>
               <div className="h-16 sm:hidden" />

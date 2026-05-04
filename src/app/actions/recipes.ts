@@ -528,12 +528,12 @@ export async function addHouseholdMemberAction(householdId: string, memberData: 
   try {
     const supabase = await getServerSupabase();
 
-    if (memberData.type === "email") {
+    if (memberData.type === "email" || memberData.type === "link") {
       const { data, error } = await supabase
         .from("household_members")
         .insert({
           household_id: householdId,
-          invitation_email: memberData.email,
+          invitation_email: memberData.type === "email" ? memberData.email : null,
           status: "pending",
           role: "member",
           preferences: { 
@@ -547,27 +547,29 @@ export async function addHouseholdMemberAction(householdId: string, memberData: 
 
       if (error) throw error;
 
-      // Send Invitation Email
-      const { data: household } = await supabase
-        .from("households")
-        .select("name")
-        .eq("id", householdId)
-        .single();
-      
-      const { data: { user: inviter } } = await supabase.auth.getUser();
-      const inviterName = inviter?.user_metadata?.full_name || "Člen rodiny";
-      
-      await sendHouseholdInvitation(
-        memberData.email,
-        household?.name || "Moja Domácnosť",
-        inviterName,
-        data.id
-      );
+      // Only send email if it's an email invitation
+      if (memberData.type === "email") {
+        const { data: household } = await supabase
+          .from("households")
+          .select("name")
+          .eq("id", householdId)
+          .single();
+        
+        const { data: { user: inviter } } = await supabase.auth.getUser();
+        const inviterName = inviter?.user_metadata?.full_name || "Člen rodiny";
+        
+        await sendHouseholdInvitation(
+          memberData.email,
+          household?.name || "Moja Domácnosť",
+          inviterName,
+          data.id
+        );
+      }
 
-      // DEBUG: Log invitation link to console for manual sharing
+      // DEBUG: Log invitation link to console
       const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-      console.log(`\n🚀 [DEBUG] POZVÁNKA VYGENEROVANÁ:`);
-      console.log(`📧 Pre: ${memberData.email}`);
+      console.log(`\n🚀 [DEBUG] POZVÁNKA VYGENEROVANÁ (${memberData.type}):`);
+      if (memberData.email) console.log(`📧 Pre: ${memberData.email}`);
       console.log(`🔗 Odkaz: ${baseUrl}/invite/${data.id}\n`);
 
       return { success: true, member: data };
