@@ -345,6 +345,12 @@ function RecipesContent() {
                           )}
                         </AnimatePresence>
                       </div>
+                      {recipe.household_id && (
+                        <div className="absolute top-4 left-4 z-20 bg-sage-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm border border-white/20 scale-90 origin-top-left">
+                          <Users size={14} strokeWidth={2.5} />
+                          <span className="text-[10px] font-bold uppercase tracking-wider">Rodinný</span>
+                        </div>
+                      )}
                       {recipe.image_url ? (
                         <img 
                           src={recipe.image_url} 
@@ -358,7 +364,7 @@ function RecipesContent() {
                       )}
                     </div>
                     <div className="p-7">
-                      <h3 className="text-xl font-bold text-gray-800 mb-5 line-clamp-1 group-hover:text-sage-600 transition-colors leading-tight">
+                      <h3 className="text-xl font-bold text-gray-800 mb-5 line-clamp-2 group-hover:text-sage-600 transition-colors leading-tight h-[3.5rem]">
                         {recipe.title}
                       </h3>
                       <div className="flex justify-between items-center text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-7 px-1">

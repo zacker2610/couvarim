@@ -402,7 +402,7 @@ export default function HouseholdPage() {
                 </div>
                 <div className="flex-1 flex flex-col justify-between py-0.5">
                   <div>
-                    <h4 className="font-bold text-gray-800 line-clamp-1 group-hover:text-sage-600 transition-colors text-sm">{recipe.title}</h4>
+                    <h4 className="font-bold text-gray-800 line-clamp-2 group-hover:text-sage-600 transition-colors text-sm h-10">{recipe.title}</h4>
                     <p className="text-[10px] text-gray-400 font-medium mt-0.5">
                       Odporúča: <span className="text-sage-600 font-bold">{recipe.profiles?.full_name || "Člen rodiny"}</span>
                     </p>
