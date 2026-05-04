@@ -727,3 +727,80 @@ export async function getHouseholdSharedRecipesAction(householdId: string) {
     return { success: false, error: error.message };
   }
 }
+
+export async function getInvitationDetailsAction(inviteId: string) {
+  try {
+    const supabase = await getServerSupabase();
+    
+    const { data, error } = await supabase
+      .from("household_members")
+      .select(`
+        *,
+        households (name)
+      `)
+      .eq("id", inviteId)
+      .eq("status", "pending")
+      .maybeSingle();
+
+    if (error) throw error;
+    return { success: true, invitation: data };
+  } catch (error: any) {
+    console.error("Get Invitation Error:", error);
+    return { success: false, error: error.message };
+  }
+}
+
+export async function acceptInvitationAction(inviteId: string, userId: string, fullName: string | null) {
+  try {
+    const supabase = await getServerSupabase();
+    
+    // 1. Get invitation details first to check if it's still pending
+    const { data: invite, error: fetchError } = await supabase
+      .from("household_members")
+      .select("household_id, invitation_email")
+      .eq("id", inviteId)
+      .eq("status", "pending")
+      .maybeSingle();
+      
+    if (fetchError) throw fetchError;
+    if (!invite) return { success: false, error: "Pozvánka už nie je platná." };
+
+    // 2. Check if user is already in THIS household
+    const { data: existing } = await supabase
+      .from("household_members")
+      .select("id")
+      .eq("household_id", invite.household_id)
+      .eq("user_id", userId)
+      .maybeSingle();
+      
+    if (existing) {
+      // If they are already a member, just update the invitation record if it was their record
+      // or just return success
+      await supabase
+        .from("household_members")
+        .update({ status: 'active', joined_at: new Date().toISOString() })
+        .eq("id", inviteId);
+        
+      return { success: true, alreadyMember: true };
+    }
+
+    // 3. Update the invitation record
+    const { error: updateError } = await supabase
+      .from("household_members")
+      .update({
+        user_id: userId,
+        status: "active",
+        display_name: fullName || (invite.invitation_email ? invite.invitation_email.split('@')[0] : "Nový člen"),
+        joined_at: new Date().toISOString()
+      })
+      .eq("id", inviteId);
+
+    if (updateError) throw updateError;
+
+    revalidatePath("/household");
+    return { success: true };
+  } catch (error: any) {
+    console.error("Accept Invitation Error:", error);
+    return { success: false, error: error.message };
+  }
+}

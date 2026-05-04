@@ -5,6 +5,7 @@ import { useParams, useRouter } from "next/navigation";
 import { ChefHat, Users, Check, AlertCircle, Loader2, ArrowRight } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import { getInvitationDetailsAction, acceptInvitationAction } from "@/app/actions/recipes";
 
 export default function InvitePage() {
   const { id } = useParams();
@@ -28,28 +29,18 @@ export default function InvitePage() {
   const fetchInviteDetails = async () => {
     try {
       setLoading(true);
-      // Fetch invitation from household_members
-      const { data, error } = await supabase
-        .from("household_members")
-        .select(`
-          *,
-          households (name)
-        `)
-        .eq("id", id)
-        .eq("status", "pending")
-        .maybeSingle();
-
-      if (error) throw error;
-      if (!data) {
+      const result = await getInvitationDetailsAction(id as string);
+      
+      if (!result.success) {
+        setError(result.error || "Nepodarilo sa načítať pozvánku.");
+      } else if (!result.invitation) {
         setError("Táto pozvánka je neplatná alebo už bola použitá.");
       } else {
-        setInvitation(data);
+        setInvitation(result.invitation);
       }
     } catch (err: any) {
       console.error("Invite Fetch Error:", err);
-      // More detailed error for debugging
-      const detail = err.message || JSON.stringify(err);
-      setError(`Nepodarilo sa načítať detaily pozvánky. Chyba: ${detail}`);
+      setError("Chyba pri načítaní pozvánky.");
     } finally {
       setLoading(false);
     }
@@ -63,25 +54,20 @@ export default function InvitePage() {
 
     try {
       setIsJoining(true);
-      
-      // 1. Update the household_member record
-      const { error: updateError } = await supabase
-        .from("household_members")
-        .update({
-          user_id: user.id,
-          status: "active",
-          display_name: user.user_metadata?.full_name || invitation.invitation_email.split('@')[0],
-          joined_at: new Date().toISOString()
-        })
-        .eq("id", id);
+      const result = await acceptInvitationAction(
+        id as string, 
+        user.id, 
+        user.user_metadata?.full_name || user.user_metadata?.name || null
+      );
 
-      if (updateError) throw updateError;
-
-      // Success! Redirect to household
-      router.push("/household");
+      if (result.success) {
+        router.push("/household");
+      } else {
+        alert(result.error || "Nepodarilo sa pripojiť k domácnosti.");
+      }
     } catch (err: any) {
       console.error("Join Error:", err);
-      alert("Nepodarilo sa pripojiť k domácnosti: " + err.message);
+      alert("Chyba pri pripájaní.");
     } finally {
       setIsJoining(false);
     }
@@ -131,7 +117,7 @@ export default function InvitePage() {
         </div>
 
         <h1 className="text-3xl font-black text-gray-800 tracking-tight mb-2">
-          Pozvánka do rodiny
+          Pozvánka do domácnosti
         </h1>
         <p className="text-gray-500 font-medium mb-8">
           Boli ste pozvaní pripojiť sa k domácnosti:
