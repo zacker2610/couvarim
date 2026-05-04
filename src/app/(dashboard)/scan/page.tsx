@@ -1,21 +1,52 @@
 "use client";
 
-import React, { useState, useRef } from "react";
-import { Camera, Upload, Loader2, Sparkles, Utensils, ListChecks, Save } from "lucide-react";
+import React, { useState, useRef, useEffect } from "react";
+import { 
+  Camera, 
+  Upload, 
+  Loader2, 
+  Sparkles, 
+  Utensils, 
+  ListChecks, 
+  Save, 
+  ChefHat, 
+  X, 
+  BookOpen, 
+  FileText,
+  CheckCircle2,
+  ArrowRight
+} from "lucide-react";
 import { geminiVisionModel } from "@/lib/gemini";
+import { motion, AnimatePresence } from "framer-motion";
+import { saveRecipeAction } from "@/app/actions/recipes";
+import { useRouter } from "next/navigation";
 
 interface Recipe {
-  nazov: string;
-  ingrediencie: string[];
-  postup: string[];
-  cas: string;
-  narocnost: string;
+  title: string;
+  description: string;
+  ingredients: { item: string; amount: string; unit: string; owned: boolean }[];
+  instructions: string[];
+  prep_time: string;
+  cook_time: string;
+  difficulty: "Jednoduchá" | "Stredná" | "Náročná";
+  calories: number;
+  nutrition: {
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
 }
 
+type ScanMode = "ingredients" | "recipe";
+
 export default function ScanPage() {
+  const router = useRouter();
+  const [mode, setMode] = useState<ScanMode>("ingredients");
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
+  const [saveSuccess, setSaveSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -36,14 +67,43 @@ export default function ScanPage() {
     setRecipe(null);
 
     try {
-      // Convert base64 to parts for Gemini
       const base64Data = image.split(",")[1];
       
-      const prompt = `Identifikuj všetky suroviny na tomto obrázku. 
-                      Následne z týchto surovín (a bežných domácich zásob ako soľ, korenie, olej) navrhni recept.
-                      Zohľadni, že používateľ má tieto intolerancie: Lepok, Laktóza (simulované dáta z profilu). 
-                      Odpovedaj v slovenčine a výhradne ako čistý JSON v tomto formáte: 
-                      {"nazov": "...", "ingrediencie": ["identifikovaná surovina 1", "..."], "postup": ["..."], "cas": "...", "narocnost": "..."}`;
+      let prompt = "";
+      if (mode === "ingredients") {
+        prompt = `Identifikuj všetky suroviny na tomto obrázku (napr. z chladničky alebo nákupu). 
+                  Následne z týchto surovín navrhni JEDEN chutný a originálny recept. 
+                  Odpovedaj VŽDY v slovenčine a výhradne ako čistý JSON v tomto formáte: 
+                  {
+                    "title": "Názov receptu",
+                    "description": "Stručný lákavý popis",
+                    "servings": 4,
+                    "prep_time": "15",
+                    "cook_time": "30",
+                    "difficulty": "Jednoduchá",
+                    "calories": 450,
+                    "nutrition": {"protein": 25, "carbs": 40, "fat": 15},
+                    "ingredients": [{"item": "názov", "amount": "100", "unit": "g", "owned": true}],
+                    "instructions": ["krok 1", "krok 2"]
+                  }`;
+      } else {
+        prompt = `Tento obrázok obsahuje napísaný alebo vytlačený recept (z knihy, časopisu alebo ručne písaný). 
+                  Tvojou úlohou je TEXT receptu rozpoznať (OCR) a pretransformovať ho do štruktúrovaného JSON formátu. 
+                  Snaž sa presne zachovať názov, ingrediencie a postup. Ak chýbajú nutričné hodnoty alebo časy, skús ich rozumne odhadnúť.
+                  Odpovedaj VŽDY v slovenčine a výhradne ako čistý JSON v tomto formáte: 
+                  {
+                    "title": "Názov receptu z obrázka",
+                    "description": "Stručný popis podľa textu",
+                    "servings": 4,
+                    "prep_time": "15",
+                    "cook_time": "30",
+                    "difficulty": "Stredná",
+                    "calories": 450,
+                    "nutrition": {"protein": 25, "carbs": 40, "fat": 15},
+                    "ingredients": [{"item": "názov", "amount": "100", "unit": "g", "owned": true}],
+                    "instructions": ["krok 1", "krok 2"]
+                  }`;
+      }
 
       const result = await geminiVisionModel.generateContent([
         prompt,
@@ -63,120 +123,231 @@ export default function ScanPage() {
       setRecipe(data);
     } catch (error) {
       console.error("Chyba pri analýze:", error);
-      alert("Nepodarilo sa rozpoznať suroviny. Skúste to znova.");
+      alert("Nepodarilo sa spracovať obrázok. Skúste to prosím znova s lepším svetlom alebo iným uhlom.");
     } finally {
       setLoading(false);
     }
   };
 
+  const handleSaveRecipe = async () => {
+    if (!recipe) return;
+    setIsSaving(true);
+    try {
+      const result = await saveRecipeAction(recipe);
+      if (result.success) {
+        setSaveSuccess(true);
+        setTimeout(() => {
+          router.push("/recipes");
+        }, 1500);
+      } else {
+        alert("Chyba pri ukladaní: " + result.error);
+      }
+    } catch (error) {
+      alert("Nepodarilo sa uložiť recept.");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
-    <div className="space-y-10 pb-20">
-      <header>
-        <h2 className="text-3xl font-bold text-gray-800 tracking-tight">Odfotiť suroviny</h2>
-        <p className="text-gray-500 mt-2">Stačí jedna fotka a Gemini zistí, čo máš v chladničke.</p>
+    <div className="space-y-8 pb-24">
+      <header className="space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-12 h-12 bg-sage-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-sage-200">
+            <Camera size={28} />
+          </div>
+          <div>
+            <h2 className="text-3xl font-black text-gray-800 tracking-tight">Skener</h2>
+            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-0.5">Sila AI vo vašom foťáku</p>
+          </div>
+        </div>
+
+        {/* Mode Selector */}
+        <div className="flex p-1.5 bg-gray-100 rounded-[24px] w-full max-w-sm">
+          <button 
+            onClick={() => { setMode("ingredients"); setImage(null); setRecipe(null); }}
+            className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-[20px] text-xs font-bold transition-all ${mode === 'ingredients' ? 'bg-white shadow-md text-sage-600 scale-[1.02]' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            <ChefHat size={16} />
+            Čo variť?
+          </button>
+          <button 
+            onClick={() => { setMode("recipe"); setImage(null); setRecipe(null); }}
+            className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-[20px] text-xs font-bold transition-all ${mode === 'recipe' ? 'bg-white shadow-md text-sage-600 scale-[1.02]' : 'text-gray-500 hover:text-gray-700'}`}
+          >
+            <BookOpen size={16} />
+            Skenovať recept
+          </button>
+        </div>
       </header>
 
-      <div className="bg-white p-8 rounded-2xl border border-sage-100 shadow-sm flex flex-col items-center">
+      <section className="bg-white p-6 sm:p-10 rounded-[40px] border border-gray-100 shadow-sm relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-32 h-32 bg-sage-50 rounded-full -mr-16 -mt-16 opacity-50" />
+        
         {image ? (
-          <div className="w-full max-w-md space-y-6">
-            <img src={image} alt="Suroviny" className="w-full h-64 object-cover rounded-2xl shadow-md border border-sage-50" />
-            <div className="flex gap-4">
+          <div className="relative z-10 flex flex-col items-center gap-8">
+            <div className="relative w-full max-w-sm aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
+              <img src={image} alt="Scan" className="w-full h-full object-cover" />
               <button 
-                onClick={() => setImage(null)}
-                className="flex-1 py-3 border border-gray-200 text-gray-600 rounded-2xl font-semibold hover:bg-gray-50 transition-all"
+                onClick={() => { setImage(null); setRecipe(null); }}
+                className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-red-500 shadow-lg active:scale-90 transition-all"
               >
-                Iná fotka
-              </button>
-              <button 
-                onClick={analyzeAndGenerate}
-                disabled={loading}
-                className="flex-[2] py-3 bg-sage-400 text-white rounded-2xl font-bold shadow-lg hover:bg-sage-500 transition-all flex items-center justify-center gap-2"
-              >
-                {loading ? <Loader2 className="animate-spin" /> : <Sparkles />}
-                Analyzovať a variť
+                <X size={20} />
               </button>
             </div>
-          </div>
-        ) : (
-          <div 
-            onClick={() => fileInputRef.current?.click()}
-            className="w-full max-w-md h-64 border-2 border-dashed border-sage-200 rounded-2xl flex flex-col items-center justify-center cursor-pointer hover:bg-sage-50 hover:border-sage-300 transition-all group"
-          >
-            <div className="w-16 h-16 bg-sage-50 text-sage-400 rounded-full flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-              <Camera size={32} />
-            </div>
-            <p className="text-gray-500 font-medium">Klikni pre nahranie alebo fotenie</p>
-            <p className="text-gray-400 text-sm mt-1">Podporuje JPG, PNG</p>
-            <input 
-              type="file" 
-              accept="image/*" 
-              className="hidden" 
-              ref={fileInputRef} 
-              onChange={handleImageUpload}
-            />
-          </div>
-        )}
-      </div>
-
-      {loading && (
-        <div className="text-center p-12">
-          <Loader2 className="animate-spin mx-auto text-sage-400 mb-4" size={48} />
-          <p className="text-xl text-gray-500 font-medium italic">Gemini skúma vašu chladničku...</p>
-        </div>
-      )}
-
-      {recipe && (
-        <div className="bg-white rounded-2xl border border-sage-100 shadow-xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 duration-500">
-          <div className="bg-sage-400 p-8 text-white flex justify-between items-start">
-            <div>
-              <h3 className="text-3xl font-bold mb-2">{recipe.nazov}</h3>
-              <div className="flex gap-4 opacity-90">
-                <span className="flex items-center gap-1">
-                  <Utensils size={16} /> {recipe.narocnost}
-                </span>
-                <span className="flex items-center gap-1">
-                  <ListChecks size={16} /> {recipe.cas}
-                </span>
-              </div>
-            </div>
-            <button className="p-3 bg-white/20 hover:bg-white/30 rounded-2xl transition-colors">
-              <Save size={24} />
+            
+            <button 
+              onClick={analyzeAndGenerate}
+              disabled={loading}
+              className="w-full max-w-sm py-5 bg-sage-500 text-white rounded-2xl font-bold text-lg shadow-xl shadow-sage-200 active:scale-95 transition-all hover:bg-sage-600 flex items-center justify-center gap-3 disabled:opacity-50"
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="animate-spin" size={24} />
+                  {mode === 'ingredients' ? 'Gemini skúma suroviny...' : 'Gemini číta recept...'}
+                </>
+              ) : (
+                <>
+                  <Sparkles size={24} />
+                  {mode === 'ingredients' ? 'Zistiť čo uvariť' : 'Skenovať a uložiť'}
+                </>
+              )}
             </button>
           </div>
-
-          <div className="p-8 grid grid-cols-1 md:grid-cols-3 gap-12">
-            <div className="md:col-span-1">
-              <h4 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b border-sage-50 pb-2">
-                Rozpoznané suroviny
-              </h4>
-              <ul className="space-y-3">
-                {recipe.ingrediencie.map((ing, i) => (
-                  <li key={i} className="flex items-start gap-2 text-gray-600">
-                    <div className="mt-1.5 w-1.5 h-1.5 rounded-full bg-sage-400 flex-shrink-0" />
-                    {ing}
-                  </li>
-                ))}
-              </ul>
+        ) : (
+          <div className="relative z-10 text-center space-y-8 py-4">
+            <div className="w-24 h-24 bg-sage-50 text-sage-500 rounded-[30px] flex items-center justify-center mx-auto shadow-inner transform rotate-6">
+              {mode === 'ingredients' ? <Utensils size={48} /> : <FileText size={48} />}
+            </div>
+            
+            <div className="space-y-3">
+              <h3 className="text-2xl font-black text-gray-800 leading-tight">
+                {mode === 'ingredients' ? 'Odfotťe nákup alebo chladničku' : 'Odfotťe recept z knihy či papiera'}
+              </h3>
+              <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-xs mx-auto">
+                {mode === 'ingredients' 
+                  ? 'Umelá inteligencia rozpozná suroviny a okamžite vám navrhne recept na mieru.' 
+                  : 'Nestrácajte čas prepisovaním. Gemini rozpozná text a uloží ho do vašej kuchárky.'}
+              </p>
             </div>
 
-            <div className="md:col-span-2">
-              <h4 className="text-xl font-bold text-gray-800 mb-6 flex items-center gap-2 border-b border-sage-50 pb-2">
-                Postup prípravy
-              </h4>
-              <div className="space-y-6">
-                {recipe.postup.map((step, i) => (
-                  <div key={i} className="flex gap-4">
-                    <div className="flex-shrink-0 w-8 h-8 bg-sage-50 text-sage-600 rounded-2xl flex items-center justify-center font-bold">
-                      {i + 1}
-                    </div>
-                    <p className="text-gray-600 leading-relaxed pt-1">{step}</p>
-                  </div>
-                ))}
+            <div 
+              onClick={() => fileInputRef.current?.click()}
+              className="group cursor-pointer bg-sage-50 hover:bg-sage-100 transition-all p-8 rounded-3xl border-2 border-dashed border-sage-200 flex flex-col items-center gap-4"
+            >
+              <div className="w-16 h-16 bg-white text-sage-500 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                <Upload size={32} />
               </div>
+              <span className="font-bold text-sage-600 uppercase text-[10px] tracking-widest">Kliknite pre nahranie alebo fotenie</span>
+              <input 
+                type="file" 
+                accept="image/*" 
+                className="hidden" 
+                ref={fileInputRef} 
+                onChange={handleImageUpload}
+              />
             </div>
           </div>
-        </div>
-      )}
+        )}
+      </section>
+
+      {/* Results Section */}
+      <AnimatePresence>
+        {recipe && (
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="space-y-6"
+          >
+            <div className="bg-white rounded-[40px] border border-gray-100 shadow-xl overflow-hidden">
+              <div className="p-8 sm:p-10 bg-sage-500 text-white space-y-6">
+                <div className="flex justify-between items-start">
+                  <div className="space-y-2 flex-1 pr-4">
+                    <span className="bg-white/20 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-white/20">
+                      {mode === 'ingredients' ? 'AI Inšpirácia' : 'Naskenovaný recept'}
+                    </span>
+                    <h3 className="text-3xl font-black leading-tight drop-shadow-md">{recipe.title}</h3>
+                  </div>
+                  <button 
+                    onClick={handleSaveRecipe}
+                    disabled={isSaving || saveSuccess}
+                    className={`p-5 rounded-2xl shadow-2xl active:scale-90 transition-all flex items-center justify-center border-2 ${
+                      saveSuccess 
+                        ? 'bg-white text-green-600 border-white' 
+                        : 'bg-white/20 text-white border-white/30 hover:bg-white/30'
+                    }`}
+                  >
+                    {isSaving ? <Loader2 className="animate-spin" /> : (saveSuccess ? <CheckCircle2 size={28} /> : <Save size={28} />)}
+                  </button>
+                </div>
+                
+                <div className="flex flex-wrap gap-4 text-[10px] font-black uppercase tracking-widest opacity-90">
+                  <div className="bg-black/10 px-4 py-2 rounded-xl flex items-center gap-2">
+                    <Clock size={14} /> {recipe.prep_time}m
+                  </div>
+                  <div className="bg-black/10 px-4 py-2 rounded-xl flex items-center gap-2">
+                    <ChefHat size={14} /> {recipe.difficulty}
+                  </div>
+                  <div className="bg-black/10 px-4 py-2 rounded-xl flex items-center gap-2">
+                    <Sparkles size={14} /> {recipe.calories} kcal
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8 sm:p-10 grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div className="md:col-span-1 space-y-6">
+                  <h4 className="text-lg font-black text-gray-800 flex items-center gap-3">
+                    <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
+                    Suroviny
+                  </h4>
+                  <div className="space-y-3">
+                    {recipe.ingredients.map((ing, i) => (
+                      <div key={i} className="bg-gray-50/50 p-4 rounded-2xl flex justify-between items-center text-sm">
+                        <span className="font-bold text-gray-700">{ing.item}</span>
+                        <span className="text-sage-600 font-black">{ing.amount} {ing.unit}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="md:col-span-2 space-y-6">
+                  <h4 className="text-lg font-black text-gray-800 flex items-center gap-3">
+                    <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
+                    Postup
+                  </h4>
+                  <div className="space-y-6">
+                    {recipe.instructions.map((step, i) => (
+                      <div key={i} className="flex gap-5">
+                        <div className="flex-shrink-0 w-8 h-8 bg-sage-50 text-sage-600 rounded-2xl flex items-center justify-center font-black text-sm border border-sage-100">
+                          {i + 1}
+                        </div>
+                        <p className="text-gray-600 leading-relaxed font-medium pt-0.5">{step}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-8 sm:p-10 border-t border-gray-100 flex flex-col sm:flex-row gap-4">
+                <button 
+                  onClick={handleSaveRecipe}
+                  disabled={isSaving || saveSuccess}
+                  className="flex-1 py-5 bg-sage-500 text-white rounded-3xl font-black text-lg shadow-xl shadow-sage-200 active:scale-95 transition-all hover:bg-sage-600 flex items-center justify-center gap-3"
+                >
+                  {isSaving ? <Loader2 className="animate-spin" /> : (saveSuccess ? 'Uložené!' : 'Uložiť do kuchárky')}
+                  {!saveSuccess && !isSaving && <ArrowRight size={20} />}
+                </button>
+                <button 
+                  onClick={() => { setImage(null); setRecipe(null); }}
+                  className="py-5 px-10 border-2 border-gray-100 text-gray-400 rounded-3xl font-bold hover:bg-gray-50 transition-all active:scale-95"
+                >
+                  Zrušiť
+                </button>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
