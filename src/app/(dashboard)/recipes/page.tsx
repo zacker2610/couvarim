@@ -53,6 +53,7 @@ function RecipesContent() {
   const [userPantry, setUserPantry] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showShareModal, setShowShareModal] = useState(false);
   const [checkedIngredients, setCheckedIngredients] = useState<string[]>([]);
   
   const searchParams = useSearchParams();
@@ -108,25 +109,6 @@ function RecipesContent() {
     setSelectedRecipe(recipe);
     setView("detail");
     setActiveMenuId(null);
-
-    // Initialize checked ingredients
-    const createdAt = new Date(recipe.created_at);
-    const now = new Date();
-    const hoursSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
-    const isFresh = hoursSinceCreation <= 24;
-
-    const initialChecked = recipe.ingredients
-      ?.filter((ing: any) => {
-        const name = ing.item.toLowerCase();
-        // Check if in pantry
-        const isInPantry = userPantry.some(p => name.includes(p) || p.includes(name));
-        // Check if explicitly owned (from fresh generation)
-        const isOwned = isFresh && ing.owned;
-        return isInPantry || isOwned || name.includes("voda") || name.includes("soľ") || name.includes("korenie");
-      })
-      .map((ing: any) => ing.item) || [];
-    
-    setCheckedIngredients(initialChecked);
   };
 
   const handleToggleShare = async (recipe: any) => {
@@ -194,6 +176,28 @@ function RecipesContent() {
     recipe.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     recipe.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  const handleOpenShareModal = () => {
+    if (!selectedRecipe) return;
+    
+    // Initialize checked ingredients ONLY when opening the modal
+    const createdAt = new Date(selectedRecipe.created_at);
+    const now = new Date();
+    const hoursSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+    const isFresh = hoursSinceCreation <= 24;
+
+    const initialChecked = selectedRecipe.ingredients
+      ?.filter((ing: any) => {
+        const name = ing.item.toLowerCase();
+        const isInPantry = userPantry.some(p => name.includes(p) || p.includes(name));
+        const isOwned = isFresh && ing.owned;
+        return isInPantry || isOwned || name.includes("voda") || name.includes("soľ") || name.includes("korenie");
+      })
+      .map((ing: any) => ing.item) || [];
+    
+    setCheckedIngredients(initialChecked);
+    setShowShareModal(true);
+  };
 
   const handleShareShoppingList = () => {
     if (!selectedRecipe) return;
@@ -574,61 +578,22 @@ function RecipesContent() {
                       Ingrediencie
                     </h4>
                     <button 
-                      onClick={handleShareShoppingList}
+                      onClick={handleOpenShareModal}
                       className="flex items-center gap-2 px-4 py-2 bg-sage-50 text-sage-600 rounded-2xl text-xs font-bold hover:bg-sage-100 transition-all active:scale-95 border border-sage-100"
                     >
                       <Share2 size={14} /> Zdieľať nákupný zoznam
                     </button>
                   </div>
                   <div className="space-y-3">
-                    {selectedRecipe.ingredients?.map((ing: any, i: number) => {
-                      const isChecked = checkedIngredients.includes(ing.item);
-                      return (
-                        <div 
-                          key={i} 
-                          onClick={() => {
-                            setCheckedIngredients(prev => 
-                              prev.includes(ing.item) 
-                                ? prev.filter(t => t !== ing.item) 
-                                : [...prev, ing.item]
-                            );
-                          }}
-                          className={`flex justify-between items-center p-5 rounded-2xl border transition-all cursor-pointer group ${
-                            isChecked 
-                              ? 'bg-sage-50/50 border-sage-200 shadow-sm' 
-                              : 'bg-gray-50/50 border-gray-100/50 hover:bg-white hover:border-sage-200'
-                          }`}
-                        >
-                          <div className="flex items-center gap-4">
-                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all ${
-                              isChecked 
-                                ? 'bg-sage-500 border-sage-500 text-white' 
-                                : 'bg-white border-gray-200 text-transparent group-hover:border-sage-300'
-                            }`}>
-                              <Check size={14} strokeWidth={3} />
-                            </div>
-                            <div className="flex flex-col">
-                              <span className={`font-semibold transition-all ${isChecked ? 'text-sage-900' : 'text-gray-700'}`}>
-                                {ing.item}
-                              </span>
-                              {isChecked && (
-                                <motion.span 
-                                  initial={{ opacity: 0, x: -5 }}
-                                  animate={{ opacity: 1, x: 0 }}
-                                  className="text-[9px] font-bold text-sage-500 uppercase tracking-widest leading-none mt-1 flex items-center gap-1"
-                                >
-                                  <div className="w-1 h-1 bg-sage-500 rounded-full" />
-                                  Mám doma
-                                </motion.span>
-                              )}
-                            </div>
-                          </div>
-                          <span className={`font-bold transition-all ${isChecked ? 'text-sage-600' : 'text-sage-600'}`}>
-                            {ing.amount} {ing.unit}
-                          </span>
-                        </div>
-                      );
-                    })}
+                    {selectedRecipe.ingredients?.map((ing: any, i: number) => (
+                      <div 
+                        key={i} 
+                        className="flex justify-between items-center bg-gray-50/50 p-5 rounded-2xl border border-gray-100/50 hover:bg-white transition-colors"
+                      >
+                        <span className="font-medium text-gray-700">{ing.item}</span>
+                        <span className="text-sage-600 font-bold">{ing.amount} {ing.unit}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
 
@@ -695,6 +660,95 @@ function RecipesContent() {
                     Zrušiť
                   </button>
                 </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Share Shopping List Modal */}
+      <AnimatePresence>
+        {showShareModal && selectedRecipe && (
+          <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setShowShareModal(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, y: 100 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 100 }}
+              className="relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden max-h-[90vh] flex flex-col"
+            >
+              <div className="p-6 border-b border-gray-100 flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-gray-800">Zdieľať nákup</h3>
+                  <p className="text-xs text-gray-400 font-medium">Vyberte, čo už máte doma</p>
+                </div>
+                <button 
+                  onClick={() => setShowShareModal(false)}
+                  className="w-10 h-10 bg-gray-50 text-gray-400 rounded-full flex items-center justify-center active:scale-90 transition-all"
+                >
+                  <ChevronLeft size={24} className="rotate-[-90deg] sm:rotate-0" />
+                </button>
+              </div>
+
+              <div className="flex-1 overflow-y-auto p-6 space-y-3">
+                {selectedRecipe.ingredients?.map((ing: any, i: number) => {
+                  const isChecked = checkedIngredients.includes(ing.item);
+                  return (
+                    <div 
+                      key={i} 
+                      onClick={() => {
+                        setCheckedIngredients(prev => 
+                          prev.includes(ing.item) 
+                            ? prev.filter(t => t !== ing.item) 
+                            : [...prev, ing.item]
+                        );
+                      }}
+                      className={`flex justify-between items-center p-4 rounded-2xl border transition-all cursor-pointer group ${
+                        isChecked 
+                          ? 'bg-sage-50/50 border-sage-200' 
+                          : 'bg-gray-50 border-transparent hover:bg-white hover:border-sage-200'
+                      }`}
+                    >
+                      <div className="flex items-center gap-4">
+                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all ${
+                          isChecked 
+                            ? 'bg-sage-500 border-sage-500 text-white' 
+                            : 'bg-white border-gray-200 text-transparent group-hover:border-sage-300'
+                        }`}>
+                          <Check size={14} strokeWidth={3} />
+                        </div>
+                        <span className={`font-semibold text-sm transition-all ${isChecked ? 'text-sage-900' : 'text-gray-700'}`}>
+                          {ing.item}
+                        </span>
+                      </div>
+                      <span className="text-xs font-bold text-gray-400">
+                        {ing.amount} {ing.unit}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+
+              <div className="p-6 bg-gray-50 border-t border-gray-100 space-y-4">
+                <p className="text-[10px] text-gray-400 text-center italic">
+                  * Odznačené položky budú pridané do nákupného zoznamu.
+                </p>
+                <button 
+                  onClick={() => {
+                    handleShareShoppingList();
+                    setShowShareModal(false);
+                  }}
+                  className="w-full py-5 bg-sage-500 text-white rounded-2xl font-bold shadow-xl shadow-sage-200 active:scale-95 transition-all flex items-center justify-center gap-3"
+                >
+                  <Share2 size={20} />
+                  Odoslať zoznam
+                </button>
               </div>
             </motion.div>
           </div>
