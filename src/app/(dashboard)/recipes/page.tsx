@@ -595,7 +595,7 @@ function RecipesContent() {
                           }}
                           className={`flex justify-between items-center p-5 rounded-2xl border transition-all cursor-pointer group ${
                             isChecked 
-                              ? 'bg-sage-50/30 border-sage-100 opacity-60' 
+                              ? 'bg-sage-50/50 border-sage-200 shadow-sm' 
                               : 'bg-gray-50/50 border-gray-100/50 hover:bg-white hover:border-sage-200'
                           }`}
                         >
@@ -607,11 +607,23 @@ function RecipesContent() {
                             }`}>
                               <Check size={14} strokeWidth={3} />
                             </div>
-                            <span className={`font-medium transition-all ${isChecked ? 'text-gray-400 line-through' : 'text-gray-700'}`}>
-                              {ing.item}
-                            </span>
+                            <div className="flex flex-col">
+                              <span className={`font-semibold transition-all ${isChecked ? 'text-sage-900' : 'text-gray-700'}`}>
+                                {ing.item}
+                              </span>
+                              {isChecked && (
+                                <motion.span 
+                                  initial={{ opacity: 0, x: -5 }}
+                                  animate={{ opacity: 1, x: 0 }}
+                                  className="text-[9px] font-bold text-sage-500 uppercase tracking-widest leading-none mt-1 flex items-center gap-1"
+                                >
+                                  <div className="w-1 h-1 bg-sage-500 rounded-full" />
+                                  Mám doma
+                                </motion.span>
+                              )}
+                            </div>
                           </div>
-                          <span className={`font-bold transition-all ${isChecked ? 'text-gray-300' : 'text-sage-600'}`}>
+                          <span className={`font-bold transition-all ${isChecked ? 'text-sage-600' : 'text-sage-600'}`}>
                             {ing.amount} {ing.unit}
                           </span>
                         </div>
