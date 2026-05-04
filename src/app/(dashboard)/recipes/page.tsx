@@ -224,7 +224,7 @@ function RecipesContent() {
       itemsToShare = selectedRecipe.ingredients
         .filter((ing: any) => !checkedIngredients.includes(ing.item))
         .map((ing: any) => {
-          // Use buying units if available in the recipe JSON
+          // EXCLUSIVELY use buying units if available, fallback to original only if missing
           const amount = ing.buying_amount || ing.amount;
           const unit = ing.buying_unit || ing.unit;
           return `- ${ing.item}: ${amount} ${unit}`;
@@ -778,12 +778,18 @@ function RecipesContent() {
                           </span>
                         </div>
                         <div className="text-right">
-                          <span className="text-xs font-bold text-gray-400 block">
-                            {ing.amount} {ing.unit}
-                          </span>
-                          {(ing.buying_amount || ing.buying_unit) && (
-                            <span className="text-[10px] font-medium text-blue-400 block italic">
-                              Nákup: {ing.buying_amount} {ing.buying_unit}
+                          {ing.buying_amount || ing.buying_unit ? (
+                            <>
+                              <span className="text-sm font-bold text-blue-600 block">
+                                {ing.buying_amount} {ing.buying_unit}
+                              </span>
+                              <span className="text-[9px] font-medium text-gray-300 block italic">
+                                (recept: {ing.amount} {ing.unit})
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-xs font-bold text-gray-400 block">
+                              {ing.amount} {ing.unit}
                             </span>
                           )}
                         </div>
