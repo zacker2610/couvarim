@@ -132,7 +132,7 @@ export default function ScanPage() {
             <Camera size={28} />
           </div>
           <div>
-            <h2 className="text-3xl font-black text-gray-800 tracking-tight">AI Skener</h2>
+            <h2 className="text-3xl font-black text-gray-800 tracking-tight">Skener</h2>
             <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-0.5">Zistite, čo dnes uvariť</p>
           </div>
         </div>

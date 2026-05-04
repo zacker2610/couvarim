@@ -216,7 +216,7 @@ export default function GeneratePage() {
                   <Camera size={28} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-gray-800 text-lg leading-tight">AI Skener chladničky</h3>
+                  <h3 className="font-bold text-gray-800 text-lg leading-tight">Skener chladničky</h3>
                   <p className="text-gray-400 text-xs font-medium mt-1">Odfote a my vymyslíme recept</p>
                 </div>
                 <ArrowRight size={20} className="text-gray-200 group-hover:text-sage-500 transition-colors" />
