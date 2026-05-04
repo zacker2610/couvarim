@@ -385,9 +385,9 @@ export async function updateProfileAction(profileData: any) {
 
     revalidatePath("/profile");
     return { success: true };
-  } catch (error) {
+  } catch (error: any) {
     console.error("Update Profile Error:", error);
-    return { success: false, error: "Nepodarilo sa uložiť zmeny profilu." };
+    return { success: false, error: error.message || "Nepodarilo sa uložiť zmeny profilu." };
   }
 }
 
