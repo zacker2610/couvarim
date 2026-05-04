@@ -722,6 +722,27 @@ function RecipesContent() {
               </div>
 
               <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                {/* Normalization button for OLD recipes (without buying_amount) */}
+                {!normalizedIngredients && selectedRecipe.ingredients.some((ing: any) => !ing.buying_amount) && (
+                  <button 
+                    onClick={handleNormalizeIngredients}
+                    disabled={isNormalizing || selectedRecipe.ingredients.filter((ing: any) => !checkedIngredients.includes(ing.item)).length === 0}
+                    className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-100 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
+                  >
+                    {isNormalizing ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        AI normalizuje množstvá...
+                      </>
+                    ) : (
+                      <>
+                        <Flame size={16} />
+                        Normalizovať na celé balenia (AI)
+                      </>
+                    )}
+                  </button>
+                )}
+
                 <div className="space-y-3">
                   <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Vaše suroviny</h4>
                   {selectedRecipe.ingredients?.map((ing: any, i: number) => {
@@ -770,17 +791,6 @@ function RecipesContent() {
                     );
                   })}
                 </div>
-
-                {!normalizedIngredients && (
-                  <button 
-                    onClick={handleNormalizeIngredients}
-                    disabled={isNormalizing || selectedRecipe.ingredients.filter((ing: any) => !checkedIngredients.includes(ing.item)).length === 0}
-                    className="w-full py-4 bg-blue-50 text-blue-600 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 border border-blue-100 hover:bg-blue-100 transition-all disabled:opacity-50"
-                  >
-                    {isNormalizing ? <Loader2 size={14} className="animate-spin" /> : <Flame size={14} />}
-                    Normalizovať množstvá na nákup
-                  </button>
-                )}
 
                 {normalizedIngredients && (
                   <motion.div 
