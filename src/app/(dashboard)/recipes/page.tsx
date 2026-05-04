@@ -348,7 +348,7 @@ function RecipesContent() {
                       {recipe.household_id && (
                         <div className="absolute top-4 left-4 z-20 bg-sage-500/90 backdrop-blur-sm text-white px-3 py-1.5 rounded-xl flex items-center gap-1.5 shadow-sm border border-white/20 scale-90 origin-top-left">
                           <Users size={14} strokeWidth={2.5} />
-                          <span className="text-[10px] font-bold uppercase tracking-wider">Rodinný</span>
+                          <span className="text-[10px] font-bold uppercase tracking-wider">Spoločný</span>
                         </div>
                       )}
                       {recipe.image_url ? (
@@ -442,7 +442,7 @@ function RecipesContent() {
                    <button 
                     onClick={() => handleToggleShare(selectedRecipe)}
                     className={`w-10 h-10 rounded-full flex items-center justify-center transition-all shadow-lg active:scale-90 border-2 ${selectedRecipe.household_id ? 'bg-sage-500 text-white border-white' : 'bg-white/80 backdrop-blur-sm text-gray-500 border-transparent hover:bg-white'}`}
-                    title={selectedRecipe.household_id ? "Zdieľané s rodinou" : "Zdieľať s rodinou"}
+                    title={selectedRecipe.household_id ? "Zdieľané s domácnosťou" : "Zdieľať s domácnosťou"}
                   >
                     <Users size={18} />
                   </button>

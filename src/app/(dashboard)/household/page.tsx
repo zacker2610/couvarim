@@ -223,7 +223,7 @@ export default function HouseholdPage() {
     <div className="pb-12 space-y-6">
       <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center justify-between py-4 px-2 -mx-2 mb-2">
         <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
-          {household?.name || "Moja Rodina"}
+          {household?.name || "Moja Domácnosť"}
         </h2>
         <button 
           onClick={() => setShowInviteModal(true)}
@@ -248,7 +248,7 @@ export default function HouseholdPage() {
               <Users size={24} />
             </div>
             <div>
-              <h3 className="font-bold text-gray-800 text-lg">Členovia rodiny</h3>
+              <h3 className="font-bold text-gray-800 text-lg">Členovia domácnosti</h3>
               <p className="text-gray-400 text-xs font-medium">Celkový počet v domácnosti</p>
             </div>
           </div>
@@ -282,7 +282,7 @@ export default function HouseholdPage() {
           ) : (
             <div className="py-2 text-gray-400 text-sm font-medium flex items-center gap-2">
               <Check size={16} className="text-sage-500" />
-              Vaša rodina nemá žiadne nahlásené obmedzenia.
+              Vaša domácnosť nemá žiadne nahlásené obmedzenia.
             </div>
           )}
       </section>
@@ -398,7 +398,7 @@ export default function HouseholdPage() {
       <section className="space-y-6 pt-4">
         <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-xl font-bold text-gray-800 tracking-tight">Rodinná nástenka</h3>
+              <h3 className="text-xl font-bold text-gray-800 tracking-tight">Nástenka domácnosti</h3>
               <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-1">Spoločné recepty a odporúčania</p>
             </div>
           <div className="px-3 py-1 bg-sage-50 text-sage-600 rounded-full text-[10px] font-bold border border-sage-100">
@@ -436,7 +436,7 @@ export default function HouseholdPage() {
                   <div>
                     <h4 className="font-bold text-gray-800 line-clamp-2 group-hover:text-sage-600 transition-colors text-sm h-10">{recipe.title}</h4>
                     <p className="text-[10px] text-gray-400 font-medium mt-0.5">
-                      Odporúča: <span className="text-sage-600 font-bold">{recipe.profiles?.full_name || "Člen rodiny"}</span>
+                      Odporúča: <span className="text-sage-600 font-bold">{recipe.profiles?.full_name || "Člen domácnosti"}</span>
                     </p>
                   </div>
                   <div className="flex items-center gap-3 text-[9px] font-bold text-gray-400 uppercase tracking-tighter">

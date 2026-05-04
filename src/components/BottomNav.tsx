@@ -21,7 +21,7 @@ const navItems = [
   { icon: Home, label: "Domov", href: "/dashboard" },
   { icon: ChefHat, label: "Recepty", href: "/recipes" },
   { icon: PlusCircle, label: "Nový", href: "/generate" },
-  { icon: Users, label: "Rodina", href: "/household" },
+  { icon: Users, label: "Domácnosť", href: "/household" },
   { icon: User, label: "Profil", href: "/profile" },
 ];
 
