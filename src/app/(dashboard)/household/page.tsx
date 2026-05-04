@@ -42,6 +42,7 @@ export default function HouseholdPage() {
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [editingMember, setEditingMember] = useState<any>(null);
   const [inviteType, setInviteType] = useState<"email" | "manual" | "link">("email");
+  const [generatedLink, setGeneratedLink] = useState<string | null>(null);
   const [newMemberName, setNewMemberName] = useState("");
   const [newMemberEmail, setNewMemberEmail] = useState("");
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -148,6 +149,7 @@ export default function HouseholdPage() {
         if (inviteType === 'link') {
           const baseUrl = window.location.origin;
           const inviteUrl = `${baseUrl}/invite/${result.member.id}`;
+          setGeneratedLink(inviteUrl);
           
           if (navigator.share) {
             try {
@@ -157,14 +159,11 @@ export default function HouseholdPage() {
                 url: inviteUrl
               });
             } catch (err) {
-              // Share was cancelled or failed, copy to clipboard as fallback
-              await navigator.clipboard.writeText(inviteUrl);
-              alert("Odkaz bol skopírovaný do schránky.");
+              // Share was cancelled or failed
             }
-          } else {
-            await navigator.clipboard.writeText(inviteUrl);
-            alert("Odkaz bol skopírovaný do schránky.");
           }
+          await fetchData();
+          return; // Don't close modal, show generated link
         }
         await fetchData();
         handleCloseModal();
@@ -178,12 +177,23 @@ export default function HouseholdPage() {
   const handleCloseModal = () => {
     setShowInviteModal(false);
     setEditingMember(null);
+    setInviteType("email");
     setNewMemberName("");
     setNewMemberEmail("");
     setSelectedTags([]);
     setSelectedDietTags([]);
     setDislikedIngredients([]);
     setDislikeInput("");
+    setGeneratedLink(null);
+  };
+
+  const copyToClipboard = async (text: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      alert("Odkaz bol skopírovaný!");
+    } catch (err) {
+      console.error('Failed to copy: ', err);
+    }
   };
 
   const handleRemoveMember = async (memberId: string) => {
@@ -494,16 +504,76 @@ export default function HouseholdPage() {
                     </div>
                   </div>
                 ) : inviteType === 'link' ? (
-                  <div className="py-8 text-center space-y-4">
-                    <div className="w-16 h-16 bg-sage-50 text-sage-500 rounded-2xl flex items-center justify-center mx-auto mb-2">
-                      <Share2 size={32} />
-                    </div>
-                    <div className="space-y-1">
-                      <h4 className="font-bold text-gray-800">Rýchle zdieľanie</h4>
-                      <p className="text-xs text-gray-400 px-6">
-                        Vygenerujeme unikátny odkaz, ktorý môžete poslať cez WhatsApp, Messenger alebo SMS.
-                      </p>
-                    </div>
+                  <div className="py-8 text-center space-y-6">
+                    {generatedLink ? (
+                      <>
+                        <div className="w-16 h-16 bg-green-50 text-green-500 rounded-2xl flex items-center justify-center mx-auto mb-2">
+                          <Check size={32} />
+                        </div>
+                        <div className="space-y-1">
+                          <h4 className="font-bold text-gray-800 text-lg">Odkaz je hotový!</h4>
+                          <p className="text-xs text-gray-400 px-6">
+                            Skopírujte ho nižšie alebo použite tlačidlo zdieľať.
+                          </p>
+                        </div>
+                        <div className="flex gap-2 bg-gray-50 p-2 rounded-2xl border border-gray-100">
+                          <input 
+                            readOnly 
+                            value={generatedLink} 
+                            className="flex-1 bg-transparent border-none outline-none px-3 text-[10px] font-medium text-gray-500 truncate"
+                          />
+                          <button 
+                            type="button"
+                            onClick={() => copyToClipboard(generatedLink)}
+                            className="px-4 py-2 bg-white text-sage-600 rounded-xl text-[10px] font-bold shadow-sm active:scale-95 transition-all border border-gray-100"
+                          >
+                            Kopírovať
+                          </button>
+                        </div>
+                        <button 
+                          type="button"
+                          onClick={() => {
+                            if (navigator.share) {
+                              navigator.share({
+                                title: 'Pozvánka do ČoUvarím.sk',
+                                text: `Ahoj! Pozývam ťa do našej spoločnej domácnosti v aplikácii ČoUvarím.sk. Pridaj sa tu:`,
+                                url: generatedLink
+                              });
+                            }
+                          }}
+                          className="w-full py-4 bg-sage-50 text-sage-600 rounded-2xl font-bold flex items-center justify-center gap-2 text-xs"
+                        >
+                          <Share2 size={16} /> Zdieľať znova
+                        </button>
+                        <button 
+                          type="button"
+                          onClick={handleCloseModal}
+                          className="w-full text-[10px] font-bold text-gray-400 uppercase tracking-widest pt-2"
+                        >
+                          Hotovo, zavrieť
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <div className="w-16 h-16 bg-sage-50 text-sage-500 rounded-2xl flex items-center justify-center mx-auto mb-2">
+                          <Share2 size={32} />
+                        </div>
+                        <div className="space-y-1">
+                          <h4 className="font-bold text-gray-800">Rýchle zdieľanie</h4>
+                          <p className="text-xs text-gray-400 px-6">
+                            Vygenerujeme unikátny odkaz, ktorý môžete poslať cez WhatsApp, Messenger alebo SMS.
+                          </p>
+                        </div>
+                        <button 
+                          type="submit"
+                          disabled={isSubmitting}
+                          className="w-full py-5 bg-sage-500 text-sage-50 rounded-2xl font-bold shadow-xl active:scale-[0.98] transition-all hover:bg-sage-600 mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                        >
+                          {isSubmitting && <Loader2 size={18} className="animate-spin" />}
+                          Vygenerovať odkaz
+                        </button>
+                      </>
+                    )}
                   </div>
                 ) : (
                   <>
@@ -595,14 +665,6 @@ export default function HouseholdPage() {
                   </div>
                   </>
                 )}
-                <button 
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-5 bg-sage-500 text-sage-50 rounded-2xl font-bold shadow-xl active:scale-[0.98] transition-all hover:bg-sage-600 mt-4 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-                >
-                  {isSubmitting && <Loader2 size={18} className="animate-spin" />}
-                  {editingMember ? 'Uložiť zmeny' : (inviteType === 'email' ? 'Odoslať pozvánku' : (inviteType === 'link' ? 'Zdieľať odkaz' : 'Pridať do skupiny'))}
-                </button>
               </form>
               <div className="h-16 sm:hidden" />
             </motion.div>
