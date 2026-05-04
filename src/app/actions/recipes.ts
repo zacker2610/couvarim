@@ -4,6 +4,7 @@ import { geminiModel } from "@/lib/gemini";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { sendHouseholdInvitation } from "@/lib/mail";
 
 /**
  * Generate a unique AI image for the recipe using Pollinations.ai
@@ -545,6 +546,24 @@ export async function addHouseholdMemberAction(householdId: string, memberData: 
         .single();
 
       if (error) throw error;
+
+      // Send Invitation Email
+      const { data: household } = await supabase
+        .from("households")
+        .select("name")
+        .eq("id", householdId)
+        .single();
+      
+      const { data: { user: inviter } } = await supabase.auth.getUser();
+      const inviterName = inviter?.user_metadata?.full_name || "Člen rodiny";
+      
+      await sendHouseholdInvitation(
+        memberData.email,
+        household?.name || "Moja Domácnosť",
+        inviterName,
+        data.id
+      );
+
       return { success: true, member: data };
     } else {
       const { data, error } = await supabase

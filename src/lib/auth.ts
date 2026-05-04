@@ -16,7 +16,7 @@ export const signInWithGoogle = async () => {
   return { data, error };
 };
 
-export const signUpWithEmail = async (email: string, password: string, name: string) => {
+export const signUpWithEmail = async (email: string, password: string, name: string, redirectTo?: string) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -24,7 +24,7 @@ export const signUpWithEmail = async (email: string, password: string, name: str
       data: {
         full_name: name,
       },
-      emailRedirectTo: `${window.location.origin}/auth/callback`,
+      emailRedirectTo: redirectTo || `${window.location.origin}/auth/callback`,
     },
   });
 

@@ -5,7 +5,12 @@ import Link from "next/link";
 import { ChefHat, User, Mail, Lock } from "lucide-react";
 import { signInWithGoogle, signUpWithEmail } from "@/lib/auth";
 
+import { useSearchParams } from "next/navigation";
+
 export default function RegisterPage() {
+  const searchParams = useSearchParams();
+  const returnTo = searchParams.get("returnTo");
+  
   const [name, setName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -14,7 +19,13 @@ export default function RegisterPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    await signUpWithEmail(email, password, name);
+    
+    let redirectUrl = undefined;
+    if (returnTo) {
+      redirectUrl = `${window.location.origin}${returnTo}`;
+    }
+    
+    await signUpWithEmail(email, password, name, redirectUrl);
     setLoading(false);
   };
 
