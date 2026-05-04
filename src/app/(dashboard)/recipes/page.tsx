@@ -223,7 +223,12 @@ function RecipesContent() {
     } else {
       itemsToShare = selectedRecipe.ingredients
         .filter((ing: any) => !checkedIngredients.includes(ing.item))
-        .map((ing: any) => `- ${ing.item}: ${ing.amount} ${ing.unit}`);
+        .map((ing: any) => {
+          // Use buying units if available in the recipe JSON
+          const amount = ing.buying_amount || ing.amount;
+          const unit = ing.buying_unit || ing.unit;
+          return `- ${ing.item}: ${amount} ${unit}`;
+        });
     }
     
     const missingIngredientsText = itemsToShare.join("\n");
@@ -751,9 +756,16 @@ function RecipesContent() {
                             {ing.item}
                           </span>
                         </div>
-                        <span className="text-xs font-bold text-gray-400">
-                          {ing.amount} {ing.unit}
-                        </span>
+                        <div className="text-right">
+                          <span className="text-xs font-bold text-gray-400 block">
+                            {ing.amount} {ing.unit}
+                          </span>
+                          {(ing.buying_amount || ing.buying_unit) && (
+                            <span className="text-[10px] font-medium text-blue-400 block italic">
+                              Nákup: {ing.buying_amount} {ing.buying_unit}
+                            </span>
+                          )}
+                        </div>
                       </div>
                     );
                   })}

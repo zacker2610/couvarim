@@ -152,7 +152,7 @@ export async function generateRecipeAction(
           "fat": 15
         },
         "ingredients": [
-          { "item": "názov suroviny", "amount": "100", "unit": "g", "owned": true | false }
+          { "item": "názov suroviny", "amount": "100", "unit": "g", "buying_amount": "1", "buying_unit": "kg", "owned": true | false }
         ],
         "instructions": [
           "1. krok postupu...",
@@ -168,6 +168,7 @@ export async function generateRecipeAction(
       4. KOMPLETNOSŤ: Nikdy nevynechávaj základné suroviny potrebné pre daný typ jedla.
       5. ČÍSLA A NUTRIČNÉ HODNOTY: "calories" a nutričné hodnoty (protein, carbs, fat) MUSIA byť čísla (Integer/Float). Nutričné hodnoty počítaj VŽDY na JEDNU PORCIU.
       6. LOGIKA PORCIÍ: Množstvá surovín MUSIA zodpovedať počtu porcií. Ak je "servings" 1, množstvá musia byť primerané pre jednu osobu (napr. 150-200g mäsa). Ak sú množstvá veľké (napr. 600g mäsa), nastav "servings" na zodpovedajúci počet (napr. 3-4).
+      7. NÁKUPNÉ JEDNOTKY: Pre každú ingredienciu doplň "buying_amount" a "buying_unit", ktoré predstavujú logické množstvo na nákup v obchode (napr. ak je amount "1" a unit "ČL korenia", buying_amount bude "1" a buying_unit "balenie").
       
       Návrat len čistý JSON, žiadne kecy okolo. NIKDY nepoužívaj žiadne citácie ani značky typu [cite: 1].
     `;
