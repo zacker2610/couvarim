@@ -183,32 +183,34 @@ export default function GeneratePage() {
               <p className="text-gray-500 text-sm mt-1">Čo si dnes uvaríme?</p>
             </header>
 
-            {hasHousehold && (
-              <div className="bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm flex items-center mb-2">
-                <button 
-                  onClick={() => setUseHousehold(false)} 
-                  className={`flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-                    !useHousehold 
-                      ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
-                      : 'text-gray-400 hover:text-gray-600'
-                  }`}
-                >
-                  <User size={14} />
-                  Len pre mňa
-                </button>
-                <button 
-                  onClick={() => setUseHousehold(true)} 
-                  className={`flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-                    useHousehold 
-                      ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
-                      : 'text-gray-400 hover:text-gray-600'
-                  }`}
-                >
-                  <Users size={14} />
-                  Celá domácnosť
-                </button>
-              </div>
-            )}
+            <div className="min-h-[64px]">
+              {hasHousehold && (
+                <div className="bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm flex items-center mb-2 animate-in fade-in duration-300">
+                  <button 
+                    onClick={() => setUseHousehold(false)} 
+                    className={`flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                      !useHousehold 
+                        ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                  >
+                    <User size={14} />
+                    Len pre mňa
+                  </button>
+                  <button 
+                    onClick={() => setUseHousehold(true)} 
+                    className={`flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                      useHousehold 
+                        ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
+                        : 'text-gray-400 hover:text-gray-600'
+                    }`}
+                  >
+                    <Users size={14} />
+                    Celá domácnosť
+                  </button>
+                </div>
+              )}
+            </div>
 
             <div className="flex flex-col gap-4">
               <Link href="/scan" className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5 group transition-all active:scale-[0.98]">
@@ -216,7 +218,7 @@ export default function GeneratePage() {
                   <Camera size={28} />
                 </div>
                 <div className="flex-1">
-                  <h3 className="font-bold text-gray-800 text-lg leading-tight">Skener chladničky</h3>
+                  <h3 className="font-bold text-gray-800 text-lg leading-tight">Skener</h3>
                   <p className="text-gray-400 text-xs font-medium mt-1">Odfote a my vymyslíme recept</p>
                 </div>
                 <ArrowRight size={20} className="text-gray-200 group-hover:text-sage-500 transition-colors" />
