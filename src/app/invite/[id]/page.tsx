@@ -47,7 +47,9 @@ export default function InvitePage() {
       }
     } catch (err: any) {
       console.error("Invite Fetch Error:", err);
-      setError("Nepodarilo sa načítať detaily pozvánky.");
+      // More detailed error for debugging
+      const detail = err.message || JSON.stringify(err);
+      setError(`Nepodarilo sa načítať detaily pozvánky. Chyba: ${detail}`);
     } finally {
       setLoading(false);
     }
