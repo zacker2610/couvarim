@@ -19,15 +19,13 @@ export async function sendHouseholdInvitation(email: string, householdName: stri
             <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
               <tr>
                 <td style="vertical-align: middle;">
-                  <div style="background-color: #a3b18a; width: 44px; height: 44px; border-radius: 14px; position: relative; box-shadow: 0 2px 8px rgba(0,0,0,0.15); display: table-cell; vertical-align: middle; text-align: center;">
-                    <!-- Pure CSS Chef Hat -->
-                    <div style="display: inline-block; width: 22px; height: 22px; position: relative;">
-                      <div style="position: absolute; top: 0; left: 5px; width: 12px; height: 12px; background: #ffffff; border-radius: 50%;"></div>
-                      <div style="position: absolute; top: 3px; left: 0; width: 10px; height: 10px; background: #ffffff; border-radius: 50%;"></div>
-                      <div style="position: absolute; top: 3px; right: 0; width: 10px; height: 10px; background: #ffffff; border-radius: 50%;"></div>
-                      <div style="position: absolute; bottom: 0; left: 3px; width: 16px; height: 10px; background: #ffffff; border-radius: 3px;"></div>
-                    </div>
-                  </div>
+                  <table cellpadding="0" cellspacing="0" border="0" style="background-color: #a3b18a; width: 44px; height: 44px; border-radius: 12px; border-collapse: separate; shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                    <tr>
+                      <td align="center" valign="middle" style="height: 44px; width: 44px;">
+                        <img src="https://raw.githubusercontent.com/lucide-react/lucide/main/icons/chef-hat.png" width="24" height="24" style="display: block; outline: none; border: none; text-decoration: none;" alt="" />
+                      </td>
+                    </tr>
+                  </table>
                 </td>
                 <td style="vertical-align: middle; padding-left: 14px;">
                   <h1 style="color: #4d6047; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">ČoUvarím.sk</h1>
