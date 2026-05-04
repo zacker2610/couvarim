@@ -415,7 +415,7 @@ function RecipesContent() {
               <h2 className="text-2xl font-bold text-gray-800 tracking-tight text-center flex-1">Detail</h2>
               <div className="flex items-center gap-3">
                 <button 
-                  onClick={handleExternalShare}
+                  onClick={() => handleExternalShare()}
                   className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-400 active:scale-90 transition-all hover:text-sage-500"
                 >
                   <Share2 size={22} />
