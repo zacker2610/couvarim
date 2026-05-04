@@ -6,8 +6,9 @@ import { ChefHat, User, Mail, Lock } from "lucide-react";
 import { signInWithGoogle, signUpWithEmail } from "@/lib/auth";
 
 import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function RegisterPage() {
+function RegisterForm() {
   const searchParams = useSearchParams();
   const returnTo = searchParams.get("returnTo");
   
@@ -138,5 +139,17 @@ export default function RegisterPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#F8F5F2] flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-sage-200 border-t-sage-500 rounded-full animate-spin"></div>
+      </div>
+    }>
+      <RegisterForm />
+    </Suspense>
   );
 }
