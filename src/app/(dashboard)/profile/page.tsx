@@ -22,6 +22,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { COMMON_INTOLERANCES, DIETARY_PREFERENCES } from "@/lib/constants";
 import { supabase } from "@/lib/supabase";
 import { updateProfileAction } from "@/app/actions/recipes";
+import { signOut } from "@/lib/auth";
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
@@ -204,8 +205,7 @@ export default function ProfilePage() {
   };
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    window.location.href = "/";
+    await signOut();
   };
 
   if (loading) {
@@ -520,7 +520,7 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <section className="pt-8 pb-12 text-center">
+        <section className="pt-8 pb-12 text-center md:hidden">
           <button 
             onClick={handleLogout}
             className="w-full py-4 bg-white text-red-400 rounded-2xl font-medium flex items-center justify-center gap-2 active:bg-red-50 transition-all border border-gray-100 shadow-sm"
