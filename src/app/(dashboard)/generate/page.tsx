@@ -24,7 +24,8 @@ import {
   Plus,
   Loader2,
   Check,
-  Users
+  Users,
+  User
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -179,7 +180,7 @@ export default function GeneratePage() {
                     : 'text-gray-400 hover:text-gray-600'
                 }`}
               >
-                <Zap size={14} />
+                <User size={14} />
                 Len pre mňa
               </button>
               <button 
@@ -191,7 +192,7 @@ export default function GeneratePage() {
                 }`}
               >
                 <Users size={14} />
-                Celá rodina
+                Celá domácnosť
               </button>
             </div>
 
