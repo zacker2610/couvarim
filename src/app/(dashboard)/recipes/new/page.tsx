@@ -546,16 +546,19 @@ export default function NewRecipePage() {
                 </p>
 
                 <div className="space-y-4">
-                  <div className="flex gap-4">
+                  <div className="flex flex-col gap-4">
                     <button 
                       onClick={() => scanInputRef.current?.click()}
                       disabled={isScanning || isParsing}
-                      className="flex-1 py-6 bg-white border-2 border-dashed border-sage-200 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-sage-50 transition-all active:scale-95 group disabled:opacity-50"
+                      className="w-full py-8 bg-white border-2 border-dashed border-sage-200 rounded-3xl flex flex-col items-center justify-center gap-3 hover:bg-sage-50 transition-all active:scale-95 group disabled:opacity-50"
                     >
-                      <div className="w-10 h-10 bg-sage-100 text-sage-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
-                        {isScanning ? <Loader2 className="animate-spin" size={20} /> : <Camera size={20} />}
+                      <div className="w-14 h-14 bg-sage-100 text-sage-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
+                        {isScanning ? <Loader2 className="animate-spin" size={28} /> : <Camera size={28} />}
                       </div>
-                      <span className="text-[10px] font-bold text-sage-700 uppercase tracking-widest">Odfotiť recept</span>
+                      <div className="text-center">
+                        <span className="block text-sm font-black text-sage-700 uppercase tracking-widest">Odfotiť recept</span>
+                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Papier, kniha alebo poznámky</span>
+                      </div>
                       <input 
                         type="file" 
                         accept="image/*" 
@@ -564,15 +567,9 @@ export default function NewRecipePage() {
                         onChange={handleScanRecipe}
                       />
                     </button>
-                    <div className="flex-1 py-6 bg-white border-2 border-gray-100 rounded-2xl flex flex-col items-center justify-center gap-2 opacity-50 cursor-not-allowed">
-                       <div className="w-10 h-10 bg-gray-100 text-gray-400 rounded-xl flex items-center justify-center">
-                        <FileJson size={20} />
-                      </div>
-                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">JSON Import</span>
-                    </div>
                   </div>
 
-                  <div className="relative py-4 flex items-center gap-4">
+                  <div className="relative py-2 flex items-center gap-4">
                     <div className="flex-1 h-px bg-gray-100" />
                     <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Alebo vložte text</span>
                     <div className="flex-1 h-px bg-gray-100" />
@@ -581,9 +578,9 @@ export default function NewRecipePage() {
                   <textarea 
                     value={jsonInput}
                     onChange={(e) => setJsonInput(e.target.value)}
-                    placeholder="Prilepte sem text receptu..."
+                    placeholder="Prilepte sem text receptu (napr. z blogu)..."
                     disabled={isParsing || isScanning}
-                    className="w-full h-40 p-6 rounded-2xl bg-white border border-gray-100 text-sm outline-none focus:ring-4 focus:ring-sage-500/10 transition-all resize-none shadow-inner disabled:opacity-50"
+                    className="w-full h-40 p-6 rounded-2xl bg-white border border-gray-100 text-sm outline-none focus:ring-4 focus:ring-sage-500/10 transition-all resize-none shadow-inner disabled:opacity-50 font-medium"
                   />
                   
                   {importError && (
