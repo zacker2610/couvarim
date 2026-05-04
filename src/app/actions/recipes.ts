@@ -464,6 +464,17 @@ export async function getOrCreateHouseholdAction() {
       .maybeSingle();
 
     if (household) {
+      // Automatic cleanup: Rename old default "Moja Rodina" to "Moja Domácnosť"
+      if (household.name === "Moja Rodina") {
+        const { data: updatedHousehold } = await supabase
+          .from("households")
+          .update({ name: "Moja Domácnosť" })
+          .eq("id", household.id)
+          .select()
+          .single();
+        
+        if (updatedHousehold) return { success: true, household: updatedHousehold };
+      }
       return { success: true, household };
     }
 
