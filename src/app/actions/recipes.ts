@@ -564,6 +564,12 @@ export async function addHouseholdMemberAction(householdId: string, memberData: 
         data.id
       );
 
+      // DEBUG: Log invitation link to console for manual sharing
+      const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+      console.log(`\n🚀 [DEBUG] POZVÁNKA VYGENEROVANÁ:`);
+      console.log(`📧 Pre: ${memberData.email}`);
+      console.log(`🔗 Odkaz: ${baseUrl}/invite/${data.id}\n`);
+
       return { success: true, member: data };
     } else {
       const { data, error } = await supabase
