@@ -933,3 +933,43 @@ export async function acceptInvitationAction(inviteId: string, userId: string, f
     return { success: false, error: error.message };
   }
 }
+
+/**
+ * Server Action to normalize ingredients into shopping units using AI.
+ */
+export async function normalizeShoppingListAction(ingredients: any[]) {
+  try {
+    const prompt = `
+      Pretransformuj tento zoznam ingrediencií z receptu na praktický nákupný zoznam pre obchod.
+      Cieľom je previesť kuchynské množstvá (lyžičky, štipky, malé gramáže) na reálne nákupné jednotky (balenia, kusy, kg, l).
+      
+      Zoznam na transformáciu:
+      ${JSON.stringify(ingredients.map(i => ({ item: i.item, amount: i.amount, unit: i.unit })))}
+      
+      Pravidlá:
+      1. Ak je niečoho veľmi málo (lyžička korenia, štipka soli, 5g prášku do pečiva), premeň to na "1 balenie" alebo "balenie".
+      2. Ak je gramáž špecifická (napr. 71g múky), zaokrúhli to na logické nákupné množstvo (napr. 1 kg) alebo "balenie".
+      3. Ak sú to kusy (napr. 2 cibule), ponechaj kusy alebo zaokrúhli nahor na logické balenie (napr. sáčok).
+      4. Vráť zrozumiteľné slovenské názvy a jednotky.
+      
+      Vráť VŽDY a VÝHRADNE JSON pole objektov so štruktúrou:
+      [
+        { "item": "názov suroviny", "amount": "množstvo", "unit": "jednotka" }
+      ]
+      Návrat len čistý JSON.
+    `;
+
+    const result = await geminiModel.generateContent(prompt);
+    const response = await result.response;
+    let text = response.text();
+    text = text.replace(/```json/g, "").replace(/```/g, "").replace(/\[cite: \d+\]/g, "").trim();
+    
+    const normalizedData = JSON.parse(text);
+
+    return { success: true, data: normalizedData };
+  } catch (error: any) {
+    console.error("Normalize Shopping List Error:", error);
+    // Fallback: return original ingredients if AI fails
+    return { success: true, data: ingredients };
+  }
+}

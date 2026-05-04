@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
-import { deleteRecipeAction, toggleRecipeShareAction } from "@/app/actions/recipes";
+import { deleteRecipeAction, toggleRecipeShareAction, normalizeShoppingListAction } from "@/app/actions/recipes";
 import Link from "next/link";
 
 export default function RecipesPage() {
@@ -55,6 +55,8 @@ function RecipesContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [showShareModal, setShowShareModal] = useState(false);
   const [checkedIngredients, setCheckedIngredients] = useState<string[]>([]);
+  const [normalizedIngredients, setNormalizedIngredients] = useState<any[] | null>(null);
+  const [isNormalizing, setIsNormalizing] = useState(false);
   
   const searchParams = useSearchParams();
   const recipeIdFromUrl = searchParams.get("id");
@@ -196,24 +198,42 @@ function RecipesContent() {
       .map((ing: any) => ing.item) || [];
     
     setCheckedIngredients(initialChecked);
+    setNormalizedIngredients(null); // Reset on open
     setShowShareModal(true);
+  };
+
+  const handleNormalizeIngredients = async () => {
+    if (!selectedRecipe) return;
+    setIsNormalizing(true);
+    const missing = selectedRecipe.ingredients.filter((ing: any) => !checkedIngredients.includes(ing.item));
+    const result = await normalizeShoppingListAction(missing);
+    if (result.success) {
+      setNormalizedIngredients(result.data);
+    }
+    setIsNormalizing(false);
   };
 
   const handleShareShoppingList = () => {
     if (!selectedRecipe) return;
     
-    // Only share ingredients that are NOT checked
-    const missingIngredients = selectedRecipe.ingredients
-      .filter((ing: any) => !checkedIngredients.includes(ing.item))
-      .map((ing: any) => `- ${ing.item}: ${ing.amount} ${ing.unit}`)
-      .join("\n");
+    // Use normalized ingredients if available, otherwise use unchecked ones
+    let itemsToShare = [];
+    if (normalizedIngredients) {
+      itemsToShare = normalizedIngredients.map((ing: any) => `- ${ing.item}: ${ing.amount} ${ing.unit}`);
+    } else {
+      itemsToShare = selectedRecipe.ingredients
+        .filter((ing: any) => !checkedIngredients.includes(ing.item))
+        .map((ing: any) => `- ${ing.item}: ${ing.amount} ${ing.unit}`);
+    }
+    
+    const missingIngredientsText = itemsToShare.join("\n");
       
-    if (missingIngredients.length === 0) {
+    if (itemsToShare.length === 0) {
       alert("Všetky suroviny máte označené ako dostupné! 🎉");
       return;
     }
     
-    const text = `🛒 Nákupný zoznam pre: ${selectedRecipe.title}\n\n${missingIngredients}\n\nPoslané z ČoUvarím.sk 👨‍🍳`;
+    const text = `🛒 Nákupný zoznam pre: ${selectedRecipe.title}\n\n${missingIngredientsText}\n\nPoslané z ČoUvarím.sk 👨‍🍳`;
     
     if (navigator.share) {
       navigator.share({
@@ -696,43 +716,78 @@ function RecipesContent() {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6 space-y-3">
-                {selectedRecipe.ingredients?.map((ing: any, i: number) => {
-                  const isChecked = checkedIngredients.includes(ing.item);
-                  return (
-                    <div 
-                      key={i} 
-                      onClick={() => {
-                        setCheckedIngredients(prev => 
-                          prev.includes(ing.item) 
-                            ? prev.filter(t => t !== ing.item) 
-                            : [...prev, ing.item]
-                        );
-                      }}
-                      className={`flex justify-between items-center p-4 rounded-2xl border transition-all cursor-pointer group ${
-                        isChecked 
-                          ? 'bg-sage-50/50 border-sage-200' 
-                          : 'bg-gray-50 border-transparent hover:bg-white hover:border-sage-200'
-                      }`}
-                    >
-                      <div className="flex items-center gap-4">
-                        <div className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all ${
+              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                <div className="space-y-3">
+                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Vaše suroviny</h4>
+                  {selectedRecipe.ingredients?.map((ing: any, i: number) => {
+                    const isChecked = checkedIngredients.includes(ing.item);
+                    return (
+                      <div 
+                        key={i} 
+                        onClick={() => {
+                          setCheckedIngredients(prev => {
+                            const newChecked = prev.includes(ing.item) 
+                              ? prev.filter(t => t !== ing.item) 
+                              : [...prev, ing.item];
+                            setNormalizedIngredients(null); // Reset normalization when selection changes
+                            return newChecked;
+                          });
+                        }}
+                        className={`flex justify-between items-center p-4 rounded-2xl border transition-all cursor-pointer group ${
                           isChecked 
-                            ? 'bg-sage-500 border-sage-500 text-white' 
-                            : 'bg-white border-gray-200 text-transparent group-hover:border-sage-300'
-                        }`}>
-                          <Check size={14} strokeWidth={3} />
+                            ? 'bg-sage-50/50 border-sage-200' 
+                            : 'bg-gray-50 border-transparent hover:bg-white hover:border-sage-200'
+                        }`}
+                      >
+                        <div className="flex items-center gap-4">
+                          <div className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all ${
+                            isChecked 
+                              ? 'bg-sage-500 border-sage-500 text-white' 
+                              : 'bg-white border-gray-200 text-transparent group-hover:border-sage-300'
+                          }`}>
+                            <Check size={14} strokeWidth={3} />
+                          </div>
+                          <span className={`font-semibold text-sm transition-all ${isChecked ? 'text-sage-900' : 'text-gray-700'}`}>
+                            {ing.item}
+                          </span>
                         </div>
-                        <span className={`font-semibold text-sm transition-all ${isChecked ? 'text-sage-900' : 'text-gray-700'}`}>
-                          {ing.item}
+                        <span className="text-xs font-bold text-gray-400">
+                          {ing.amount} {ing.unit}
                         </span>
                       </div>
-                      <span className="text-xs font-bold text-gray-400">
-                        {ing.amount} {ing.unit}
-                      </span>
+                    );
+                  })}
+                </div>
+
+                {!normalizedIngredients && (
+                  <button 
+                    onClick={handleNormalizeIngredients}
+                    disabled={isNormalizing || selectedRecipe.ingredients.filter((ing: any) => !checkedIngredients.includes(ing.item)).length === 0}
+                    className="w-full py-4 bg-blue-50 text-blue-600 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 border border-blue-100 hover:bg-blue-100 transition-all disabled:opacity-50"
+                  >
+                    {isNormalizing ? <Loader2 size={14} className="animate-spin" /> : <Flame size={14} />}
+                    Normalizovať množstvá na nákup
+                  </button>
+                )}
+
+                {normalizedIngredients && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    className="space-y-3 bg-blue-50/30 p-4 rounded-3xl border border-blue-100"
+                  >
+                    <div className="flex justify-between items-center px-1">
+                      <h4 className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Normalizovaný nákup</h4>
+                      <button onClick={() => setNormalizedIngredients(null)} className="text-[10px] font-bold text-blue-400 hover:text-blue-600 underline">Zrušiť</button>
                     </div>
-                  );
-                })}
+                    {normalizedIngredients.map((ing: any, i: number) => (
+                      <div key={i} className="flex justify-between items-center bg-white/80 backdrop-blur-sm p-4 rounded-2xl shadow-sm border border-white">
+                        <span className="text-sm font-bold text-blue-900">{ing.item}</span>
+                        <span className="text-xs font-black text-blue-600">{ing.amount} {ing.unit}</span>
+                      </div>
+                    ))}
+                  </motion.div>
+                )}
               </div>
 
               <div className="p-6 bg-gray-50 border-t border-gray-100 space-y-4">
