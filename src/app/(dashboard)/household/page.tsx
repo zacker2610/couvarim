@@ -31,8 +31,10 @@ import {
   updateHouseholdMemberAction,
   getHouseholdSharedRecipesAction
 } from "@/app/actions/recipes";
+import { supabase } from "@/lib/supabase";
 
 export default function HouseholdPage() {
+  const [currentUser, setCurrentUser] = useState<any>(null);
   const [household, setHousehold] = useState<any>(null);
   const [members, setMembers] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -56,6 +58,11 @@ export default function HouseholdPage() {
 
   const fetchData = async () => {
     setIsLoading(true);
+    
+    // Get current user for comparison
+    const { data: { user } } = await supabase.auth.getUser();
+    setCurrentUser(user);
+
     // Don't create by default, just check
     const hResult = await getOrCreateHouseholdAction(false);
     if (hResult.success && hResult.household) {
@@ -367,7 +374,7 @@ export default function HouseholdPage() {
                           <div className="flex items-center gap-2">
                             <h4 className="font-bold text-gray-800">
                               {getMemberName(member)}
-                              {member.user_id === household?.owner_id && " (Vy)"}
+                              {member.user_id === currentUser?.id && " (Vy)"}
                             </h4>
                             {member.role === 'owner' && (
                               <span className="px-1.5 py-0.5 bg-sage-100 text-sage-700 text-[8px] font-bold uppercase rounded-2xl">Správca</span>
