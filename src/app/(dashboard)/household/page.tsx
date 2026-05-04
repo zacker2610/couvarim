@@ -207,7 +207,7 @@ export default function HouseholdPage() {
   };
 
   const activeMembers = members.filter(m => m.status !== 'pending');
-  const pendingMembers = members.filter(m => m.status === 'pending');
+  const pendingMembers = members.filter(m => m.status === 'pending' && m.invitation_email);
 
   const allConstraints = Array.from(new Set(
     activeMembers.flatMap(m => {
