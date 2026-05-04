@@ -478,7 +478,7 @@ export default function HouseholdPage() {
               )}
 
               <form onSubmit={(e) => { e.preventDefault(); handleAddOrUpdateMember(); }} className="space-y-5">
-                {inviteType === 'email' && !editingMember ? (
+                {inviteType === 'email' ? (
                   <div className="space-y-1.5">
                     <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Emailová adresa</label>
                     <div className="relative">
@@ -490,6 +490,18 @@ export default function HouseholdPage() {
                         placeholder="rodina@priklad.sk" 
                         className="w-full pl-12 pr-4 py-4 rounded-2xl bg-gray-50 outline-none text-gray-800 font-medium" 
                       />
+                    </div>
+                  </div>
+                ) : inviteType === 'link' ? (
+                  <div className="py-8 text-center space-y-4">
+                    <div className="w-16 h-16 bg-sage-50 text-sage-500 rounded-2xl flex items-center justify-center mx-auto mb-2">
+                      <Share2 size={32} />
+                    </div>
+                    <div className="space-y-1">
+                      <h4 className="font-bold text-gray-800">Rýchle zdieľanie</h4>
+                      <p className="text-xs text-gray-400 px-6">
+                        Vygenerujeme unikátny odkaz, ktorý môžete poslať cez WhatsApp, Messenger alebo SMS.
+                      </p>
                     </div>
                   </div>
                 ) : (
