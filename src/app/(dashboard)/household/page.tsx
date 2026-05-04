@@ -275,17 +275,27 @@ export default function HouseholdPage() {
             return (
               <div key={member.id} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
                 <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${member.user_id ? 'bg-sage-100 text-sage-600' : 'bg-blue-100 text-blue-600'}`}>
-                    {member.user_id ? <User size={24} /> : <Users size={24} />}
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                    member.status === 'pending' ? 'bg-amber-100 text-amber-600' : 
+                    member.user_id ? 'bg-sage-100 text-sage-600' : 'bg-blue-100 text-blue-600'
+                  }`}>
+                    {member.status === 'pending' ? <Mail size={24} /> : 
+                     member.user_id ? <User size={24} /> : <Users size={24} />}
                   </div>
                   <div>
                     <div className="flex items-center gap-2">
-                      <h4 className="font-bold text-gray-800">
-                        {member.user_id ? (member.profiles?.full_name || "Registrovaný používateľ") : member.display_name}
+                      <h4 className={`font-bold ${member.status === 'pending' ? 'text-gray-500 italic' : 'text-gray-800'}`}>
+                        {member.status === 'pending' ? (member.invitation_email || "Pozvaný člen") : 
+                         member.user_id ? (member.profiles?.full_name || "Registrovaný používateľ") : member.display_name}
                         {member.user_id === household?.owner_id && " (Vy)"}
                       </h4>
                       {member.role === 'owner' && (
                         <span className="px-1.5 py-0.5 bg-sage-100 text-sage-700 text-[8px] font-bold uppercase rounded-2xl">Správca</span>
+                      )}
+                      {member.status === 'pending' && (
+                        <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-bold uppercase rounded-2xl flex items-center gap-1">
+                          <Clock size={8} /> Čaká na prijatie
+                        </span>
                       )}
                     </div>
                     <p className="text-gray-400 text-[11px] font-medium leading-tight max-w-[200px] truncate">

@@ -527,14 +527,32 @@ export async function addHouseholdMemberAction(householdId: string, memberData: 
   try {
     const supabase = await getServerSupabase();
 
-    if (memberData.type === "registered") {
-      return { success: false, error: "Pridávanie podľa emailu bude dostupné čoskoro." };
+    if (memberData.type === "email") {
+      const { data, error } = await supabase
+        .from("household_members")
+        .insert({
+          household_id: householdId,
+          invitation_email: memberData.email,
+          status: "pending",
+          role: "member",
+          preferences: { 
+            intolerances: memberData.intolerances || [],
+            diet: memberData.diet || [],
+            disliked_ingredients: memberData.disliked_ingredients || []
+          }
+        })
+        .select()
+        .single();
+
+      if (error) throw error;
+      return { success: true, member: data };
     } else {
       const { data, error } = await supabase
         .from("household_members")
         .insert({
           household_id: householdId,
           display_name: memberData.name,
+          status: "active",
           preferences: { 
             intolerances: memberData.intolerances || [],
             diet: memberData.diet || [],
