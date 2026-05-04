@@ -1,6 +1,7 @@
 export const COMMON_INTOLERANCES = [
-  "Lepok",
+  "Lepok (Celiakia)",
   "Laktóza",
+  "Mliečna bielkovina",
   "Arašidy",
   "Orechy",
   "Vajcia",
@@ -22,5 +23,7 @@ export const DIETARY_PREFERENCES = [
   "Pescetarián",
   "Keto",
   "Paleo",
-  "Low Carb"
+  "Low Carb",
+  "Bezlepková diéta",
+  "Bezmliečna diéta"
 ];
