@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { generateRecipeAction, saveRecipeAction } from "@/app/actions/recipes";
+import { generateRecipeAction, saveRecipeAction, getOrCreateHouseholdAction } from "@/app/actions/recipes";
 import { supabase } from "@/lib/supabase";
 
 const LOADING_MESSAGES = [
@@ -55,8 +55,20 @@ export default function GeneratePage() {
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [refineError, setRefineError] = useState<string | null>(null);
   const [lastActionType, setLastActionType] = useState<"dish" | "ingredients" | "random" | null>(null);
-  const [useHousehold, setUseHousehold] = useState(true);
+  const [useHousehold, setUseHousehold] = useState(false);
+  const [hasHousehold, setHasHousehold] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const checkHousehold = async () => {
+      const result = await getOrCreateHouseholdAction(false);
+      if (result.success && result.household) {
+        setHasHousehold(true);
+        setUseHousehold(true);
+      }
+    };
+    checkHousehold();
+  }, []);
 
   useEffect(() => {
     const fetchGoals = async () => {
@@ -171,30 +183,32 @@ export default function GeneratePage() {
               <p className="text-gray-500 text-sm mt-1">Čo si dnes uvaríme?</p>
             </header>
 
-            <div className="bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm flex items-center mb-2">
-              <button 
-                onClick={() => setUseHousehold(false)} 
-                className={`flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-                  !useHousehold 
-                    ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
-                    : 'text-gray-400 hover:text-gray-600'
-                }`}
-              >
-                <User size={14} />
-                Len pre mňa
-              </button>
-              <button 
-                onClick={() => setUseHousehold(true)} 
-                className={`flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
-                  useHousehold 
-                    ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
-                    : 'text-gray-400 hover:text-gray-600'
-                }`}
-              >
-                <Users size={14} />
-                Celá domácnosť
-              </button>
-            </div>
+            {hasHousehold && (
+              <div className="bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm flex items-center mb-2">
+                <button 
+                  onClick={() => setUseHousehold(false)} 
+                  className={`flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                    !useHousehold 
+                      ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
+                      : 'text-gray-400 hover:text-gray-600'
+                  }`}
+                >
+                  <User size={14} />
+                  Len pre mňa
+                </button>
+                <button 
+                  onClick={() => setUseHousehold(true)} 
+                  className={`flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
+                    useHousehold 
+                      ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
+                      : 'text-gray-400 hover:text-gray-600'
+                  }`}
+                >
+                  <Users size={14} />
+                  Celá domácnosť
+                </button>
+              </div>
+            )}
 
             <div className="flex flex-col gap-4">
               <Link href="/scan" className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5 group transition-all active:scale-[0.98]">

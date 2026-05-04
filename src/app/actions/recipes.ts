@@ -53,7 +53,7 @@ export async function generateRecipeAction(
           .from("household_members")
           .select(`
             *,
-            profiles:user_id (preferences)
+            profiles:user_id (preferences, full_name)
           `)
           .eq("household_id", household.id);
         
@@ -449,7 +449,7 @@ export async function parseRecipeTextAction(rawText: string) {
  * Household Actions
  */
 
-export async function getOrCreateHouseholdAction() {
+export async function getOrCreateHouseholdAction(createIfNotFound: boolean = false) {
   try {
     const supabase = await getServerSupabase();
     const { data: { user } } = await supabase.auth.getUser();
@@ -466,12 +466,17 @@ export async function getOrCreateHouseholdAction() {
     if (mError) throw mError;
 
     if (memberRecords && memberRecords.length > 0) {
-      // Prioritize the one they were most recently added to
-      // This is helpful when they just accepted an invitation
-      const bestRecord = memberRecords[0];
-      // Supabase join might return households as an object or array depending on config
+      // Prioritize shared households (where role is 'member') over personal ones (where role is 'owner')
+      // This ensures that if someone joins a household, they are directed there instead of their own empty one
+      let bestRecord = memberRecords[0];
+      
+      const sharedRecord = memberRecords.find(r => r.role === 'member');
+      if (sharedRecord) {
+        bestRecord = sharedRecord;
+      }
+
       const household = Array.isArray(bestRecord.households) 
-        ? bestRecord.households[0] 
+        ? (bestRecord.households as any)[0] 
         : bestRecord.households;
 
       if (household) {
@@ -508,7 +513,12 @@ export async function getOrCreateHouseholdAction() {
       return { success: true, household: ownedHousehold };
     }
 
-    // If not, create a default one
+    // If not found and we shouldn't create, return null
+    if (!createIfNotFound) {
+      return { success: true, household: null };
+    }
+
+    // Explicitly create a default one
     const { data: newHousehold, error: hError } = await supabase
       .from("households")
       .insert({
@@ -548,7 +558,13 @@ export async function getHouseholdMembersAction(householdId: string) {
 
     if (error) throw error;
 
-    return { success: true, members: data };
+    // Flatten profiles if they come as an array
+    const flattenedMembers = data?.map((member: any) => ({
+      ...member,
+      profiles: Array.isArray(member.profiles) ? member.profiles[0] : member.profiles
+    })) || [];
+
+    return { success: true, members: flattenedMembers };
   } catch (error: any) {
     return { success: false, error: error.message };
   }
@@ -814,12 +830,26 @@ export async function acceptInvitationAction(inviteId: string, userId: string, f
     }
 
     // 3. Update the invitation record
+    // Try to get a better name if fullName is missing
+    let finalName = fullName;
+    if (!finalName) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("full_name")
+        .eq("id", userId)
+        .maybeSingle();
+      
+      if (profile?.full_name) {
+        finalName = profile.full_name;
+      }
+    }
+
     const { error: updateError } = await supabase
       .from("household_members")
       .update({
         user_id: userId,
         status: "active",
-        display_name: fullName || (invite.invitation_email ? invite.invitation_email.split('@')[0] : "Nový člen"),
+        display_name: finalName || (invite.invitation_email ? invite.invitation_email.split('@')[0] : "Nový člen"),
         joined_at: new Date().toISOString()
       })
       .eq("id", inviteId);
