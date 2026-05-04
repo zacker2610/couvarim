@@ -779,7 +779,7 @@ function RecipesContent() {
 
                 <div className="space-y-3">
                   <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Vaše suroviny</h4>
-                  {selectedRecipe.ingredients?.map((ing: any, i: number) => {
+                  {selectedRecipe.ingredients?.filter((ing: any) => !ing.item.toLowerCase().includes("voda")).map((ing: any, i: number) => {
                     const isChecked = checkedIngredients.includes(ing.item);
                     return (
                       <div 
