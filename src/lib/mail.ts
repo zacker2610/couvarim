@@ -11,10 +11,20 @@ export async function sendHouseholdInvitation(email: string, householdName: stri
       to: [email],
       subject: `Pozvánka do domácnosti "${householdName}"`,
       html: `
-        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #eee; border-radius: 20px;">
-          <div style="text-align: center; margin-bottom: 20px;">
-            <div style="background-color: #4d6047; color: white; width: 60px; height: 60px; line-height: 60px; border-radius: 15px; display: inline-block; font-size: 30px;">👩‍🍳</div>
-            <h1 style="color: #333; margin-top: 10px;">ČoUvarím.sk</h1>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 40px 20px; background-color: #ffffff;">
+          <div style="margin-bottom: 40px; display: flex; align-items: center; justify-content: center;">
+            <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
+              <tr>
+                <td style="vertical-align: middle;">
+                  <div style="background-color: #a3b18a; width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+                    <img src="https://img.icons8.com/ios-filled/50/ffffff/chef-hat.png" width="32" height="32" style="display: block; margin: 16px auto;" alt="👨‍🍳" />
+                  </div>
+                </td>
+                <td style="vertical-align: middle; padding-left: 15px;">
+                  <h1 style="color: #4d6047; margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.5px;">ČoUvarím.sk</h1>
+                </td>
+              </tr>
+            </table>
           </div>
           
           <p style="font-size: 16px; color: #555;">Ahoj!</p>
