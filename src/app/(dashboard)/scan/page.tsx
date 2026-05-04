@@ -1,33 +1,18 @@
 "use client";
 
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef } from "react";
 import { 
-  Users, 
-  UserPlus,
-  Mail, 
-  Trash2, 
-  User,
-  Plus,
-  X,
-  AlertCircle,
-  Check,
-  Loader2,
-  Pencil,
-  Clock,
-  Flame,
-  Utensils,
-  ChevronRight,
-  ChefHat,
-  Share2,
-  LogOut,
-  Sparkles,
-  Save,
-  BookOpen,
-  FileText,
-  CheckCircle2,
+  Camera, 
+  Upload, 
+  Loader2, 
+  Sparkles, 
+  Utensils, 
+  ChefHat, 
+  X, 
   ArrowRight,
-  Upload,
-  Camera
+  Save,
+  CheckCircle2,
+  Clock
 } from "lucide-react";
 import { geminiVisionModel } from "@/lib/gemini";
 import { motion, AnimatePresence } from "framer-motion";
@@ -50,11 +35,8 @@ interface Recipe {
   };
 }
 
-type ScanMode = "ingredients" | "recipe";
-
 export default function ScanPage() {
   const router = useRouter();
-  const [mode, setMode] = useState<ScanMode>("ingredients");
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
@@ -82,41 +64,21 @@ export default function ScanPage() {
     try {
       const base64Data = image.split(",")[1];
       
-      let prompt = "";
-      if (mode === "ingredients") {
-        prompt = `Identifikuj všetky suroviny na tomto obrázku (napr. z chladničky alebo nákupu). 
-                  Následne z týchto surovín navrhni JEDEN chutný a originálny recept. 
-                  Odpovedaj VŽDY v slovenčine a výhradne ako čistý JSON v tomto formáte: 
-                  {
-                    "title": "Názov receptu",
-                    "description": "Stručný lákavý popis",
-                    "servings": 4,
-                    "prep_time": "15",
-                    "cook_time": "30",
-                    "difficulty": "Jednoduchá",
-                    "calories": 450,
-                    "nutrition": {"protein": 25, "carbs": 40, "fat": 15},
-                    "ingredients": [{"item": "názov", "amount": "100", "unit": "g", "owned": true}],
-                    "instructions": ["krok 1", "krok 2"]
-                  }`;
-      } else {
-        prompt = `Tento obrázok obsahuje napísaný alebo vytlačený recept (z knihy, časopisu alebo ručne písaný). 
-                  Tvojou úlohou je TEXT receptu rozpoznať (OCR) a pretransformovať ho do štruktúrovaného JSON formátu. 
-                  Snaž sa presne zachovať názov, ingrediencie a postup. Ak chýbajú nutričné hodnoty alebo časy, skús ich rozumne odhadnúť.
-                  Odpovedaj VŽDY v slovenčine a výhradne ako čistý JSON v tomto formáte: 
-                  {
-                    "title": "Názov receptu z obrázka",
-                    "description": "Stručný popis podľa textu",
-                    "servings": 4,
-                    "prep_time": "15",
-                    "cook_time": "30",
-                    "difficulty": "Stredná",
-                    "calories": 450,
-                    "nutrition": {"protein": 25, "carbs": 40, "fat": 15},
-                    "ingredients": [{"item": "názov", "amount": "100", "unit": "g", "owned": true}],
-                    "instructions": ["krok 1", "krok 2"]
-                  }`;
-      }
+      const prompt = `Identifikuj všetky suroviny na tomto obrázku (napr. z chladničky alebo nákupu). 
+                      Následne z týchto surovín navrhni JEDEN chutný a originálny recept. 
+                      Odpovedaj VŽDY v slovenčine a výhradne ako čistý JSON v tomto formáte: 
+                      {
+                        "title": "Názov receptu",
+                        "description": "Stručný lákavý popis",
+                        "servings": 4,
+                        "prep_time": "15",
+                        "cook_time": "30",
+                        "difficulty": "Jednoduchá",
+                        "calories": 450,
+                        "nutrition": {"protein": 25, "carbs": 40, "fat": 15},
+                        "ingredients": [{"item": "názov", "amount": "100", "unit": "g", "owned": true}],
+                        "instructions": ["krok 1", "krok 2"]
+                      }`;
 
       const result = await geminiVisionModel.generateContent([
         prompt,
@@ -136,7 +98,7 @@ export default function ScanPage() {
       setRecipe(data);
     } catch (error) {
       console.error("Chyba pri analýze:", error);
-      alert("Nepodarilo sa spracovať obrázok. Skúste to prosím znova s lepším svetlom alebo iným uhlom.");
+      alert("Nepodarilo sa rozpoznať suroviny. Skúste to prosím znova s lepším svetlom.");
     } finally {
       setLoading(false);
     }
@@ -164,33 +126,15 @@ export default function ScanPage() {
 
   return (
     <div className="space-y-8 pb-24">
-      <header className="space-y-4">
+      <header className="space-y-2">
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-sage-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-sage-200">
             <Camera size={28} />
           </div>
           <div>
-            <h2 className="text-3xl font-black text-gray-800 tracking-tight">Skener</h2>
-            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-0.5">Sila AI vo vašom foťáku</p>
+            <h2 className="text-3xl font-black text-gray-800 tracking-tight">AI Skener</h2>
+            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-0.5">Zistite, čo dnes uvariť</p>
           </div>
-        </div>
-
-        {/* Mode Selector */}
-        <div className="flex p-1.5 bg-gray-100 rounded-[24px] w-full max-w-sm">
-          <button 
-            onClick={() => { setMode("ingredients"); setImage(null); setRecipe(null); }}
-            className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-[20px] text-xs font-bold transition-all ${mode === 'ingredients' ? 'bg-white shadow-md text-sage-600 scale-[1.02]' : 'text-gray-500 hover:text-gray-700'}`}
-          >
-            <ChefHat size={16} />
-            Čo variť?
-          </button>
-          <button 
-            onClick={() => { setMode("recipe"); setImage(null); setRecipe(null); }}
-            className={`flex-1 flex items-center justify-center gap-2 py-3.5 rounded-[20px] text-xs font-bold transition-all ${mode === 'recipe' ? 'bg-white shadow-md text-sage-600 scale-[1.02]' : 'text-gray-500 hover:text-gray-700'}`}
-          >
-            <BookOpen size={16} />
-            Skenovať recept
-          </button>
         </div>
       </header>
 
@@ -200,7 +144,7 @@ export default function ScanPage() {
         {image ? (
           <div className="relative z-10 flex flex-col items-center gap-8">
             <div className="relative w-full max-w-sm aspect-[3/4] rounded-3xl overflow-hidden shadow-2xl border-4 border-white">
-              <img src={image} alt="Scan" className="w-full h-full object-cover" />
+              <img src={image} alt="Suroviny" className="w-full h-full object-cover" />
               <button 
                 onClick={() => { setImage(null); setRecipe(null); }}
                 className="absolute top-4 right-4 w-10 h-10 bg-white/90 backdrop-blur-md rounded-full flex items-center justify-center text-red-500 shadow-lg active:scale-90 transition-all"
@@ -217,12 +161,12 @@ export default function ScanPage() {
               {loading ? (
                 <>
                   <Loader2 className="animate-spin" size={24} />
-                  {mode === 'ingredients' ? 'Gemini skúma suroviny...' : 'Gemini číta recept...'}
+                  Gemini skúma suroviny...
                 </>
               ) : (
                 <>
                   <Sparkles size={24} />
-                  {mode === 'ingredients' ? 'Zistiť čo uvariť' : 'Skenovať a uložiť'}
+                  Zistiť čo uvariť
                 </>
               )}
             </button>
@@ -230,17 +174,15 @@ export default function ScanPage() {
         ) : (
           <div className="relative z-10 text-center space-y-8 py-4">
             <div className="w-24 h-24 bg-sage-50 text-sage-500 rounded-[30px] flex items-center justify-center mx-auto shadow-inner transform rotate-6">
-              {mode === 'ingredients' ? <Utensils size={48} /> : <FileText size={48} />}
+              <Utensils size={48} />
             </div>
             
             <div className="space-y-3">
               <h3 className="text-2xl font-black text-gray-800 leading-tight">
-                {mode === 'ingredients' ? 'Odfotťe nákup alebo chladničku' : 'Odfotťe recept z knihy či papiera'}
+                Odfotiť nákup alebo chladničku
               </h3>
               <p className="text-gray-400 text-sm font-medium leading-relaxed max-w-xs mx-auto">
-                {mode === 'ingredients' 
-                  ? 'Umelá inteligencia rozpozná suroviny a okamžite vám navrhne recept na mieru.' 
-                  : 'Nestrácajte čas prepisovaním. Gemini rozpozná text a uloží ho do vašej kuchárky.'}
+                Umelá inteligencia rozpozná suroviny a okamžite vám navrhne recept na mieru podľa toho, čo máte doma.
               </p>
             </div>
 
@@ -277,7 +219,7 @@ export default function ScanPage() {
                 <div className="flex justify-between items-start">
                   <div className="space-y-2 flex-1 pr-4">
                     <span className="bg-white/20 text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-full border border-white/20">
-                      {mode === 'ingredients' ? 'AI Inšpirácia' : 'Naskenovaný recept'}
+                      AI Inšpirácia
                     </span>
                     <h3 className="text-3xl font-black leading-tight drop-shadow-md">{recipe.title}</h3>
                   </div>
@@ -311,7 +253,7 @@ export default function ScanPage() {
                 <div className="md:col-span-1 space-y-6">
                   <h4 className="text-lg font-black text-gray-800 flex items-center gap-3">
                     <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
-                    Suroviny
+                    Zistené suroviny
                   </h4>
                   <div className="space-y-3">
                     {recipe.ingredients.map((ing, i) => (
@@ -326,7 +268,7 @@ export default function ScanPage() {
                 <div className="md:col-span-2 space-y-6">
                   <h4 className="text-lg font-black text-gray-800 flex items-center gap-3">
                     <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
-                    Postup
+                    Navrhovaný postup
                   </h4>
                   <div className="space-y-6">
                     {recipe.instructions.map((step, i) => (
