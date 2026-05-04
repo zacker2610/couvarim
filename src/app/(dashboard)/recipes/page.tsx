@@ -27,7 +27,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
-import { deleteRecipeAction, toggleRecipeShareAction, normalizeShoppingListAction } from "@/app/actions/recipes";
+import { deleteRecipeAction, toggleRecipeShareAction, normalizeShoppingListAction, updateRecipeAction } from "@/app/actions/recipes";
 import Link from "next/link";
 
 export default function RecipesPage() {
@@ -205,10 +205,37 @@ function RecipesContent() {
   const handleNormalizeIngredients = async () => {
     if (!selectedRecipe) return;
     setIsNormalizing(true);
-    const missing = selectedRecipe.ingredients.filter((ing: any) => !checkedIngredients.includes(ing.item));
-    const result = await normalizeShoppingListAction(missing);
-    if (result.success) {
-      setNormalizedIngredients(result.data);
+    
+    // Normalize ALL ingredients to be thorough
+    const result = await normalizeShoppingListAction(selectedRecipe.ingredients);
+    
+    if (result.success && result.data) {
+      // Merge normalized data back into the original ingredients
+      const updatedIngredients = selectedRecipe.ingredients.map((origIng: any) => {
+        const normIng = result.data.find((n: any) => n.item.toLowerCase() === origIng.item.toLowerCase());
+        if (normIng) {
+          return {
+            ...origIng,
+            buying_amount: normIng.amount,
+            buying_unit: normIng.unit
+          };
+        }
+        return origIng;
+      });
+
+      // Update database
+      const updateResult = await updateRecipeAction(selectedRecipe.id, {
+        ...selectedRecipe,
+        ingredients: updatedIngredients
+      });
+
+      if (updateResult.success) {
+        // Update local state
+        const updatedRecipe = { ...selectedRecipe, ingredients: updatedIngredients };
+        setSelectedRecipe(updatedRecipe);
+        setRecipes(prev => prev.map(r => r.id === selectedRecipe.id ? updatedRecipe : r));
+        setNormalizedIngredients(null); // Clear temporary state since it's now in the recipe
+      }
     }
     setIsNormalizing(false);
   };
