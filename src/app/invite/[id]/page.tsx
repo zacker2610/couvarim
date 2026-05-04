@@ -33,8 +33,11 @@ export default function InvitePage() {
       
       if (!result.success) {
         setError(result.error || "Nepodarilo sa načítať pozvánku.");
+      } else if (result.alreadyAccepted) {
+        // User already accepted this, just take them home
+        router.push("/household");
       } else if (!result.invitation) {
-        setError("Táto pozvánka je neplatná alebo už bola použitá.");
+        setError(result.error || "Táto pozvánka je neplatná alebo už bola použitá.");
       } else {
         setInvitation(result.invitation);
       }

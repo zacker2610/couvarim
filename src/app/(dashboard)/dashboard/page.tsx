@@ -78,8 +78,8 @@ export default async function DashboardPage() {
             {recipes.map((recipe: any) => (
               <Link 
                 key={recipe.id} 
-                href="/recipes"
-                className="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden hover:shadow-md transition-all duration-300 flex flex-col"
+                href={`/recipes?id=${recipe.id}`}
+                className="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden active:scale-[0.98] transition-all duration-300 relative cursor-pointer hover:shadow-md hover:border-sage-200 flex flex-col"
               >
                 <div className="relative h-48 overflow-hidden bg-sage-50">
                   {recipe.image_url ? (

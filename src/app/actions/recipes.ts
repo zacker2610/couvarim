@@ -456,37 +456,56 @@ export async function getOrCreateHouseholdAction() {
 
     if (!user) return { success: false, error: "Musíte byť prihlásený." };
 
-    // Try to find if user is already in a household (as owner)
-    const { data: household } = await supabase
+    // Find all households where the user is a member
+    const { data: memberRecords, error: mError } = await supabase
+      .from("household_members")
+      .select("household_id, role, joined_at, households(*)")
+      .eq("user_id", user.id)
+      .order('joined_at', { ascending: false });
+
+    if (mError) throw mError;
+
+    if (memberRecords && memberRecords.length > 0) {
+      // Prioritize the one they were most recently added to
+      // This is helpful when they just accepted an invitation
+      const bestRecord = memberRecords[0];
+      // Supabase join might return households as an object or array depending on config
+      const household = Array.isArray(bestRecord.households) 
+        ? bestRecord.households[0] 
+        : bestRecord.households;
+
+      if (household) {
+        // Automatic cleanup: Rename old default "Moja Rodina" to "Moja Domácnosť"
+        if (household.name === "Moja Rodina") {
+          const { data: updatedHousehold } = await supabase
+            .from("households")
+            .update({ name: "Moja Domácnosť" })
+            .eq("id", household.id)
+            .select()
+            .single();
+          
+          if (updatedHousehold) return { success: true, household: updatedHousehold };
+        }
+        
+        return { success: true, household };
+      }
+    }
+
+    // If no membership found, check if they own one (for safety/legacy)
+    const { data: ownedHousehold } = await supabase
       .from("households")
       .select("*")
       .eq("owner_id", user.id)
       .maybeSingle();
 
-    if (household) {
-      // Automatic cleanup: Rename old default "Moja Rodina" to "Moja Domácnosť"
-      if (household.name === "Moja Rodina") {
-        const { data: updatedHousehold } = await supabase
-          .from("households")
-          .update({ name: "Moja Domácnosť" })
-          .eq("id", household.id)
-          .select()
-          .single();
-        
-        if (updatedHousehold) return { success: true, household: updatedHousehold };
-      }
-      return { success: true, household };
-    }
-
-    // Try to find if user is a member of any household
-    const { data: memberOf } = await supabase
-      .from("household_members")
-      .select("household_id, households(*)")
-      .eq("user_id", user.id)
-      .maybeSingle();
-
-    if (memberOf) {
-      return { success: true, household: memberOf.households };
+    if (ownedHousehold) {
+      // Add them as a member if they are owner but not in members table
+      await supabase.from("household_members").insert({
+        household_id: ownedHousehold.id,
+        user_id: user.id,
+        role: "owner"
+      });
+      return { success: true, household: ownedHousehold };
     }
 
     // If not, create a default one
@@ -731,6 +750,7 @@ export async function getHouseholdSharedRecipesAction(householdId: string) {
 export async function getInvitationDetailsAction(inviteId: string) {
   try {
     const supabase = await getServerSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
     
     const { data, error } = await supabase
       .from("household_members")
@@ -739,10 +759,19 @@ export async function getInvitationDetailsAction(inviteId: string) {
         households (name)
       `)
       .eq("id", inviteId)
-      .eq("status", "pending")
       .maybeSingle();
 
     if (error) throw error;
+    if (!data) return { success: true, invitation: null };
+
+    // If it's already active, check if it's the current user
+    if (data.status === 'active') {
+      if (user && data.user_id === user.id) {
+        return { success: true, invitation: data, alreadyAccepted: true };
+      }
+      return { success: true, invitation: null, error: "Táto pozvánka už bola použitá." };
+    }
+
     return { success: true, invitation: data };
   } catch (error: any) {
     console.error("Get Invitation Error:", error);

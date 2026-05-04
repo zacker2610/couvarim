@@ -286,7 +286,11 @@ function RecipesContent() {
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredRecipes.map((recipe) => (
-                  <div key={recipe.id} className="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden active:scale-[0.98] transition-all duration-300 relative">
+                  <div 
+                    key={recipe.id} 
+                    onClick={() => handleOpenRecipe(recipe)}
+                    className="group bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden active:scale-[0.98] transition-all duration-300 relative cursor-pointer hover:shadow-md hover:border-sage-200"
+                  >
                     <div className="relative h-60 overflow-hidden bg-sage-50">
                       {/* Floating More Options Button */}
                       <div className="absolute top-4 right-4 z-20">
