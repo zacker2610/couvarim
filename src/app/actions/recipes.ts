@@ -402,7 +402,7 @@ export async function parseRecipeTextAction(rawText: string) {
           "fat": 15
         },
         "ingredients": [
-          { "item": "názov suroviny", "amount": "množstvo", "unit": "jednotka" }
+          { "item": "názov suroviny", "amount": "množstvo", "unit": "jednotka", "buying_amount": "množstvo pre nákup", "buying_unit": "jednotka pre nákup" }
         ],
         "instructions": [
           "krok 1",
@@ -452,7 +452,7 @@ export async function scanRecipeImageAction(base64Image: string) {
           "fat": 15
         },
         "ingredients": [
-          { "item": "názov suroviny", "amount": "množstvo", "unit": "jednotka" }
+          { "item": "názov suroviny", "amount": "množstvo", "unit": "jednotka", "buying_amount": "množstvo pre nákup", "buying_unit": "jednotka pre nákup" }
         ],
         "instructions": [
           "krok 1",
