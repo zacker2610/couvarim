@@ -16,12 +16,12 @@ export async function sendHouseholdInvitation(email: string, householdName: stri
             <table cellpadding="0" cellspacing="0" border="0" style="margin: 0 auto;">
               <tr>
                 <td style="vertical-align: middle;">
-                  <div style="background-color: #93a381; width: 50px; height: 50px; border-radius: 16px; display: flex; align-items: center; justify-content: center; text-align: center; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-                    <img src="https://img.icons8.com/ios-filled/50/ffffff/chef-hat.png" width="28" height="28" style="display: block; margin: 11px auto;" alt="👨‍🍳" />
+                  <div style="background-color: #a3b18a; width: 44px; height: 44px; border-radius: 14px; display: flex; align-items: center; justify-content: center; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.15);">
+                    <img src="https://img.icons8.com/material-rounded/48/ffffff/chef-hat.png" width="24" height="24" style="display: block; margin: 10px auto;" alt="👨‍🍳" />
                   </div>
                 </td>
-                <td style="vertical-align: middle; padding-left: 12px;">
-                  <h1 style="color: #4d6047; margin: 0; font-size: 24px; font-weight: 800; letter-spacing: -0.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">ČoUvarím.sk</h1>
+                <td style="vertical-align: middle; padding-left: 14px;">
+                  <h1 style="color: #4d6047; margin: 0; font-size: 24px; font-weight: 700; letter-spacing: -0.8px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">ČoUvarím.sk</h1>
                 </td>
               </tr>
             </table>
