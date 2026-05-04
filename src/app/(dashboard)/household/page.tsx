@@ -18,7 +18,8 @@ import {
   Utensils,
   ChevronRight,
   ChefHat,
-  Share2
+  Share2,
+  LogOut
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
@@ -29,7 +30,8 @@ import {
   addHouseholdMemberAction,
   removeHouseholdMemberAction,
   updateHouseholdMemberAction,
-  getHouseholdSharedRecipesAction
+  getHouseholdSharedRecipesAction,
+  leaveHouseholdAction
 } from "@/app/actions/recipes";
 import { supabase } from "@/lib/supabase";
 
@@ -83,12 +85,17 @@ export default function HouseholdPage() {
     setIsLoading(false);
   };
 
+  const isOwner = household?.owner_id === currentUser?.id;
+
   const handleOpenEdit = (member: any) => {
+    // Only owner can edit, and only manual members (or own registered profile preferences? No, registered users manage their own).
+    // The user said: "editovat manualne clenov ktori nieus registrovani"
+    if (!isOwner || member.user_id) return;
+
     setEditingMember(member);
-    const prefs = member.user_id ? member.profiles?.preferences : member.preferences;
-    setInviteType(member.user_id ? "email" : "manual");
-    setNewMemberName(member.display_name || member.profiles?.full_name || "");
-    setNewMemberEmail(member.profiles?.email || member.invitation_email || ""); 
+    const prefs = member.preferences;
+    setInviteType("manual");
+    setNewMemberName(member.display_name || "");
     setSelectedTags(prefs?.intolerances || []);
     setSelectedDietTags(prefs?.diet || []);
     setDislikedIngredients(prefs?.disliked_ingredients || []);
@@ -96,6 +103,8 @@ export default function HouseholdPage() {
   };
 
   const handleAddOrUpdateMember = async () => {
+    if (!isOwner && household) return; // Only owner can add members to existing household
+
     let currentHousehold = household;
     
     // Create household on demand if it doesn't exist
@@ -186,9 +195,26 @@ export default function HouseholdPage() {
   };
 
   const handleRemoveMember = async (memberId: string) => {
-    const result = await removeHouseholdMemberAction(memberId);
-    if (result.success) {
-      setMembers(members.filter(m => m.id !== memberId));
+    if (!isOwner) return;
+    if (confirm("Naozaj chcete odstrániť tohto člena z domácnosti?")) {
+      const result = await removeHouseholdMemberAction(memberId);
+      if (result.success) {
+        setMembers(members.filter(m => m.id !== memberId));
+      }
+    }
+  };
+
+  const handleLeaveHousehold = async () => {
+    if (!household) return;
+    if (confirm("Naozaj chcete opustiť túto spoločnú domácnosť?")) {
+      setIsSubmitting(true);
+      const result = await leaveHouseholdAction(household.id);
+      if (result.success) {
+        window.location.reload(); // Refresh to show empty state
+      } else {
+        alert(result.error);
+      }
+      setIsSubmitting(false);
     }
   };
 
@@ -229,7 +255,9 @@ export default function HouseholdPage() {
         <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
           {isAlone ? "Spoločná Domácnosť" : (household?.name || "Moja Domácnosť")}
         </h2>
-        {!isAlone && (
+        
+        {/* Only Owner can invite new members */}
+        {isOwner && !isAlone && (
           <button 
             onClick={() => setShowInviteModal(true)}
             className="hidden sm:flex bg-sage-500 text-sage-50 px-5 py-2.5 rounded-full font-bold text-sm shadow-md active:scale-95 transition-all items-center gap-2 hover:bg-sage-600"
@@ -238,14 +266,35 @@ export default function HouseholdPage() {
             Pridať člena
           </button>
         )}
+
+        {/* Members can leave the household */}
+        {!isOwner && household && (
+           <button 
+            onClick={handleLeaveHousehold}
+            className="hidden sm:flex bg-red-50 text-red-600 px-5 py-2.5 rounded-full font-bold text-sm shadow-sm active:scale-95 transition-all items-center gap-2 hover:bg-red-100 border border-red-100"
+          >
+            <LogOut size={18} />
+            Opustiť domácnosť
+          </button>
+        )}
       </header>
 
-      {!isAlone && (
+      {/* Floating Action Buttons for Mobile */}
+      {isOwner && !isAlone && (
         <button 
           onClick={() => setShowInviteModal(true)}
           className="sm:hidden fixed bottom-24 right-6 w-16 h-16 bg-sage-500 text-sage-50 rounded-full z-40 flex items-center justify-center active:scale-90 transition-all shadow-[0_15px_30px_-5px_rgba(77,96,71,0.5)] hover:bg-sage-600"
         >
           <UserPlus size={28} strokeWidth={2.5} />
+        </button>
+      )}
+
+      {!isOwner && household && (
+        <button 
+          onClick={handleLeaveHousehold}
+          className="sm:hidden fixed bottom-24 right-6 w-16 h-16 bg-red-500 text-white rounded-full z-40 flex items-center justify-center active:scale-90 transition-all shadow-lg hover:bg-red-600"
+        >
+          <LogOut size={28} strokeWidth={2.5} />
         </button>
       )}
 
@@ -386,7 +435,8 @@ export default function HouseholdPage() {
                         </div>
                       </div>
                       <div className="flex items-center gap-1">
-                        {member.user_id !== household?.owner_id && (
+                        {/* Only Owner can edit MANUAL members */}
+                        {isOwner && !member.user_id && (
                           <button 
                             onClick={() => handleOpenEdit(member)}
                             className="p-2.5 text-gray-300 hover:text-sage-500 hover:bg-sage-50 rounded-2xl transition-all"
@@ -394,7 +444,8 @@ export default function HouseholdPage() {
                             <Pencil size={18} />
                           </button>
                         )}
-                        {member.role !== 'owner' && (
+                        {/* Only Owner can remove OTHER members */}
+                        {isOwner && member.user_id !== currentUser?.id && (
                           <button 
                             onClick={() => handleRemoveMember(member.id)}
                             className="p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
@@ -409,7 +460,7 @@ export default function HouseholdPage() {
               </div>
             </div>
 
-            {pendingMembers.length > 0 && (
+            {pendingMembers.length > 0 && isOwner && (
               <div className="space-y-3">
                 <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Čakajú na prijatie</h3>
                 <div className="space-y-3 opacity-80">

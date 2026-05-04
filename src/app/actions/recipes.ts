@@ -686,6 +686,37 @@ export async function updateHouseholdMemberAction(memberId: string, memberData: 
   }
 }
 
+export async function leaveHouseholdAction(householdId: string) {
+  try {
+    const supabase = await getServerSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) return { success: false, error: "Musíte byť prihlásený." };
+
+    // Check if they are the owner (owners can't leave this way)
+    const { data: household } = await supabase
+      .from("households")
+      .select("owner_id")
+      .eq("id", householdId)
+      .maybeSingle();
+
+    if (household?.owner_id === user.id) {
+      return { success: false, error: "Správca nemôže opustiť domácnosť. Najskôr ju musíte zmazať alebo previesť na iného člena." };
+    }
+
+    const { error } = await supabase
+      .from("household_members")
+      .delete()
+      .eq("household_id", householdId)
+      .eq("user_id", user.id);
+
+    if (error) throw error;
+    return { success: true };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
+}
+
 export async function toggleRecipeShareAction(recipeId: string, shouldShare: boolean) {
   try {
     const supabase = await getServerSupabase();
