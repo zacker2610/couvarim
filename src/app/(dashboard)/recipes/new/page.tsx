@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { 
   ArrowLeft, 
   Camera, 
@@ -22,7 +22,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { saveRecipeAction, parseRecipeTextAction } from "@/app/actions/recipes";
+import { saveRecipeAction, parseRecipeTextAction, scanRecipeImageAction } from "@/app/actions/recipes";
 import { supabase } from "@/lib/supabase";
 
 export default function NewRecipePage() {
@@ -53,6 +53,51 @@ export default function NewRecipePage() {
   const [jsonInput, setJsonInput] = useState("");
   const [importError, setImportError] = useState<string | null>(null);
   const [isParsing, setIsParsing] = useState(false);
+  const [isScanning, setIsScanning] = useState(false);
+  const scanInputRef = useRef<HTMLInputElement>(null);
+
+  const applyImportedData = (data: any) => {
+    if (data.title) setName(data.title);
+    if (data.description) setDesc(data.description);
+    if (data.prep_time) {
+      const val = data.prep_time.toString().replace(/\D/g, "");
+      if (val) setTime(val);
+    }
+    if (data.cook_time) {
+      const val = data.cook_time.toString().replace(/\D/g, "");
+      if (val) setCookTime(val);
+    }
+    if (data.servings) {
+      setServings(data.servings.toString().replace(/\D/g, "") || "1");
+    }
+    
+    if (data.difficulty) {
+      const diff = data.difficulty.toLowerCase();
+      if (diff.includes("jednoduch")) setDifficulty("Jednoduchá");
+      else if (diff.includes("stredn")) setDifficulty("Stredná");
+      else if (diff.includes("náročn") || diff.includes("narocn")) setDifficulty("Náročná");
+    }
+    if (Array.isArray(data.ingredients)) {
+      setIngredients(data.ingredients.map((ing: any) => ({
+        amount: ing.amount?.toString() || "",
+        unit: ing.unit?.toLowerCase() || "g",
+        name: ing.item || ing.name || ""
+      })));
+    }
+    if (Array.isArray(data.instructions)) {
+      setSteps(data.instructions.map((s: string) => s.replace(/\[cite: \d+\]/g, "").trim()));
+    } else if (Array.isArray(data.steps)) {
+      setSteps(data.steps.map((s: string) => s.replace(/\[cite: \d+\]/g, "").trim()));
+    }
+    if (data.calories) setCalories(Number(data.calories));
+    if (data.nutrition) {
+      setNutrition({
+        protein: Number(data.nutrition.protein?.value || data.nutrition.protein || 0),
+        carbs: Number(data.nutrition.carbs?.value || data.nutrition.carbs || 0),
+        fat: Number(data.nutrition.fat?.value || data.nutrition.fat || 0)
+      });
+    }
+  };
 
   const addIngredient = () => {
     setIngredients([...ingredients, { amount: "", unit: "g", name: "" }]);
@@ -107,52 +152,42 @@ export default function NewRecipePage() {
         if (result.success) data = result.data;
         else throw new Error(result.error);
       }
-      if (data.title) setName(data.title);
-      if (data.description) setDesc(data.description);
-      if (data.prep_time) {
-        const val = data.prep_time.toString().replace(/\D/g, "");
-        if (val) setTime(val);
-      }
-      if (data.cook_time) {
-        const val = data.cook_time.toString().replace(/\D/g, "");
-        if (val) setCookTime(val);
-      }
-      if (data.servings) {
-        setServings(data.servings.toString().replace(/\D/g, "") || "1");
-      }
       
-      if (data.difficulty) {
-        const diff = data.difficulty.toLowerCase();
-        if (diff.includes("jednoduch")) setDifficulty("Jednoduchá");
-        else if (diff.includes("stredn")) setDifficulty("Stredná");
-        else if (diff.includes("náročn") || diff.includes("narocn")) setDifficulty("Náročná");
-      }
-      if (Array.isArray(data.ingredients)) {
-        setIngredients(data.ingredients.map((ing: any) => ({
-          amount: ing.amount?.toString() || "",
-          unit: ing.unit?.toLowerCase() || "g",
-          name: ing.item || ing.name || ""
-        })));
-      }
-      if (Array.isArray(data.instructions)) {
-        setSteps(data.instructions.map((s: string) => s.replace(/\[cite: \d+\]/g, "").trim()));
-      } else if (Array.isArray(data.steps)) {
-        setSteps(data.steps.map((s: string) => s.replace(/\[cite: \d+\]/g, "").trim()));
-      }
-      if (data.calories) setCalories(Number(data.calories));
-      if (data.nutrition) {
-        setNutrition({
-          protein: Number(data.nutrition.protein?.value || data.nutrition.protein || 0),
-          carbs: Number(data.nutrition.carbs?.value || data.nutrition.carbs || 0),
-          fat: Number(data.nutrition.fat?.value || data.nutrition.fat || 0)
-        });
-      }
+      applyImportedData(data);
       setIsImportModalOpen(false);
       setJsonInput("");
     } catch (err: any) {
       setImportError(err.message || "Nepodarilo sa spracovať text.");
     } finally {
       setIsParsing(false);
+    }
+  };
+
+  const handleScanRecipe = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsScanning(true);
+    setImportError(null);
+    
+    try {
+      const reader = new FileReader();
+      reader.onloadend = async () => {
+        const base64 = (reader.result as string).split(",")[1];
+        const result = await scanRecipeImageAction(base64);
+        
+        if (result.success) {
+          applyImportedData(result.data);
+          setIsImportModalOpen(false);
+        } else {
+          setImportError(result.error || "Nepodarilo sa prečítať recept.");
+        }
+        setIsScanning(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (err: any) {
+      setImportError("Chyba pri spracovaní fotky.");
+      setIsScanning(false);
     }
   };
 
@@ -511,12 +546,44 @@ export default function NewRecipePage() {
                 </p>
 
                 <div className="space-y-4">
+                  <div className="flex gap-4">
+                    <button 
+                      onClick={() => scanInputRef.current?.click()}
+                      disabled={isScanning || isParsing}
+                      className="flex-1 py-6 bg-white border-2 border-dashed border-sage-200 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-sage-50 transition-all active:scale-95 group disabled:opacity-50"
+                    >
+                      <div className="w-10 h-10 bg-sage-100 text-sage-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                        {isScanning ? <Loader2 className="animate-spin" size={20} /> : <Camera size={20} />}
+                      </div>
+                      <span className="text-[10px] font-bold text-sage-700 uppercase tracking-widest">Odfotiť recept</span>
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        className="hidden" 
+                        ref={scanInputRef}
+                        onChange={handleScanRecipe}
+                      />
+                    </button>
+                    <div className="flex-1 py-6 bg-white border-2 border-gray-100 rounded-2xl flex flex-col items-center justify-center gap-2 opacity-50 cursor-not-allowed">
+                       <div className="w-10 h-10 bg-gray-100 text-gray-400 rounded-xl flex items-center justify-center">
+                        <FileJson size={20} />
+                      </div>
+                      <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">JSON Import</span>
+                    </div>
+                  </div>
+
+                  <div className="relative py-4 flex items-center gap-4">
+                    <div className="flex-1 h-px bg-gray-100" />
+                    <span className="text-[10px] font-bold text-gray-300 uppercase tracking-widest">Alebo vložte text</span>
+                    <div className="flex-1 h-px bg-gray-100" />
+                  </div>
+
                   <textarea 
                     value={jsonInput}
                     onChange={(e) => setJsonInput(e.target.value)}
                     placeholder="Prilepte sem text receptu..."
-                    disabled={isParsing}
-                    className="w-full h-64 p-6 rounded-2xl bg-white border border-gray-100 text-sm outline-none focus:ring-4 focus:ring-sage-500/10 transition-all resize-none shadow-inner disabled:opacity-50"
+                    disabled={isParsing || isScanning}
+                    className="w-full h-40 p-6 rounded-2xl bg-white border border-gray-100 text-sm outline-none focus:ring-4 focus:ring-sage-500/10 transition-all resize-none shadow-inner disabled:opacity-50"
                   />
                   
                   {importError && (

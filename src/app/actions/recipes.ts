@@ -1,6 +1,6 @@
 "use server";
 
-import { geminiModel } from "@/lib/gemini";
+import { geminiModel, geminiVisionModel } from "@/lib/gemini";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
@@ -442,6 +442,66 @@ export async function parseRecipeTextAction(rawText: string) {
   } catch (error: any) {
     console.error("Parse Text Error:", error);
     return { success: false, error: "AI sa nepodarilo tento text spracovať. Skúste vložiť jasnejší text." };
+  }
+}
+
+/**
+ * Server Action to scan recipe from an image using AI.
+ */
+export async function scanRecipeImageAction(base64Image: string) {
+  try {
+    const prompt = `
+      Tento obrázok obsahuje napísaný alebo vytlačený recept (z knihy, časopisu alebo ručne písaný). 
+      Tvojou úlohou je TEXT receptu rozpoznať (OCR) a pretransformovať ho do štruktúrovaného JSON formátu. 
+      Snaž sa presne zachovať názov, ingrediencie (aj s množstvami) a postup. 
+      Ak na obrázku chýbajú nutričné hodnoty alebo časy, skús ich rozumne odhadnúť podľa obsahu jedla.
+
+      Odpovedaj VŽDY a VÝHRADNE vo formáte JSON v SLOVENČINE.
+      Štruktúra JSON musí byť presne takáto:
+      {
+        "title": "Názov receptu",
+        "description": "Stručný popis",
+        "servings": 4,
+        "prep_time": "15",
+        "cook_time": "30",
+        "difficulty": "Stredná",
+        "calories": 450,
+        "nutrition": {
+          "protein": 25,
+          "carbs": 50,
+          "fat": 15
+        },
+        "ingredients": [
+          { "item": "názov suroviny", "amount": "množstvo", "unit": "jednotka" }
+        ],
+        "instructions": [
+          "krok 1",
+          "krok 2"
+        ]
+      }
+    `;
+
+    const result = await geminiVisionModel.generateContent([
+      prompt,
+      {
+        inlineData: {
+          data: base64Image,
+          mimeType: "image/jpeg",
+        },
+      },
+    ]);
+
+    const response = await result.response;
+    const responseText = response.text();
+    
+    // Clean JSON response
+    const cleanedJson = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+    const recipeData = JSON.parse(cleanedJson);
+
+    return { success: true, data: recipeData };
+  } catch (error: any) {
+    console.error("Scan Image Error:", error);
+    return { success: false, error: "AI sa nepodarilo prečítať recept z fotky. Skúste fotku urobiť znova s lepším svetlom." };
   }
 }
 
