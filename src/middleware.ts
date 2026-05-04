@@ -54,7 +54,8 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  await supabase.auth.getUser()
+  // This will refresh the session if needed
+  await supabase.auth.getSession()
 
   return response
 }
