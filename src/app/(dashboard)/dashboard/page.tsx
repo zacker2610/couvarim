@@ -12,6 +12,8 @@ import {
 import Link from "next/link";
 import { getLatestRecipesAction } from "@/app/actions/recipes";
 
+export const dynamic = 'force-dynamic';
+
 export default async function DashboardPage() {
   const result = await getLatestRecipesAction();
   const recipes = result.success && result.recipes ? result.recipes : [];
