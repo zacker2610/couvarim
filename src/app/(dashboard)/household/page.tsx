@@ -174,17 +174,11 @@ export default function HouseholdPage() {
     }
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-12 h-12 text-sage-500 animate-spin" />
-        <p className="text-gray-400 font-medium animate-pulse">Načítavam vašu rodinu...</p>
-      </div>
-    );
-  }
+  const activeMembers = members.filter(m => m.status !== 'pending');
+  const pendingMembers = members.filter(m => m.status === 'pending');
 
   const allConstraints = Array.from(new Set(
-    members.flatMap(m => {
+    activeMembers.flatMap(m => {
       const prefs = m.user_id ? m.profiles?.preferences : m.preferences;
       return [
         ...(prefs?.intolerances || []),
@@ -226,7 +220,7 @@ export default function HouseholdPage() {
               <p className="text-gray-400 text-xs font-medium">Celkový počet v domácnosti</p>
             </div>
           </div>
-          <div className="text-3xl font-black text-sage-600 mr-2">{members.length}</div>
+          <div className="text-3xl font-black text-sage-600 mr-2">{activeMembers.length}</div>
         </div>
       </div>
 
@@ -261,70 +255,111 @@ export default function HouseholdPage() {
           )}
       </section>
 
-      <section className="space-y-3">
-        <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Zoznam členov</h3>
+      <section className="space-y-6">
         <div className="space-y-3">
-          {members.map((member: any) => {
-            const prefs = member.user_id ? member.profiles?.preferences : member.preferences;
-            const summary = [
-              ...(prefs?.diet || []),
-              ...(prefs?.intolerances || []),
-              ...(prefs?.disliked_ingredients || [])
-            ];
+          <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Aktívni členovia</h3>
+          <div className="space-y-3">
+            {activeMembers.map((member: any) => {
+              const prefs = member.user_id ? member.profiles?.preferences : member.preferences;
+              const summary = [
+                ...(prefs?.diet || []),
+                ...(prefs?.intolerances || []),
+                ...(prefs?.disliked_ingredients || [])
+              ];
 
-            return (
-              <div key={member.id} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
-                    member.status === 'pending' ? 'bg-amber-100 text-amber-600' : 
-                    member.user_id ? 'bg-sage-100 text-sage-600' : 'bg-blue-100 text-blue-600'
-                  }`}>
-                    {member.status === 'pending' ? <Mail size={24} /> : 
-                     member.user_id ? <User size={24} /> : <Users size={24} />}
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <h4 className={`font-bold ${member.status === 'pending' ? 'text-gray-500 italic' : 'text-gray-800'}`}>
-                        {member.status === 'pending' ? (member.invitation_email || "Pozvaný člen") : 
-                         member.user_id ? (member.profiles?.full_name || "Registrovaný používateľ") : member.display_name}
-                        {member.user_id === household?.owner_id && " (Vy)"}
-                      </h4>
-                      {member.role === 'owner' && (
-                        <span className="px-1.5 py-0.5 bg-sage-100 text-sage-700 text-[8px] font-bold uppercase rounded-2xl">Správca</span>
-                      )}
-                      {member.status === 'pending' && (
-                        <span className="px-1.5 py-0.5 bg-amber-100 text-amber-700 text-[8px] font-bold uppercase rounded-2xl flex items-center gap-1">
-                          <Clock size={8} /> Čaká na prijatie
-                        </span>
-                      )}
+              return (
+                <div key={member.id} className="bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                      member.user_id ? 'bg-sage-100 text-sage-600' : 'bg-blue-100 text-blue-600'
+                    }`}>
+                      {member.user_id ? <User size={24} /> : <Users size={24} />}
                     </div>
-                    <p className="text-gray-400 text-[11px] font-medium leading-tight max-w-[200px] truncate">
-                      {summary.join(", ") || "Bez obmedzení"}
-                    </p>
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-bold text-gray-800">
+                          {member.user_id ? (member.profiles?.full_name || "Registrovaný používateľ") : member.display_name}
+                          {member.user_id === household?.owner_id && " (Vy)"}
+                        </h4>
+                        {member.role === 'owner' && (
+                          <span className="px-1.5 py-0.5 bg-sage-100 text-sage-700 text-[8px] font-bold uppercase rounded-2xl">Správca</span>
+                        )}
+                      </div>
+                      <p className="text-gray-400 text-[11px] font-medium leading-tight max-w-[200px] truncate">
+                        {summary.join(", ") || "Bez obmedzení"}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    {member.user_id !== household?.owner_id && (
+                      <button 
+                        onClick={() => handleOpenEdit(member)}
+                        className="p-2.5 text-gray-300 hover:text-sage-500 hover:bg-sage-50 rounded-2xl transition-all"
+                      >
+                        <Pencil size={18} />
+                      </button>
+                    )}
+                    {member.role !== 'owner' && (
+                      <button 
+                        onClick={() => handleRemoveMember(member.id)}
+                        className="p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    )}
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  {member.user_id !== household?.owner_id && (
-                    <button 
-                      onClick={() => handleOpenEdit(member)}
-                      className="p-2.5 text-gray-300 hover:text-sage-500 hover:bg-sage-50 rounded-2xl transition-all"
-                    >
-                      <Pencil size={18} />
-                    </button>
-                  )}
-                  {member.role !== 'owner' && (
-                    <button 
-                      onClick={() => handleRemoveMember(member.id)}
-                      className="p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
-                    >
-                      <Trash2 size={18} />
-                    </button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
+
+        {pendingMembers.length > 0 && (
+          <div className="space-y-3">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-widest ml-1">Čakajú na prijatie</h3>
+            <div className="space-y-3 opacity-80">
+              {pendingMembers.map((member: any) => {
+                const prefs = member.preferences;
+                const summary = [
+                  ...(prefs?.diet || []),
+                  ...(prefs?.intolerances || []),
+                  ...(prefs?.disliked_ingredients || [])
+                ];
+
+                return (
+                  <div key={member.id} className="bg-white/70 p-4 rounded-2xl border border-dashed border-gray-200 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-amber-50 text-amber-600">
+                        <Mail size={24} />
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="font-bold text-gray-500 italic">
+                            {member.invitation_email || "Pozvaný člen"}
+                          </h4>
+                          <span className="px-1.5 py-0.5 bg-amber-50 text-amber-700 text-[8px] font-bold uppercase rounded-2xl flex items-center gap-1">
+                            <Clock size={8} /> Pozvánka odoslaná
+                          </span>
+                        </div>
+                        <p className="text-gray-400 text-[11px] font-medium leading-tight max-w-[200px] truncate">
+                          {summary.join(", ") || "Bez obmedzení"}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <button 
+                        onClick={() => handleRemoveMember(member.id)}
+                        className="p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Spoločné recepty - Rodinná nástenka */}
