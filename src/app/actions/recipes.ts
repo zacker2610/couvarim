@@ -4,6 +4,7 @@ import { geminiModel, geminiVisionModel } from "@/lib/gemini";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { revalidatePath } from "next/cache";
+import { getServerSupabase } from "@/lib/supabase-server";
 import { sendHouseholdInvitation } from "@/lib/mail";
 
 /**
@@ -195,28 +196,6 @@ export async function generateRecipeAction(
   }
 }
 
-/**
- * Helper to get server-side supabase client
- */
-async function getServerSupabase() {
-  const cookieStore = await cookies();
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() { return cookieStore.getAll(); },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {}
-        },
-      },
-    }
-  );
-}
 
 /**
  * Server Action to get the latest 3 recipes for the user.

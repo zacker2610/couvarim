@@ -1,7 +1,11 @@
 import Link from "next/link";
 import { ChefHat, ArrowRight, Sparkles } from "lucide-react";
+import { getServerSupabase } from "@/lib/supabase-server";
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const supabase = await getServerSupabase();
+  const { data: { user } } = await supabase.auth.getUser();
+
   return (
     <div className="min-h-screen bg-[#F8F5F2] flex flex-col overflow-hidden">
       {/* Desktop Navigation (Hidden on mobile) */}
@@ -13,12 +17,20 @@ export default function LandingPage() {
           <span className="text-xl font-bold text-sage-700">ČoUvarím.sk</span>
         </div>
         <div className="flex gap-4">
-          <Link href="/login" className="px-6 py-2.5 text-sage-700 font-semibold hover:bg-sage-50 rounded-xl transition-all">
-            Prihlásiť sa
-          </Link>
-          <Link href="/register" className="px-6 py-2.5 bg-sage-500 text-sage-50 font-semibold rounded-xl shadow-md hover:bg-sage-600 transition-all">
-            Začať zadarmo
-          </Link>
+          {user ? (
+            <Link href="/generate" className="px-6 py-2.5 bg-sage-500 text-sage-50 font-semibold rounded-xl shadow-md hover:bg-sage-600 transition-all flex items-center gap-2">
+              Vstup do aplikácie <ArrowRight size={18} />
+            </Link>
+          ) : (
+            <>
+              <Link href="/login" className="px-6 py-2.5 text-sage-700 font-semibold hover:bg-sage-50 rounded-xl transition-all">
+                Prihlásiť sa
+              </Link>
+              <Link href="/register" className="px-6 py-2.5 bg-sage-500 text-sage-50 font-semibold rounded-xl shadow-md hover:bg-sage-600 transition-all">
+                Začať zadarmo
+              </Link>
+            </>
+          )}
         </div>
       </nav>
 
@@ -35,7 +47,7 @@ export default function LandingPage() {
         <div className="max-w-2xl animate-in fade-in slide-in-from-bottom-8 duration-1000">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-sage-100 text-sage-700 rounded-full text-sm font-bold mb-8 mx-auto">
             <Sparkles size={14} />
-            <span className="tracking-tight text-[10px]">Inteligentné varenie s AI</span>
+            <span className="tracking-tight text-[10px]">Inteligentné varenie</span>
           </div>
           
           <h1 className="text-4xl sm:text-7xl font-bold text-gray-900 tracking-tighter mb-6 leading-[1.1]">
@@ -44,14 +56,20 @@ export default function LandingPage() {
           </h1>
           
           <p className="text-lg sm:text-xl text-gray-500 leading-relaxed mb-12 px-4">
-            Premeňte suroviny vo vašej chladničke na gurmánsky zážitok vďaka umelej inteligencii.
+            Premeňte suroviny vo vašej chladničke na gurmánsky zážitok vďaka modernej technológii.
           </p>
 
           {/* Desktop Buttons */}
           <div className="hidden sm:flex gap-4 justify-center">
-            <Link href="/register" className="px-10 py-4 bg-sage-500 text-sage-50 text-lg font-bold rounded-2xl shadow-xl hover:bg-sage-600 transition-all flex items-center gap-2 group">
-              Vyskúšať teraz <ArrowRight className="group-hover:translate-x-1 transition-transform" />
-            </Link>
+            {user ? (
+              <Link href="/generate" className="px-10 py-4 bg-sage-500 text-sage-50 text-lg font-bold rounded-2xl shadow-xl hover:bg-sage-600 transition-all flex items-center gap-2 group">
+                Vstup do aplikácie <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+            ) : (
+              <Link href="/register" className="px-10 py-4 bg-sage-500 text-sage-50 text-lg font-bold rounded-2xl shadow-xl hover:bg-sage-600 transition-all flex items-center gap-2 group">
+                Vyskúšať teraz <ArrowRight className="group-hover:translate-x-1 transition-transform" />
+              </Link>
+            )}
             <button className="px-10 py-4 bg-white text-gray-700 text-lg font-bold rounded-2xl shadow-md border border-gray-100 hover:bg-gray-50 transition-all">
               Ako to funguje?
             </button>
@@ -60,12 +78,20 @@ export default function LandingPage() {
 
         {/* Mobile Action Area (Fixed at bottom for native feel) */}
         <div className="sm:hidden fixed bottom-0 left-0 right-0 p-8 space-y-4 bg-gradient-to-t from-[#F8F5F2] via-[#F8F5F2] to-transparent pt-20">
-          <Link href="/register" className="w-full py-5 bg-sage-500 text-sage-50 rounded-2xl font-bold shadow-xl flex items-center justify-center active:scale-95 transition-all">
-            Začať teraz
-          </Link>
-          <Link href="/login" className="w-full py-5 bg-white text-gray-700 rounded-2xl font-bold shadow-sm border border-gray-100 flex items-center justify-center active:scale-95 transition-all">
-            Už mám účet
-          </Link>
+          {user ? (
+            <Link href="/generate" className="w-full py-5 bg-sage-500 text-sage-50 rounded-2xl font-bold shadow-xl flex items-center justify-center active:scale-95 transition-all">
+              Vstup do aplikácie
+            </Link>
+          ) : (
+            <>
+              <Link href="/register" className="w-full py-5 bg-sage-500 text-sage-50 rounded-2xl font-bold shadow-xl flex items-center justify-center active:scale-95 transition-all">
+                Začať teraz
+              </Link>
+              <Link href="/login" className="w-full py-5 bg-white text-gray-700 rounded-2xl font-bold shadow-sm border border-gray-100 flex items-center justify-center active:scale-95 transition-all">
+                Už mám účet
+              </Link>
+            </>
+          )}
           <div className="h-safe-area-inset-bottom" />
         </div>
       </main>
@@ -73,7 +99,7 @@ export default function LandingPage() {
       {/* Desktop Features Section (Hidden on mobile) */}
       <section className="hidden sm:block bg-white py-24">
         <div className="max-w-7xl mx-auto px-6 grid grid-cols-3 gap-12 text-center">
-          <Feature icon={<Sparkles />} title="Osobné preferencie" text="AI berie do úvahy vaše alergie, intolerancie a chute." />
+          <Feature icon={<Sparkles />} title="Osobné preferencie" text="Aplikácia berie do úvahy vaše alergie, intolerancie a chute." />
           <Feature icon={<Sparkles />} title="Rozpoznanie fotky" text="Odfote suroviny a naša technológia ich identifikuje." />
           <Feature icon={<Sparkles />} title="História receptov" text="Všetky vaše vygenerované lahôdky máte po ruke." />
         </div>
