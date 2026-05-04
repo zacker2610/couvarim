@@ -4,7 +4,10 @@ const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function sendHouseholdInvitation(email: string, householdName: string, inviterName: string, inviteId: string) {
   try {
-    const inviteLink = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/invite/${inviteId}`;
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 
+                     process.env.NEXT_PUBLIC_SITE_URL || 
+                     (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : 'http://localhost:3000');
+    const inviteLink = `${baseUrl}/invite/${inviteId}`;
     
     const { data, error } = await resend.emails.send({
       from: 'ČoUvarím.sk <onboarding@resend.dev>', // In production, this would be your domain
