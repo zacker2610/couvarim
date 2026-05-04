@@ -17,9 +17,13 @@ export default function AuthCallbackPage() {
         return;
       }
 
+      const searchParams = new URLSearchParams(window.location.search);
+      const next = searchParams.get("next");
+      const redirectPath = next || "/dashboard";
+      
       if (data.session) {
-        console.log("✅ Session found, redirecting to dashboard");
-        router.push("/dashboard");
+        console.log("✅ Session found, redirecting to", redirectPath);
+        router.push(redirectPath);
       } else {
         // If no session yet, maybe it's still processing or we need to wait
         console.log("Waiting for session...");
@@ -27,8 +31,8 @@ export default function AuthCallbackPage() {
         // Listen for auth state changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
           if (event === "SIGNED_IN" && session) {
-            console.log("✅ Signed in event, redirecting to dashboard");
-            router.push("/dashboard");
+            console.log("✅ Signed in event, redirecting to", redirectPath);
+            router.push(redirectPath);
             subscription.unsubscribe();
           }
         });

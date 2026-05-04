@@ -18,8 +18,19 @@ export default function LoginPage() {
     const { error } = await signInWithEmail(email, password);
     setLoading(false);
     if (!error) {
-      router.push("/dashboard");
+      const searchParams = new URLSearchParams(window.location.search);
+      const returnTo = searchParams.get("returnTo");
+      router.push(returnTo || "/dashboard");
     }
+  };
+
+  const handleGoogleLogin = async () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const returnTo = searchParams.get("returnTo");
+    const redirectTo = returnTo 
+      ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(returnTo)}`
+      : undefined;
+    await signInWithGoogle(redirectTo);
   };
 
   return (
@@ -93,7 +104,7 @@ export default function LoginPage() {
 
             <button 
               type="button"
-              onClick={signInWithGoogle}
+              onClick={handleGoogleLogin}
               className="w-full py-5 bg-white sm:bg-gray-50 border border-gray-100 text-gray-700 rounded-2xl font-bold flex items-center justify-center gap-3 hover:bg-gray-100 transition-all shadow-sm active:scale-[0.98]"
             >
               <svg viewBox="0 0 24 24" width="20" height="20" xmlns="http://www.w3.org/2000/svg">

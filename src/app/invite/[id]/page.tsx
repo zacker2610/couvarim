@@ -102,9 +102,14 @@ export default function InvitePage() {
         </div>
         <h1 className="text-2xl font-bold text-gray-800 mb-2">Ups! Niečo nie je v poriadku</h1>
         <p className="text-gray-500 mb-8 max-w-sm">{error}</p>
-        <Link href="/" className="px-8 py-4 bg-sage-500 text-white rounded-2xl font-bold shadow-lg hover:bg-sage-600 transition-all">
-          Späť na domovskú stránku
-        </Link>
+        <div className="flex flex-col gap-3 w-full max-w-xs">
+          <Link href="/dashboard" className="px-8 py-4 bg-sage-500 text-white rounded-2xl font-bold shadow-lg hover:bg-sage-600 transition-all">
+            Ísť do aplikácie
+          </Link>
+          <Link href="/" className="px-8 py-2 text-gray-400 font-bold hover:text-gray-600 transition-all">
+            Domovská stránka
+          </Link>
+        </div>
       </div>
     );
   }
