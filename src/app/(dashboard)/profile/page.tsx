@@ -21,8 +21,9 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { COMMON_INTOLERANCES, DIETARY_PREFERENCES } from "@/lib/constants";
 import { supabase } from "@/lib/supabase";
-import { updateProfileAction } from "@/app/actions/recipes";
+import { updateProfileAction, getOrCreateHouseholdAction, leaveHouseholdAction } from "@/app/actions/recipes";
 import { signOut } from "@/lib/auth";
+import { Trash2 } from "lucide-react";
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
@@ -44,6 +45,10 @@ export default function ProfilePage() {
     },
     pantry: [] as string[]
   });
+  
+  const [household, setHousehold] = useState<any>(null);
+  const [leaveConfirmHousehold, setLeaveConfirmHousehold] = useState(false);
+  const [isOwner, setIsOwner] = useState(false);
   
   const [tagInput, setTagInput] = useState("");
   const [pantryInput, setPantryInput] = useState("");
@@ -76,7 +81,15 @@ export default function ProfilePage() {
             pantry: profileData.pantry || []
           });
         }
+      
+        // Fetch household status
+        const hResult = await getOrCreateHouseholdAction(false);
+        if (hResult.success && hResult.household) {
+          setHousehold(hResult.household);
+          setIsOwner(hResult.household.owner_id === authUser.id);
+        }
       }
+
       setLoading(false);
     };
 
@@ -206,6 +219,19 @@ export default function ProfilePage() {
 
   const handleLogout = async () => {
     await signOut();
+  };
+
+  const handleLeaveHousehold = async () => {
+    if (!household) return;
+    setSaving(true);
+    const result = await leaveHouseholdAction(household.id);
+    if (result.success) {
+      window.location.reload();
+    } else {
+      alert(result.error);
+    }
+    setSaving(false);
+    setLeaveConfirmHousehold(false);
   };
 
   if (loading) {
@@ -520,7 +546,17 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <section className="pt-8 pb-12 text-center md:hidden">
+        <section className="pt-8 pb-12 space-y-4 px-4">
+          {!isOwner && household && (
+            <button 
+              onClick={() => setLeaveConfirmHousehold(true)}
+              className="w-full py-4 bg-white text-amber-600 rounded-2xl font-bold flex items-center justify-center gap-2 active:bg-amber-50 transition-all border border-amber-100 shadow-sm"
+            >
+              <LogOut size={18} />
+              Opustiť domácnosť
+            </button>
+          )}
+
           <button 
             onClick={handleLogout}
             className="w-full py-4 bg-white text-red-400 rounded-2xl font-medium flex items-center justify-center gap-2 active:bg-red-50 transition-all border border-gray-100 shadow-sm"
@@ -528,10 +564,57 @@ export default function ProfilePage() {
             <LogOut size={18} />
             Odhlásiť sa
           </button>
-          <p className="text-gray-300 text-[10px] mt-8 tracking-widest uppercase font-bold">
+          <p className="text-gray-300 text-[10px] mt-8 text-center tracking-widest uppercase font-bold">
             ČoUvarím.sk • v1.0.0
           </p>
         </section>
+
+        {/* Custom Leave Household Confirmation Modal */}
+        <AnimatePresence>
+          {leaveConfirmHousehold && (
+            <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+              <motion.div 
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                onClick={() => setLeaveConfirmHousehold(false)}
+                className="absolute inset-0 bg-black/60 backdrop-blur-md"
+              />
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden"
+              >
+                <div className="p-8 text-center space-y-6">
+                  <div className="w-20 h-20 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto">
+                    <LogOut size={40} />
+                  </div>
+                  <div className="space-y-2">
+                    <h3 className="text-xl font-bold text-gray-800">Opustiť domácnosť?</h3>
+                    <p className="text-gray-500 text-sm leading-relaxed px-4">
+                      Naozaj chcete opustiť spoločnú domácnosť <span className="font-bold text-gray-700">"{household?.name}"</span>?
+                    </p>
+                  </div>
+                  <div className="flex flex-col gap-3 pt-2">
+                    <button 
+                      onClick={handleLeaveHousehold}
+                      className="w-full py-4 bg-amber-500 text-white rounded-2xl font-bold shadow-lg shadow-amber-200 active:scale-95 transition-all"
+                    >
+                      Opustiť domácnosť
+                    </button>
+                    <button 
+                      onClick={() => setLeaveConfirmHousehold(false)}
+                      className="w-full py-4 bg-gray-50 text-gray-500 rounded-2xl font-bold hover:bg-gray-100 active:scale-95 transition-all"
+                    >
+                      Zrušiť
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

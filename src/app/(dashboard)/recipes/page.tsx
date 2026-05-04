@@ -53,6 +53,7 @@ function RecipesContent() {
   const [userPantry, setUserPantry] = useState<string[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+  const [checkedIngredients, setCheckedIngredients] = useState<string[]>([]);
   
   const searchParams = useSearchParams();
   const recipeIdFromUrl = searchParams.get("id");
@@ -107,6 +108,25 @@ function RecipesContent() {
     setSelectedRecipe(recipe);
     setView("detail");
     setActiveMenuId(null);
+
+    // Initialize checked ingredients
+    const createdAt = new Date(recipe.created_at);
+    const now = new Date();
+    const hoursSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
+    const isFresh = hoursSinceCreation <= 24;
+
+    const initialChecked = recipe.ingredients
+      ?.filter((ing: any) => {
+        const name = ing.item.toLowerCase();
+        // Check if in pantry
+        const isInPantry = userPantry.some(p => name.includes(p) || p.includes(name));
+        // Check if explicitly owned (from fresh generation)
+        const isOwned = isFresh && ing.owned;
+        return isInPantry || isOwned || name.includes("voda") || name.includes("soľ") || name.includes("korenie");
+      })
+      .map((ing: any) => ing.item) || [];
+    
+    setCheckedIngredients(initialChecked);
   };
 
   const handleToggleShare = async (recipe: any) => {
@@ -178,30 +198,14 @@ function RecipesContent() {
   const handleShareShoppingList = () => {
     if (!selectedRecipe) return;
     
-    // Logic for "freshness" - if recipe is older than 24 hours, assume user doesn't have the ingredients anymore (except staples)
-    const createdAt = new Date(selectedRecipe.created_at);
-    const now = new Date();
-    const hoursSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
-    const isStale = hoursSinceCreation > 24;
-
+    // Only share ingredients that are NOT checked
     const missingIngredients = selectedRecipe.ingredients
-      .filter((ing: any) => {
-        const name = ing.item.toLowerCase();
-        // Always skip water
-        if (name.includes("voda")) return false;
-        
-        // Skip if it's in pantry
-        if (userPantry.some(p => name.includes(p) || p.includes(name))) return false;
-        
-        // If recipe is fresh, respect the "owned" flag from AI/photo
-        // If recipe is stale, treat everything as missing
-        return isStale ? true : !ing.owned;
-      })
+      .filter((ing: any) => !checkedIngredients.includes(ing.item))
       .map((ing: any) => `- ${ing.item}: ${ing.amount} ${ing.unit}`)
       .join("\n");
       
     if (missingIngredients.length === 0) {
-      alert("Máte všetky suroviny doma alebo v špajzi! 🎉");
+      alert("Všetky suroviny máte označené ako dostupné! 🎉");
       return;
     }
     
@@ -213,8 +217,8 @@ function RecipesContent() {
         text: text,
       }).catch(console.error);
     } else {
-      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(text)}`;
-      window.open(whatsappUrl, "_blank");
+      const mailUrl = `mailto:?subject=${encodeURIComponent(`Nákupný zoznam - ${selectedRecipe.title}`)}&body=${encodeURIComponent(text)}`;
+      window.open(mailUrl, "_blank");
     }
   };
 
@@ -573,19 +577,46 @@ function RecipesContent() {
                       onClick={handleShareShoppingList}
                       className="flex items-center gap-2 px-4 py-2 bg-sage-50 text-sage-600 rounded-2xl text-xs font-bold hover:bg-sage-100 transition-all active:scale-95 border border-sage-100"
                     >
-                      <Share2 size={14} /> Zdieľať nákup
+                      <Share2 size={14} /> Zdieľať nákupný zoznam
                     </button>
                   </div>
                   <div className="space-y-3">
-                    {selectedRecipe.ingredients?.map((ing: any, i: number) => (
-                      <div 
-                        key={i} 
-                        className="flex justify-between items-center bg-gray-50/50 p-5 rounded-2xl border border-gray-100/50 hover:bg-white transition-colors"
-                      >
-                        <span className="font-medium text-gray-700">{ing.item}</span>
-                        <span className="text-sage-600 font-bold">{ing.amount} {ing.unit}</span>
-                      </div>
-                    ))}
+                    {selectedRecipe.ingredients?.map((ing: any, i: number) => {
+                      const isChecked = checkedIngredients.includes(ing.item);
+                      return (
+                        <div 
+                          key={i} 
+                          onClick={() => {
+                            setCheckedIngredients(prev => 
+                              prev.includes(ing.item) 
+                                ? prev.filter(t => t !== ing.item) 
+                                : [...prev, ing.item]
+                            );
+                          }}
+                          className={`flex justify-between items-center p-5 rounded-2xl border transition-all cursor-pointer group ${
+                            isChecked 
+                              ? 'bg-sage-50/30 border-sage-100 opacity-60' 
+                              : 'bg-gray-50/50 border-gray-100/50 hover:bg-white hover:border-sage-200'
+                          }`}
+                        >
+                          <div className="flex items-center gap-4">
+                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all ${
+                              isChecked 
+                                ? 'bg-sage-500 border-sage-500 text-white' 
+                                : 'bg-white border-gray-200 text-transparent group-hover:border-sage-300'
+                            }`}>
+                              <Check size={14} strokeWidth={3} />
+                            </div>
+                            <span className={`font-medium transition-all ${isChecked ? 'text-gray-400 line-through' : 'text-gray-700'}`}>
+                              {ing.item}
+                            </span>
+                          </div>
+                          <span className={`font-bold transition-all ${isChecked ? 'text-gray-300' : 'text-sage-600'}`}>
+                            {ing.amount} {ing.unit}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
