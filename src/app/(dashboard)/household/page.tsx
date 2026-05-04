@@ -42,6 +42,8 @@ export default function HouseholdPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sharedRecipes, setSharedRecipes] = useState<any[]>([]);
+  const [deleteConfirmMember, setDeleteConfirmMember] = useState<any | null>(null);
+  const [leaveConfirmHousehold, setLeaveConfirmHousehold] = useState<boolean>(false);
   
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [editingMember, setEditingMember] = useState<any>(null);
@@ -194,28 +196,28 @@ export default function HouseholdPage() {
     setIsSubmitting(false);
   };
 
-  const handleRemoveMember = async (memberId: string) => {
-    if (!isOwner) return;
-    if (confirm("Naozaj chcete odstrániť tohto člena z domácnosti?")) {
-      const result = await removeHouseholdMemberAction(memberId);
-      if (result.success) {
-        setMembers(members.filter(m => m.id !== memberId));
-      }
+  const handleRemoveMember = async () => {
+    if (!deleteConfirmMember || !isOwner) return;
+    
+    const memberId = deleteConfirmMember.id;
+    const result = await removeHouseholdMemberAction(memberId);
+    if (result.success) {
+      setMembers(members.filter(m => m.id !== memberId));
+      setDeleteConfirmMember(null);
     }
   };
 
   const handleLeaveHousehold = async () => {
     if (!household) return;
-    if (confirm("Naozaj chcete opustiť túto spoločnú domácnosť?")) {
-      setIsSubmitting(true);
-      const result = await leaveHouseholdAction(household.id);
-      if (result.success) {
-        window.location.reload(); // Refresh to show empty state
-      } else {
-        alert(result.error);
-      }
-      setIsSubmitting(false);
+    setIsSubmitting(true);
+    const result = await leaveHouseholdAction(household.id);
+    if (result.success) {
+      window.location.reload(); // Refresh to show empty state
+    } else {
+      console.error(result.error);
     }
+    setIsSubmitting(false);
+    setLeaveConfirmHousehold(false);
   };
 
   const activeMembers = members.filter(m => m.status !== 'pending');
@@ -269,8 +271,8 @@ export default function HouseholdPage() {
 
         {/* Members can leave the household */}
         {!isOwner && household && (
-           <button 
-            onClick={handleLeaveHousehold}
+          <button 
+            onClick={() => setLeaveConfirmHousehold(true)}
             className="hidden sm:flex bg-red-50 text-red-600 px-5 py-2.5 rounded-full font-bold text-sm shadow-sm active:scale-95 transition-all items-center gap-2 hover:bg-red-100 border border-red-100"
           >
             <LogOut size={18} />
@@ -291,7 +293,7 @@ export default function HouseholdPage() {
 
       {!isOwner && household && (
         <button 
-          onClick={handleLeaveHousehold}
+          onClick={() => setLeaveConfirmHousehold(true)}
           className="sm:hidden fixed bottom-24 right-6 w-16 h-16 bg-red-500 text-white rounded-full z-40 flex items-center justify-center active:scale-90 transition-all shadow-lg hover:bg-red-600"
         >
           <LogOut size={28} strokeWidth={2.5} />
@@ -447,7 +449,7 @@ export default function HouseholdPage() {
                         {/* Only Owner can remove OTHER members */}
                         {isOwner && member.user_id !== currentUser?.id && (
                           <button 
-                            onClick={() => handleRemoveMember(member.id)}
+                            onClick={() => setDeleteConfirmMember(member)}
                             className="p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
                           >
                             <Trash2 size={18} />
@@ -494,7 +496,7 @@ export default function HouseholdPage() {
                         </div>
                         <div className="flex items-center gap-1">
                           <button 
-                            onClick={() => handleRemoveMember(member.id)}
+                            onClick={() => setDeleteConfirmMember(member)}
                             className="p-2.5 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-2xl transition-all"
                           >
                             <Trash2 size={18} />
@@ -751,6 +753,100 @@ export default function HouseholdPage() {
                 )}
               </form>
               <div className="h-8" />
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+      
+      {/* Custom Member Delete Confirmation Modal */}
+      <AnimatePresence>
+        {deleteConfirmMember && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setDeleteConfirmMember(null)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden"
+            >
+              <div className="p-8 text-center space-y-6">
+                <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto">
+                  <Trash2 size={40} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold text-gray-800">Odstrániť člena?</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed px-4">
+                    Naozaj chcete odstrániť člena <span className="font-bold text-gray-700">"{getMemberName(deleteConfirmMember)}"</span> z vašej domácnosti?
+                  </p>
+                </div>
+                <div className="flex flex-col gap-3 pt-2">
+                  <button 
+                    onClick={handleRemoveMember}
+                    className="w-full py-4 bg-red-500 text-white rounded-2xl font-bold shadow-lg shadow-red-200 active:scale-95 transition-all"
+                  >
+                    Odstrániť člena
+                  </button>
+                  <button 
+                    onClick={() => setDeleteConfirmMember(null)}
+                    className="w-full py-4 bg-gray-50 text-gray-500 rounded-2xl font-bold hover:bg-gray-100 active:scale-95 transition-all"
+                  >
+                    Zrušiť
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Custom Leave Household Confirmation Modal */}
+      <AnimatePresence>
+        {leaveConfirmHousehold && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setLeaveConfirmHousehold(false)}
+              className="absolute inset-0 bg-black/60 backdrop-blur-md"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-sm bg-white rounded-2xl shadow-2xl overflow-hidden"
+            >
+              <div className="p-8 text-center space-y-6">
+                <div className="w-20 h-20 bg-amber-50 text-amber-500 rounded-full flex items-center justify-center mx-auto">
+                  <LogOut size={40} />
+                </div>
+                <div className="space-y-2">
+                  <h3 className="text-xl font-bold text-gray-800">Opustiť domácnosť?</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed px-4">
+                    Naozaj chcete opustiť spoločnú domácnosť <span className="font-bold text-gray-700">"{household?.name}"</span>?
+                  </p>
+                </div>
+                <div className="flex flex-col gap-3 pt-2">
+                  <button 
+                    onClick={handleLeaveHousehold}
+                    className="w-full py-4 bg-amber-500 text-white rounded-2xl font-bold shadow-lg shadow-amber-200 active:scale-95 transition-all"
+                  >
+                    Opustiť domácnosť
+                  </button>
+                  <button 
+                    onClick={() => setLeaveConfirmHousehold(false)}
+                    className="w-full py-4 bg-gray-50 text-gray-500 rounded-2xl font-bold hover:bg-gray-100 active:scale-95 transition-all"
+                  >
+                    Zrušiť
+                  </button>
+                </div>
+              </div>
             </motion.div>
           </div>
         )}
