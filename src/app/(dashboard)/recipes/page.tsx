@@ -193,7 +193,8 @@ function RecipesContent() {
         const name = ing.item.toLowerCase();
         const isInPantry = userPantry.some(p => name.includes(p) || p.includes(name));
         const isOwned = isFresh && ing.owned;
-        return isInPantry || isOwned || name.includes("voda") || name.includes("soľ") || name.includes("korenie");
+        const isStaple = name.includes("voda") || name.includes("soľ") || name.includes("korenie") || name.includes("soľ") || name.includes("voda");
+        return isInPantry || isOwned || isStaple;
       })
       .map((ing: any) => ing.item) || [];
     
@@ -246,10 +247,16 @@ function RecipesContent() {
     // Use normalized ingredients if available, otherwise use unchecked ones
     let itemsToShare = [];
     if (normalizedIngredients) {
-      itemsToShare = normalizedIngredients.map((ing: any) => `- ${ing.item}: ${ing.amount} ${ing.unit}`);
+      itemsToShare = normalizedIngredients
+        .filter((ing: any) => !ing.item.toLowerCase().includes("voda"))
+        .map((ing: any) => `- ${ing.item}: ${ing.amount} ${ing.unit}`);
     } else {
       itemsToShare = selectedRecipe.ingredients
-        .filter((ing: any) => !checkedIngredients.includes(ing.item))
+        .filter((ing: any) => {
+          const isChecked = checkedIngredients.includes(ing.item);
+          const isWater = ing.item.toLowerCase().includes("voda");
+          return !isChecked && !isWater;
+        })
         .map((ing: any) => {
           // EXCLUSIVELY use buying units if available, fallback to original only if missing
           const amount = ing.buying_amount || ing.amount;
