@@ -116,19 +116,21 @@ function RecipesContent() {
 
   // Unified URL param and selection synchronization
   useEffect(() => {
+    // Aggressively clear selection if no ID in URL
+    if (!recipeIdFromUrl) {
+      setSelectedRecipe(null);
+      return;
+    }
+
     if (isLoading) return;
 
-    if (recipeIdFromUrl) {
-      const recipe = recipes.find(r => r.id === recipeIdFromUrl);
-      if (recipe) {
-        setSelectedRecipe(recipe);
-        setActiveMenuId(null);
-      } else if (recipes.length > 0) {
-        // ID in URL but not found in recipes (might be deleted or wrong)
-        router.replace("/recipes");
-      }
-    } else {
-      setSelectedRecipe(null);
+    const recipe = recipes.find(r => r.id === recipeIdFromUrl);
+    if (recipe) {
+      setSelectedRecipe(recipe);
+      setActiveMenuId(null);
+    } else if (recipes.length > 0) {
+      // ID in URL but not found in recipes (might be deleted or wrong)
+      router.replace("/recipes");
     }
   }, [recipeIdFromUrl, recipes, isLoading, router]);
 
