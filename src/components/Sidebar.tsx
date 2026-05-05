@@ -13,7 +13,8 @@ import {
   Camera,
   LogOut,
   Users,
-  Download
+  Download,
+  Info
 } from "lucide-react";
 import { clsx, type ClassValue } from "clsx";
 import { twMerge } from "tailwind-merge";
@@ -98,16 +99,29 @@ export default function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto pt-4 border-t border-sage-100 space-y-1">
+      <div className="mt-auto pt-4 border-t border-sage-100 space-y-2">
         {deferredPrompt && (
           <button 
             onClick={handleInstallClick}
-            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-blue-50 text-blue-600 hover:bg-blue-100 transition-all duration-200 border border-blue-100"
+            className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl bg-blue-600 text-white hover:bg-blue-700 shadow-md shadow-blue-100 transition-all duration-200"
           >
             <Download size={20} />
             <span className="font-bold text-sm">Nainštalovať appku</span>
           </button>
         )}
+        
+        {!isInstalled && !deferredPrompt && (
+          <div className="px-3 py-2 bg-gray-50 rounded-xl border border-gray-100">
+            <div className="flex items-center gap-2 mb-1">
+              <Info size={12} className="text-gray-400" />
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-tight">Inštalácia</span>
+            </div>
+            <p className="text-[10px] text-gray-400 leading-tight">
+              Kliknite na <strong>tři bodky</strong> (Chrome/Edge) alebo <strong>Zdieľať</strong> (Safari) a zvoľte <strong>Inštalovať</strong> alebo <strong>Na plochu</strong>.
+            </p>
+          </div>
+        )}
+
         <button 
           onClick={signOut}
           className="w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl text-gray-500 hover:bg-red-50 hover:text-red-600 transition-all duration-200"
