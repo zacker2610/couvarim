@@ -279,7 +279,7 @@ export default function GeneratePage() {
         {step === "result" && generatedRecipe && !isRefining && (
           <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="bg-transparent min-h-full max-w-4xl mx-auto">
             {/* Solid Header on top */}
-            <header className="sticky md:static top-0 z-50 bg-[#F8F5F2]/80 md:bg-transparent backdrop-blur-md md:backdrop-blur-none flex items-center justify-between py-4 px-4">
+            <header className="sticky md:static top-0 z-50 bg-[#F8F5F2]/80 md:bg-transparent backdrop-blur-md md:backdrop-blur-none flex items-center justify-between py-4">
               <button 
                 onClick={() => setStep("hub")} 
                 className="w-10 h-10 bg-white/50 text-gray-500 rounded-xl active:scale-90 transition-all flex items-center justify-center border border-white/50 shadow-sm"
@@ -297,7 +297,7 @@ export default function GeneratePage() {
               </div>
             </header>
 
-            <div className="relative px-4">
+            <div className="relative">
               {/* Hero Image - True Full Bleed */}
               <div className="w-full h-64 md:h-96 relative bg-sage-50 rounded-[32px] overflow-hidden md:mt-4 shadow-sm border border-black/5">
                 <img 
