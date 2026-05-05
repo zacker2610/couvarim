@@ -128,24 +128,14 @@ export default function ScanPage() {
 
   return (
     <div className="space-y-8 pb-24">
-      <header className="flex items-center justify-between mb-8">
-        <div className="flex items-center gap-4">
-          <Link 
-            href="/generate"
-            className="p-2 bg-white rounded-xl shadow-sm border border-gray-100 text-gray-400 hover:text-sage-500 active:scale-90 transition-all"
-          >
-            <ChevronLeft size={24} />
-          </Link>
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 bg-sage-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-sage-200">
-              <Camera size={28} />
-            </div>
-            <div>
-              <h2 className="text-3xl font-black text-gray-800 tracking-tight">Skener</h2>
-              <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-0.5">Zistite, čo dnes uvariť</p>
-            </div>
-          </div>
-        </div>
+      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-4 py-4 px-1 mb-6">
+        <Link 
+          href="/generate"
+          className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all"
+        >
+          <ChevronLeft size={22} />
+        </Link>
+        <h2 className="text-2xl font-bold text-gray-800 tracking-tight flex-1">Skener</h2>
       </header>
 
       <section className="bg-white p-6 sm:p-10 rounded-[40px] border border-gray-100 shadow-sm relative overflow-hidden">
