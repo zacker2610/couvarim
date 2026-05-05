@@ -14,18 +14,18 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "ČoUvarím.sk - Inteligentná kuchyňa",
-  description: "Generujte recepty pomocou AI na základe vašich surovín a preferencií.",
+  description: "Inteligentný asistent pre vaše varenie a nákupy",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
-    statusBarStyle: "default",
+    statusBarStyle: "black-translucent",
     title: "ČoUvarím",
   },
   icons: {
-    apple: "/icon.svg",
+    apple: "/icon-512x512.png",
     icon: [
-      { url: "/icon.png", type: "image/png" },
-      { url: "/icon.svg", type: "image/svg+xml" },
+      { url: "/icon-192x192.png", type: "image/png", sizes: "192x192" },
+      { url: "/icon-512x512.png", type: "image/png", sizes: "512x512" },
     ],
   },
 };
