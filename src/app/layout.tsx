@@ -16,10 +16,14 @@ export const metadata: Metadata = {
   title: "ČoUvarím.sk - Inteligentná kuchyňa",
   description: "Inteligentný asistent pre vaše varenie a nákupy",
   manifest: "/manifest.json",
+  applicationName: "ČoUvarím",
   appleWebApp: {
     capable: true,
     statusBarStyle: "black-translucent",
     title: "ČoUvarím",
+  },
+  formatDetection: {
+    telephone: false,
   },
   icons: {
     apple: "/icon-512x512.png",

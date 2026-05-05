@@ -1,10 +1,12 @@
 {
   "name": "ČoUvarím.sk",
   "short_name": "ČoUvarím",
+  "id": "/",
   "description": "Inteligentný asistent pre vaše varenie a nákupy",
-  "start_url": "./",
+  "start_url": "/",
   "display": "standalone",
-  "background_color": "#9CAF88",
+  "display_override": ["standalone", "window-controls-overlay"],
+  "background_color": "#F8F5F2",
   "theme_color": "#9CAF88",
   "icons": [
     {
