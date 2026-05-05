@@ -127,8 +127,8 @@ export default function ScanPage() {
   };
 
   return (
-    <div className="space-y-8 pb-24 px-4 pt-6">
-      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-4 py-4 px-1 mb-6">
+    <div className="space-y-8">
+      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-4 py-4 mb-6">
         <Link 
           href="/generate"
           className="w-12 h-12 bg-white rounded-2xl shadow-md border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all flex items-center justify-center"

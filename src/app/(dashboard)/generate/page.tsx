@@ -162,10 +162,10 @@ export default function GeneratePage() {
   };
 
   return (
-    <div className="pb-24">
+    <div>
       <AnimatePresence mode="wait">
         {step === "hub" && (
-          <motion.div key="hub" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6 px-4 pt-6">
+          <motion.div key="hub" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
             <header className="flex flex-col gap-1">
               <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Vymyslime niečo!</h1>
               <p className="text-gray-400 text-sm font-medium">Vyberte si spôsob, ako vytvoriť recept</p>
@@ -490,7 +490,7 @@ export default function GeneratePage() {
         )}
 
         {step === "ai_ingredients" && (
-          <motion.div key="ai_ingredients" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 px-4 pt-6">
+          <motion.div key="ai_ingredients" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
             <header className="flex items-center gap-4">
               <button onClick={() => setStep("hub")} className="w-12 h-12 bg-white rounded-2xl shadow-md border border-gray-100 text-gray-600 active:scale-90 transition-all flex items-center justify-center">
                 <ChevronLeft size={22} strokeWidth={2.5} />
@@ -514,7 +514,7 @@ export default function GeneratePage() {
         )}
 
         {step === "ai_dish" && (
-          <motion.div key="ai_dish" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 px-4 pt-6">
+          <motion.div key="ai_dish" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
             <header className="flex items-center gap-4">
               <button onClick={() => setStep("hub")} className="w-12 h-12 bg-white rounded-2xl shadow-md border border-gray-100 text-gray-600 active:scale-90 transition-all flex items-center justify-center">
                 <ChevronLeft size={22} strokeWidth={2.5} />

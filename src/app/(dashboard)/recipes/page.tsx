@@ -347,7 +347,7 @@ function RecipesContent() {
   const isDetail = !!recipeIdFromUrl && selectedRecipe;
 
   return (
-    <div className="pb-12">
+    <div>
       <AnimatePresence mode="wait">
         {!isDetail ? (
           <motion.div 
@@ -355,9 +355,9 @@ function RecipesContent() {
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }}
-            className="space-y-8 px-4 pt-6"
+            className="space-y-8"
           >
-            <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md py-4 px-2 -mx-2 mb-2 flex items-center justify-between">
+            <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md py-4 mb-2 flex items-center justify-between px-4 -mx-4">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Moje recepty</h2>
                 <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-1">Zbierka vašich jedál</p>
@@ -555,7 +555,7 @@ function RecipesContent() {
             animate={{ opacity: 1 }} 
             className="bg-transparent min-h-full max-w-4xl mx-auto"
           >
-            <header className="sticky md:static top-0 z-50 bg-[#F8F5F2]/80 md:bg-transparent backdrop-blur-md md:backdrop-blur-none flex items-center justify-between py-4">
+            <header className="sticky md:static top-0 z-50 bg-[#F8F5F2]/80 md:bg-transparent backdrop-blur-md md:backdrop-blur-none flex items-center justify-between py-4 px-4 -mx-4 md:px-0 md:mx-0">
               <button 
                 onClick={() => {
                   setSelectedRecipe(null);

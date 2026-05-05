@@ -235,8 +235,8 @@ export default function HouseholdPage() {
   }
 
   return (
-    <div className="pb-12 space-y-6 px-4 pt-6">
-      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center justify-between py-4 px-2 -mx-2 mb-2">
+    <div className="space-y-6">
+      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center justify-between py-4 px-4 -mx-4 mb-2">
         <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
           {isAlone ? "Spoločná Domácnosť" : (household?.name || "Moja Domácnosť")}
         </h2>

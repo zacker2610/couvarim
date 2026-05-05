@@ -274,9 +274,9 @@ export default function NewRecipePage() {
   };
 
   return (
-    <div className="pb-24 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="animate-in fade-in slide-in-from-right-4 duration-500">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-4 py-4 px-1 mb-6">
+      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-4 py-4 px-4 -mx-4 mb-6">
         <button 
           onClick={() => router.back()}
           className="w-12 h-12 bg-white rounded-2xl shadow-md border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all flex items-center justify-center"
