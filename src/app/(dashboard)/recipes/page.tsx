@@ -686,9 +686,9 @@ function RecipesContent() {
                     </h4>
                     <button 
                       onClick={handleOpenShareModal}
-                      className="flex items-center gap-2 px-4 py-2 bg-sage-50 text-sage-600 rounded-2xl text-xs font-bold hover:bg-sage-100 transition-all active:scale-95 border border-sage-100"
+                      className="flex items-center gap-2 px-3 py-2 bg-sage-50 text-sage-600 rounded-2xl text-[10px] font-bold hover:bg-sage-100 transition-all active:scale-95 border border-sage-100 whitespace-nowrap"
                     >
-                      <Share2 size={14} /> Zdieľať nákupný zoznam
+                      <Share2 size={14} /> Zdieľať zoznam
                     </button>
                   </div>
                   <div className="space-y-3">
