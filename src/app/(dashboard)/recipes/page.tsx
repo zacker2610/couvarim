@@ -24,7 +24,8 @@ import {
   AlertTriangle,
   Share2,
   ExternalLink,
-  Camera
+  Camera,
+  X
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
@@ -361,8 +362,21 @@ function RecipesContent() {
                   placeholder="Hľadať recept..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-11 pr-4 py-4 bg-white border border-transparent focus:border-sage-500 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sage-500/10 transition-all shadow-sm text-gray-700 font-medium"
+                  className="w-full pl-11 pr-12 py-4 bg-white border border-transparent focus:border-sage-500 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sage-500/10 transition-all shadow-sm text-gray-700 font-medium"
                 />
+                <AnimatePresence>
+                  {searchQuery && (
+                    <motion.button
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      exit={{ opacity: 0, scale: 0.8 }}
+                      onClick={() => setSearchQuery("")}
+                      className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 bg-gray-100 text-gray-400 rounded-xl hover:text-red-500 hover:bg-red-50 transition-all active:scale-90"
+                    >
+                      <X size={14} />
+                    </motion.button>
+                  )}
+                </AnimatePresence>
               </div>
               <button className="p-4 bg-white text-gray-400 rounded-2xl border border-transparent hover:border-sage-100 hover:text-sage-600 transition-all shadow-sm active:scale-95">
                 <Filter size={20} />
