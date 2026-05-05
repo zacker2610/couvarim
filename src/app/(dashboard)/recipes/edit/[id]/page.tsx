@@ -259,7 +259,7 @@ export default function EditRecipePage() {
             </>
           ) : (
             <label className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-sage-50 transition-colors">
-              <ChefHat size={64} className="text-sage-200" />
+              <Camera size={64} className="text-sage-200" />
               <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
             </label>
           )}
