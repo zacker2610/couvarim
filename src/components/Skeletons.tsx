@@ -53,13 +53,13 @@ export function RecipesSkeleton() {
         <Skeleton className="h-12 w-12 rounded-2xl" />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {[1, 2, 3, 4, 5, 6].map((i) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        {[1, 2, 3, 4].map((i) => (
           <div key={i} className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
             <Skeleton className="h-60 w-full rounded-none" />
-            <div className="p-7 space-y-4">
-              <Skeleton className="h-6 w-3/4" />
-              <div className="flex justify-between">
+            <div className="p-7">
+              <Skeleton className="h-7 w-3/4 mb-5" />
+              <div className="flex justify-between mb-9 px-1">
                 <Skeleton className="h-4 w-16" />
                 <Skeleton className="h-4 w-16" />
                 <Skeleton className="h-4 w-16" />
