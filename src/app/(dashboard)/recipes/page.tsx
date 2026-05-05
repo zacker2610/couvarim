@@ -562,23 +562,23 @@ function RecipesContent() {
                   router.push("/recipes");
                   window.dispatchEvent(new CustomEvent('clear-recipe-selection'));
                 }}
-                className="w-10 h-10 bg-white/50 text-gray-500 rounded-xl active:scale-90 transition-all flex items-center justify-center border border-white/50 shadow-sm"
+                className="w-12 h-12 bg-white text-gray-500 rounded-2xl active:scale-90 transition-all flex items-center justify-center border border-gray-100 shadow-md"
               >
-                <ChevronLeft size={20} strokeWidth={2.5} />
+                <ChevronLeft size={22} strokeWidth={2.5} />
               </button>
               <h2 className="text-gray-800 font-bold text-base">Detail receptu</h2>
               <div className="flex gap-2">
                 <button 
                   onClick={() => handleExternalShare()}
-                  className="w-10 h-10 bg-white/50 text-gray-400 rounded-xl active:scale-90 transition-all flex items-center justify-center hover:text-sage-500 border border-white/50 shadow-sm"
+                  className="w-12 h-12 bg-white text-gray-400 rounded-2xl active:scale-90 transition-all flex items-center justify-center hover:text-sage-500 border border-gray-100 shadow-md"
                 >
-                  <Share2 size={18} />
+                  <Share2 size={20} />
                 </button>
                 <Link 
                   href={`/recipes/edit/${selectedRecipe.id}`}
-                  className="w-10 h-10 bg-white/50 text-sage-600 rounded-xl active:scale-90 transition-all flex items-center justify-center border border-white/50 shadow-sm"
+                  className="w-12 h-12 bg-white text-sage-600 rounded-2xl active:scale-90 transition-all flex items-center justify-center border border-gray-100 shadow-md"
                 >
-                  <Pencil size={18} />
+                  <Pencil size={20} />
                 </Link>
               </div>
             </header>
