@@ -771,12 +771,12 @@ function RecipesContent() {
                 </button>
               </div>
 
-              <div className="flex-1 overflow-y-auto p-6 space-y-6">
+              <div className="flex-1 overflow-y-auto p-6 space-y-8">
                 {/* Normalization button for OLD recipes (without buying_amount) */}
                 {!normalizedIngredients && selectedRecipe.ingredients.some((ing: any) => !ing.buying_amount) && (
                   <button 
                     onClick={handleNormalizeIngredients}
-                    disabled={isNormalizing || selectedRecipe.ingredients.filter((ing: any) => !checkedIngredients.includes(ing.item)).length === 0}
+                    disabled={isNormalizing || selectedRecipe.ingredients.filter((ing: any) => checkedIngredients.includes(ing.item)).length === 0}
                     className="w-full py-4 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-2xl text-xs font-bold flex items-center justify-center gap-2 shadow-lg shadow-blue-100 hover:scale-[1.02] active:scale-95 transition-all disabled:opacity-50 disabled:scale-100"
                   >
                     {isNormalizing ? (
@@ -793,66 +793,103 @@ function RecipesContent() {
                   </button>
                 )}
 
-                <div className="space-y-3">
-                  <h4 className="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Vaše suroviny</h4>
-                  {selectedRecipe.ingredients?.filter((ing: any) => !ing.item.toLowerCase().includes("voda")).map((ing: any, i: number) => {
-                    const isChecked = checkedIngredients.includes(ing.item);
-                    return (
-                      <div 
-                        key={i} 
-                        onClick={() => {
-                          setCheckedIngredients(prev => {
-                            const newChecked = prev.includes(ing.item) 
-                              ? prev.filter(t => t !== ing.item) 
-                              : [...prev, ing.item];
-                            setNormalizedIngredients(null); // Reset normalization when selection changes
-                            return newChecked;
-                          });
-                        }}
-                        className={`flex justify-between items-center p-4 rounded-2xl border transition-all cursor-pointer group ${
-                          isChecked 
-                            ? 'bg-sage-50/50 border-sage-200' 
-                            : 'bg-gray-50 border-transparent hover:bg-white hover:border-sage-200'
-                        }`}
-                      >
-                        <div className="flex items-center gap-4">
-                          <div className={`w-6 h-6 rounded-lg flex items-center justify-center border transition-all ${
-                            isChecked 
-                              ? 'bg-sage-500 border-sage-500 text-white' 
-                              : 'bg-white border-gray-200 text-transparent group-hover:border-sage-300'
-                          }`}>
-                            <Check size={14} strokeWidth={3} />
-                          </div>
-                          <span className={`font-semibold text-sm transition-all ${isChecked ? 'text-sage-900' : 'text-gray-700'}`}>
-                            {ing.item}
-                          </span>
-                        </div>
-                        <div className="text-right">
-                          {ing.buying_amount || ing.buying_unit ? (
-                            <>
+                {/* TO BUY SECTION */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2 px-1">
+                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
+                    <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Dokúpiť</h4>
+                    <div className="flex-1 border-t border-gray-100 ml-2" />
+                  </div>
+                  <div className="space-y-3">
+                    <AnimatePresence mode="popLayout">
+                      {selectedRecipe.ingredients
+                        ?.filter((ing: any) => !ing.item.toLowerCase().includes("voda") && checkedIngredients.includes(ing.item))
+                        .map((ing: any, i: number) => (
+                          <motion.div 
+                            layout
+                            key={ing.item}
+                            initial={{ opacity: 0, x: -10 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            exit={{ opacity: 0, x: 10 }}
+                            onClick={() => {
+                              setCheckedIngredients(prev => prev.filter(t => t !== ing.item));
+                              setNormalizedIngredients(null);
+                            }}
+                            className="flex justify-between items-center p-4 rounded-2xl border border-blue-100 bg-blue-50/20 transition-all cursor-pointer hover:border-blue-300"
+                          >
+                            <div className="flex items-center gap-4">
+                              <div className="w-6 h-6 rounded-lg flex items-center justify-center bg-blue-500 border border-blue-500 text-white shadow-sm">
+                                <Check size={14} strokeWidth={3} />
+                              </div>
+                              <span className="font-semibold text-sm text-gray-800">
+                                {ing.item}
+                              </span>
+                            </div>
+                            <div className="text-right">
                               <span className="text-sm font-bold text-blue-600 block">
-                                {ing.buying_amount} {ing.buying_unit}
+                                {ing.buying_amount || ing.amount} {ing.buying_unit || ing.unit}
                               </span>
-                              <span className="text-[9px] font-medium text-gray-300 block italic">
-                                (recept: {ing.amount} {ing.unit})
+                              {(ing.buying_amount || ing.buying_unit) && (
+                                <span className="text-[9px] font-medium text-gray-300 block italic">
+                                  (recept: {ing.amount} {ing.unit})
+                                </span>
+                              )}
+                            </div>
+                          </motion.div>
+                        ))}
+                    </AnimatePresence>
+                    {checkedIngredients.length === 0 && (
+                      <p className="text-xs text-gray-400 text-center py-4 bg-gray-50/50 rounded-2xl border border-dashed border-gray-200">Všetko máte doma! 🎉</p>
+                    )}
+                  </div>
+                </div>
+
+                {/* AT HOME SECTION */}
+                <div className="space-y-4 opacity-70">
+                  <div className="flex items-center gap-2 px-1">
+                    <div className="w-2 h-2 bg-gray-300 rounded-full" />
+                    <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Mám doma</h4>
+                    <div className="flex-1 border-t border-gray-100 ml-2" />
+                  </div>
+                  <div className="space-y-2">
+                    <AnimatePresence mode="popLayout">
+                      {selectedRecipe.ingredients
+                        ?.filter((ing: any) => !ing.item.toLowerCase().includes("voda") && !checkedIngredients.includes(ing.item))
+                        .map((ing: any, i: number) => (
+                          <motion.div 
+                            layout
+                            key={ing.item}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => {
+                              setCheckedIngredients(prev => [...prev, ing.item]);
+                              setNormalizedIngredients(null);
+                            }}
+                            className="flex justify-between items-center p-3 rounded-xl border border-gray-100 bg-gray-50/50 grayscale hover:grayscale-0 transition-all cursor-pointer hover:border-gray-200"
+                          >
+                            <div className="flex items-center gap-3">
+                              <div className="w-5 h-5 rounded-md flex items-center justify-center border border-gray-200 text-transparent">
+                                <Check size={12} strokeWidth={3} />
+                              </div>
+                              <span className="font-medium text-xs text-gray-500">
+                                {ing.item}
                               </span>
-                            </>
-                          ) : (
-                            <span className="text-xs font-bold text-gray-400 block">
+                            </div>
+                            <span className="text-[10px] font-bold text-gray-300 italic">
                               {ing.amount} {ing.unit}
                             </span>
-                          )}
-                        </div>
-                      </div>
-                    );
-                  })}
+                          </motion.div>
+                        ))}
+                    </AnimatePresence>
+                  </div>
                 </div>
 
                 {normalizedIngredients && (
                   <motion.div 
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
-                    className="space-y-3 bg-blue-50/30 p-4 rounded-3xl border border-blue-100"
+                    className="space-y-3 bg-blue-50/30 p-4 rounded-3xl border border-blue-100 shadow-inner"
                   >
                     <div className="flex justify-between items-center px-1">
                       <h4 className="text-[10px] font-bold text-blue-500 uppercase tracking-widest">Normalizovaný nákup</h4>
