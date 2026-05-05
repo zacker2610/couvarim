@@ -277,7 +277,7 @@ export default function GeneratePage() {
         )}
 
         {step === "result" && generatedRecipe && !isRefining && (
-          <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pb-24 bg-white sm:rounded-[32px] sm:shadow-sm sm:border sm:border-gray-100 overflow-hidden min-h-full">
+          <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pb-24 bg-white sm:bg-transparent min-h-full">
             {/* Solid Header on top */}
             <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 flex items-center justify-between py-4 px-4 sm:rounded-t-3xl">
               <button 
@@ -299,7 +299,7 @@ export default function GeneratePage() {
 
             <div className="relative">
               {/* Hero Image - True Full Bleed */}
-              <div className="w-full h-[40vh] sm:h-96 relative bg-sage-50 overflow-hidden">
+              <div className="w-full h-[40vh] sm:h-96 relative bg-sage-50 sm:rounded-b-[32px] overflow-hidden">
                 <img 
                   src={generatedRecipe.image_url} 
                   alt={generatedRecipe.title}
@@ -317,7 +317,7 @@ export default function GeneratePage() {
                   "{generatedRecipe.description}"
                 </p>
 
-                <div className="grid grid-cols-2 gap-4 border-b border-gray-100 pb-8">
+                <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm grid grid-cols-2 gap-4">
                   <div className="space-y-1 text-center">
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Príprava</p>
                     <p className="font-bold text-gray-800 flex items-center justify-center gap-2">
@@ -334,7 +334,7 @@ export default function GeneratePage() {
                   </div>
                 </div>
 
-                <div className="bg-gray-50/50 rounded-3xl p-6 space-y-6 border border-gray-100/50 shadow-sm">
+                <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm space-y-6">
                   <div className="grid grid-cols-2 gap-y-8 gap-x-4">
                     <div className="space-y-3">
                       <div className="flex items-center gap-2 text-amber-600">
@@ -398,14 +398,14 @@ export default function GeneratePage() {
                   </div>
                 </div>
 
-                <div className="space-y-6 pt-4">
+                <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm space-y-6 pt-4">
                   <h4 className="text-lg font-bold text-gray-800 flex items-center gap-3">
                     <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
                     Ingrediencie
                   </h4>
                   <div className="space-y-3">
                     {generatedRecipe.ingredients.map((ing: any, i: number) => (
-                      <div key={i} className="flex justify-between items-center bg-gray-50/50 p-5 rounded-2xl border border-gray-100/50">
+                      <div key={i} className="flex justify-between items-center bg-gray-50/30 p-5 rounded-2xl border border-gray-100/50 hover:bg-white transition-colors">
                         <span className="font-medium text-gray-700">{ing.item}</span>
                         <span className="text-sage-600 font-bold">{ing.amount} {ing.unit}</span>
                       </div>
@@ -413,7 +413,7 @@ export default function GeneratePage() {
                   </div>
                 </div>
 
-                <div className="space-y-6">
+                <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm space-y-6">
                   <h4 className="text-lg font-bold text-gray-800 flex items-center gap-3">
                     <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
                     Postup

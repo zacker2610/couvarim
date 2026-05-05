@@ -407,7 +407,7 @@ function RecipesContent() {
                 )}
               </div>
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-2 gap-10">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
                 {filteredRecipes.map((recipe) => (
                   <div 
                     key={recipe.id} 
@@ -532,7 +532,7 @@ function RecipesContent() {
             key="detail" 
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
-            className="pb-24 bg-white sm:rounded-[32px] sm:shadow-sm sm:border sm:border-gray-100 overflow-hidden min-h-full"
+            className="pb-24 bg-white sm:bg-transparent min-h-full"
           >
             <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 flex items-center justify-between py-4 px-4 sm:rounded-t-3xl">
               <button 
@@ -562,7 +562,7 @@ function RecipesContent() {
             </header>
 
             <div className="relative">
-              <div className="w-full h-[40vh] sm:h-96 relative bg-sage-50 overflow-hidden">
+              <div className="w-full h-[40vh] sm:h-96 relative bg-sage-50 sm:rounded-b-[32px] overflow-hidden">
                 {selectedRecipe.image_url && selectedRecipe.image_url.trim() !== "" && !selectedRecipe.image_url.includes("pollinations.ai") ? (
                   <img 
                     src={selectedRecipe.image_url} 
@@ -600,7 +600,7 @@ function RecipesContent() {
                   </p>
                 )}
 
-                <div className="grid grid-cols-2 gap-y-6 gap-x-2 border-b border-gray-100 pb-8">
+                <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm grid grid-cols-2 gap-y-6 gap-x-2">
                   <div className="space-y-1 text-center border-r border-gray-100">
                     <p className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Príprava</p>
                     <p className="font-bold text-gray-800 flex items-center justify-center gap-1.5 text-xs">
@@ -631,7 +631,7 @@ function RecipesContent() {
                   </div>
                 </div>
 
-                <div className="bg-gray-50/50 rounded-2xl p-6 space-y-6 border border-gray-100/50 shadow-sm">
+                <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm space-y-6">
                   <div className="grid grid-cols-2 gap-y-8 gap-x-4">
                     <div className="space-y-3">
                       <div className="flex items-center gap-2 text-amber-600">
@@ -699,7 +699,7 @@ function RecipesContent() {
                   </p>
                 </div>
 
-                <div className="space-y-6 pt-4">
+                <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm space-y-6 pt-4">
                   <div className="flex items-center justify-between">
                     <h4 className="text-lg font-bold text-gray-800 flex items-center gap-3">
                       <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
@@ -716,7 +716,7 @@ function RecipesContent() {
                     {selectedRecipe.ingredients?.map((ing: any, i: number) => (
                       <div 
                         key={i} 
-                        className="flex justify-between items-center bg-gray-50/50 p-5 rounded-2xl border border-gray-100/50 hover:bg-white transition-colors"
+                        className="flex justify-between items-center bg-gray-50/30 p-5 rounded-2xl border border-gray-100/50 hover:bg-white transition-colors"
                       >
                         <span className="font-medium text-gray-700">{ing.item}</span>
                         <span className="text-sage-600 font-bold">{ing.amount} {ing.unit}</span>
@@ -725,7 +725,7 @@ function RecipesContent() {
                   </div>
                 </div>
 
-                <div className="space-y-6">
+                <div className="bg-white p-6 rounded-[32px] border border-gray-100 shadow-sm space-y-6">
                   <h4 className="text-lg font-bold text-gray-800 flex items-center gap-3">
                     <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
                     Postup
