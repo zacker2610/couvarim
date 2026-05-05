@@ -45,12 +45,12 @@ export function RecipesSkeleton() {
           <Skeleton className="h-8 w-40 rounded-xl" />
           <Skeleton className="h-3 w-32 rounded-lg" />
         </div>
-        <Skeleton className="h-12 w-12 rounded-2xl" />
+        <Skeleton className="h-[60px] w-[60px] rounded-2xl" />
       </header>
 
       <div className="flex gap-3">
-        <Skeleton className="h-14 flex-1 rounded-2xl" />
-        <Skeleton className="h-14 w-14 rounded-2xl" />
+        <Skeleton className="h-[60px] flex-1 rounded-2xl" />
+        <Skeleton className="h-[60px] w-[60px] rounded-2xl" />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
