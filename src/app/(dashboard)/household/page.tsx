@@ -34,6 +34,7 @@ import {
   leaveHouseholdAction
 } from "@/app/actions/recipes";
 import { supabase } from "@/lib/supabase";
+import { HouseholdSkeleton } from "@/components/Skeletons";
 
 export default function HouseholdPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
@@ -230,12 +231,7 @@ export default function HouseholdPage() {
   ));
 
   if (isLoading) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-12 h-12 text-sage-500 animate-spin" />
-        <p className="text-gray-400 font-medium animate-pulse">Načítavam domácnosť...</p>
-      </div>
-    );
+    return <HouseholdSkeleton />;
   }
 
   return (

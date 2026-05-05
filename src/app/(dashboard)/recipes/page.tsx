@@ -30,15 +30,11 @@ import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
 import { deleteRecipeAction, toggleRecipeShareAction, normalizeShoppingListAction, updateRecipeAction } from "@/app/actions/recipes";
 import Link from "next/link";
+import { RecipesSkeleton } from "@/components/Skeletons";
 
 export default function RecipesPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-12 h-12 text-sage-500 animate-spin" />
-        <p className="text-gray-400 font-medium animate-pulse">Pripravujem vašu kuchárku...</p>
-      </div>
-    }>
+    <Suspense fallback={<RecipesSkeleton />}>
       <RecipesContent />
     </Suspense>
   );
@@ -333,12 +329,7 @@ function RecipesContent() {
   };
 
   if (isLoading) {
-    return (
-      <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-12 h-12 text-sage-500 animate-spin" />
-        <p className="text-gray-400 font-medium animate-pulse">Načítavam vašu kuchárku...</p>
-      </div>
-    );
+    return <RecipesSkeleton />;
   }
 
   return (

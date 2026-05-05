@@ -24,6 +24,7 @@ import { supabase } from "@/lib/supabase";
 import { updateProfileAction, getOrCreateHouseholdAction, leaveHouseholdAction } from "@/app/actions/recipes";
 import { signOut } from "@/lib/auth";
 import { Trash2 } from "lucide-react";
+import { ProfileSkeleton } from "@/components/Skeletons";
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
@@ -235,11 +236,7 @@ export default function ProfilePage() {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-[60vh] flex items-center justify-center">
-        <div className="w-10 h-10 border-4 border-sage-400 border-t-transparent rounded-full animate-spin"></div>
-      </div>
-    );
+    return <ProfileSkeleton />;
   }
 
   return (

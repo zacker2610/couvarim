@@ -27,6 +27,12 @@
   --color-sage-700: var(--sage-700);
 
   --radius-xl: 1rem;
+
+  @keyframes shimmer {
+    100% {
+      transform: translateX(100%);
+    }
+  }
 }
 
 @media (min-width: 1024px) {
