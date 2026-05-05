@@ -240,7 +240,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="space-y-6 max-w-2xl mx-auto">
+    <div className="space-y-6 max-w-4xl mx-auto">
       <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center justify-between py-4 px-4 -mx-4 mb-2">
         <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Nastavenia</h2>
         <button 
@@ -543,7 +543,7 @@ export default function ProfilePage() {
           </div>
         </section>
 
-        <section className="pt-8 pb-12 space-y-4 px-4">
+        <section className="pt-8 pb-12 space-y-4">
           {!isOwner && household && (
             <button 
               onClick={() => setLeaveConfirmHousehold(true)}
@@ -556,12 +556,12 @@ export default function ProfilePage() {
 
           <button 
             onClick={handleLogout}
-            className="w-full py-4 bg-white text-red-400 rounded-2xl font-medium flex items-center justify-center gap-2 active:bg-red-50 transition-all border border-gray-100 shadow-sm"
+            className="w-full py-4 bg-white text-red-500 rounded-2xl font-bold flex items-center justify-center gap-2 active:bg-red-50 transition-all border border-gray-100 shadow-sm"
           >
             <LogOut size={18} />
             Odhlásiť sa
           </button>
-          <p className="text-gray-300 text-[10px] mt-8 text-center tracking-widest uppercase font-bold">
+          <p className="text-gray-300 text-[10px] mt-8 text-center tracking-widest uppercase font-bold px-4">
             ČoUvarím.sk • v1.0.0
           </p>
         </section>
