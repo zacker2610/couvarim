@@ -287,15 +287,15 @@ export default function GeneratePage() {
         )}
 
         {step === "result" && generatedRecipe && !isRefining && (
-          <motion.div key="result" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6 pb-32">
-            <header className="flex items-center gap-4 py-4 px-2">
+          <motion.div key="result" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-0 sm:space-y-6 pb-32">
+            <header className="flex items-center gap-4 py-4 px-4 sm:px-10">
               <button onClick={() => setStep("hub")} className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-600 active:scale-90 transition-all">
                 <ChevronLeft size={22} />
               </button>
               <h2 className="text-2xl font-bold text-gray-800 tracking-tight text-center flex-1 pr-10">Váš recept</h2>
             </header>
 
-            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100">
+            <div className="bg-white sm:rounded-2xl overflow-hidden shadow-sm border-y sm:border border-gray-100">
               <div className="h-72 relative bg-sage-50 flex items-center justify-center overflow-hidden">
                 <img 
                   src={generatedRecipe.image_url} 
@@ -486,7 +486,7 @@ export default function GeneratePage() {
         )}
 
         {step === "ai_ingredients" && (
-          <motion.div key="ai_ingredients" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+          <motion.div key="ai_ingredients" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 px-4 sm:px-10">
             <header className="flex items-center gap-4 py-4">
               <button onClick={() => setStep("hub")} className="w-12 h-12 bg-white rounded-2xl shadow-md border border-gray-100 text-gray-600 active:scale-90 transition-all flex items-center justify-center">
                 <ChevronLeft size={22} strokeWidth={2.5} />
@@ -509,7 +509,7 @@ export default function GeneratePage() {
         )}
 
         {step === "ai_dish" && (
-          <motion.div key="ai_dish" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
+          <motion.div key="ai_dish" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 px-4 sm:px-10">
             <header className="flex items-center gap-4 py-4">
               <button onClick={() => setStep("hub")} className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-600 active:scale-90 transition-all">
                 <ChevronLeft size={22} />
@@ -533,7 +533,7 @@ export default function GeneratePage() {
         )}
 
         {step === "error" && (
-          <motion.div key="error" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="min-h-[70vh] flex flex-col items-center justify-center text-center space-y-8 px-8">
+          <motion.div key="error" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="min-h-[70vh] flex flex-col items-center justify-center text-center space-y-8 px-4 sm:px-10">
             <div className="w-24 h-24 bg-red-50 text-red-500 rounded-2xl flex items-center justify-center shadow-inner">
                <Zap size={48} className="text-red-400" />
             </div>
