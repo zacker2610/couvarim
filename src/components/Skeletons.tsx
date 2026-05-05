@@ -39,8 +39,8 @@ export function HouseholdSkeleton() {
 
 export function RecipesSkeleton() {
   return (
-    <div className="pb-12 space-y-6 animate-in fade-in duration-500">
-      <header className="py-4 px-2 mb-2 flex items-center justify-between">
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <header className="py-4 px-4 -mx-4 mb-2 flex items-center justify-between">
         <div className="space-y-2">
           <Skeleton className="h-8 w-40 rounded-xl" />
           <Skeleton className="h-3 w-32 rounded-lg" />

@@ -165,18 +165,18 @@ export default function GeneratePage() {
     <div>
       <AnimatePresence mode="wait">
         {step === "hub" && (
-          <motion.div key="hub" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
+          <motion.div key="hub" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6 max-w-2xl mx-auto">
             <header className="flex flex-col gap-1">
               <h1 className="text-3xl font-bold text-gray-800 tracking-tight">Vymyslime niečo!</h1>
               <p className="text-gray-400 text-sm font-medium">Vyberte si spôsob, ako vytvoriť recept</p>
             </header>
 
-            <div className="space-y-6 py-2">
-              <div className="flex items-center gap-3">
+            <div className="space-y-6 py-2 px-4">
+              <div className="flex items-center gap-3 px-2">
                 <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
                 <h2 className="text-lg font-bold text-gray-700">Pre koho varíme?</h2>
               </div>
-              <div className="flex bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm">
+              <div className="flex bg-gray-50 p-1.5 rounded-2xl border border-gray-100 shadow-inner">
                 <button 
                   onClick={() => setUseHousehold(false)} 
                   className={`flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
