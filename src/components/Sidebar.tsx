@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { 
   Home, 
   ChefHat,
@@ -34,6 +34,7 @@ const menuItems = [
 
 export default function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [deferredPrompt, setDeferredPrompt] = React.useState<any>(null);
   const [isInstalled, setIsInstalled] = React.useState(false);
 
@@ -79,11 +80,11 @@ export default function Sidebar() {
         {menuItems.map((item) => {
           const isActive = pathname === item.href;
           return (
-            <Link
+            <button
               key={item.href}
-              href={item.href}
+              onClick={() => router.push(item.href)}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-all duration-200 group",
+                "w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-all duration-200 group text-left",
                 isActive 
                   ? "bg-sage-100 text-sage-700 shadow-sm" 
                   : "text-gray-500 hover:bg-sage-50 hover:text-sage-600"
@@ -94,7 +95,7 @@ export default function Sidebar() {
                 isActive ? "text-sage-600" : "text-gray-400 group-hover:text-sage-500"
               )} />
               <span className="font-medium">{item.label}</span>
-            </Link>
+            </button>
           );
         })}
       </nav>
