@@ -176,7 +176,7 @@ export default function GeneratePage() {
                 <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
                 <h2 className="text-lg font-bold text-gray-700">Pre koho varíme?</h2>
               </div>
-              <div className="flex bg-gray-50 p-1.5 rounded-2xl border border-gray-100">
+              <div className="flex bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm">
                 <button 
                   onClick={() => setUseHousehold(false)} 
                   className={`flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
@@ -236,27 +236,27 @@ export default function GeneratePage() {
                 <ArrowRight size={20} className="text-gray-200 group-hover:text-sage-500 transition-colors" />
               </button>
 
-              <div className="grid grid-cols-2 gap-4">
-                <button onClick={() => setStep("ai_dish")} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4 text-left group active:scale-[0.98] transition-all">
-                  <div className="w-12 h-12 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center group-hover:rotate-12 transition-transform">
-                    <Sparkles size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800 leading-tight">Mám chuť na...</h3>
-                    <p className="text-gray-400 text-[10px] mt-1 font-bold uppercase tracking-wider">AI Návrh</p>
-                  </div>
-                </button>
+              <button onClick={() => setStep("ai_dish")} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5 group transition-all text-left active:scale-[0.98]">
+                <div className="w-14 h-14 bg-rose-50 text-rose-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Sparkles size={28} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-gray-800 text-lg leading-tight">Mám chuť na...</h3>
+                  <p className="text-gray-400 text-xs font-medium mt-1">Nechajte AI navrhnúť jedlo podľa nálady</p>
+                </div>
+                <ArrowRight size={20} className="text-gray-200 group-hover:text-sage-500 transition-colors" />
+              </button>
 
-                <button onClick={() => handleGenerate("random")} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm space-y-4 text-left group active:scale-[0.98] transition-all">
-                  <div className="w-12 h-12 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center group-hover:rotate-12 transition-transform">
-                    <Dices size={24} />
-                  </div>
-                  <div>
-                    <h3 className="font-bold text-gray-800 leading-tight">Prekvap ma</h3>
-                    <p className="text-gray-400 text-[10px] mt-1 font-bold uppercase tracking-wider">Náhodný výber</p>
-                  </div>
-                </button>
-              </div>
+              <button onClick={() => handleGenerate("random")} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm flex items-center gap-5 group transition-all text-left active:scale-[0.98]">
+                <div className="w-14 h-14 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform">
+                  <Dices size={28} />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-bold text-gray-800 text-lg leading-tight">Prekvap ma</h3>
+                  <p className="text-gray-400 text-xs font-medium mt-1">Náhodný výber z obľúbených receptov</p>
+                </div>
+                <ArrowRight size={20} className="text-gray-200 group-hover:text-sage-500 transition-colors" />
+              </button>
             </div>
           </motion.div>
         )}
