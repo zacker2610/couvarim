@@ -3,8 +3,8 @@ import { Skeleton } from "./ui/Skeleton";
 
 export function HouseholdSkeleton() {
   return (
-    <div className="pb-12 space-y-6 animate-in fade-in duration-500">
-      <header className="flex items-center justify-between py-4 px-2 mb-2">
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <header className="flex items-center justify-between py-4 px-4 -mx-4 mb-2">
         <Skeleton className="h-8 w-48 rounded-xl" />
       </header>
 
@@ -112,8 +112,8 @@ export function DashboardSkeleton() {
 
 export function ProfileSkeleton() {
   return (
-    <div className="pb-12 space-y-6 animate-in fade-in duration-500">
-      <header className="flex items-center justify-between py-4 px-2 mb-2">
+    <div className="space-y-6 max-w-4xl mx-auto animate-in fade-in duration-500">
+      <header className="flex items-center justify-between py-4 px-4 -mx-4 mb-2">
         <Skeleton className="h-8 w-40 rounded-xl" />
         <Skeleton className="h-10 w-24 rounded-full" />
       </header>
