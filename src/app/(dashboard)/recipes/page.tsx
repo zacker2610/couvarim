@@ -553,7 +553,7 @@ function RecipesContent() {
             key="detail" 
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
-            className="pb-24 bg-white md:bg-transparent min-h-full max-w-4xl mx-auto"
+            className="pb-24 bg-transparent min-h-full max-w-4xl mx-auto"
           >
             <header className="sticky md:static top-0 z-50 bg-[#F8F5F2]/80 md:bg-transparent backdrop-blur-md md:backdrop-blur-none flex items-center justify-between py-4 px-4">
               <button 
@@ -584,7 +584,7 @@ function RecipesContent() {
             </header>
 
             <div className="relative px-4">
-              <div className="w-full h-[40vh] md:h-96 relative bg-sage-50 md:rounded-[32px] overflow-hidden md:mt-4">
+              <div className="w-full h-[30vh] md:h-80 relative bg-sage-50 rounded-[32px] overflow-hidden md:mt-4 shadow-sm border border-black/5">
                 {selectedRecipe.image_url && selectedRecipe.image_url.trim() !== "" && !selectedRecipe.image_url.includes("pollinations.ai") ? (
                   <img 
                     src={selectedRecipe.image_url} 
