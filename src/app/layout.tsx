@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+// Trigger Vercel Build - Force Sync
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
