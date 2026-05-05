@@ -45,6 +45,8 @@ export const viewport = {
   viewportFit: "cover",
 };
 
+import PWARegistration from "@/components/PWARegistration";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -59,33 +61,15 @@ export default function RootLayout({
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="theme-color" content="#9CAF88" />
       </head>
       <body className="h-full bg-[#F8F5F2] text-gray-900 selection:bg-sage-100 selection:text-sage-900">
+        <PWARegistration />
         <main className="max-w-md mx-auto min-h-full bg-[#F8F5F2] shadow-2xl shadow-sage-900/5 relative">
           <div className="px-4 pt-6 pb-20">
             {children}
           </div>
         </main>
-        
-        {/* Service Worker Registration */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `
-              if ('serviceWorker' in navigator) {
-                window.addEventListener('load', function() {
-                  navigator.serviceWorker.register('/sw.js').then(
-                    function(registration) {
-                      console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    },
-                    function(err) {
-                      console.log('ServiceWorker registration failed: ', err);
-                    }
-                  );
-                });
-              }
-            `,
-          }}
-        />
       </body>
     </html>
   );
