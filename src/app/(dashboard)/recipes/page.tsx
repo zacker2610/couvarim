@@ -213,7 +213,16 @@ function RecipesContent() {
     if (result.success && result.data) {
       // Merge normalized data back into the original ingredients
       const updatedIngredients = selectedRecipe.ingredients.map((origIng: any) => {
-        const normIng = result.data.find((n: any) => n.item.toLowerCase() === origIng.item.toLowerCase());
+        const origName = origIng.item.toLowerCase();
+        // Try exact match first, then partial match
+        let normIng = result.data.find((n: any) => n.item.toLowerCase() === origName);
+        if (!normIng) {
+          normIng = result.data.find((n: any) => {
+            const nName = n.item.toLowerCase();
+            return nName.includes(origName) || origName.includes(nName);
+          });
+        }
+
         if (normIng) {
           return {
             ...origIng,

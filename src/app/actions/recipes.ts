@@ -952,6 +952,7 @@ export async function normalizeShoppingListAction(ingredients: any[]) {
       2. Ak je gramáž špecifická (napr. 71g múky), zaokrúhli to na logické nákupné množstvo (napr. 1 kg) alebo "balenie".
       3. Ak sú to kusy (napr. 2 cibule), ponechaj kusy alebo zaokrúhli nahor na logické balenie (napr. sáčok).
       4. Vráť zrozumiteľné slovenské názvy a jednotky.
+      5. DÔLEŽITÉ: Názvy v poli "item" MUSIA byť IDENTICKÉ s tými, ktoré sú v zozname na transformáciu. Nemeň názvy surovín, len doplň množstvá a jednotky pre nákup.
       
       Vráť VŽDY a VÝHRADNE JSON pole objektov so štruktúrou:
       [
