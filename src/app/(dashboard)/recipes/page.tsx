@@ -204,6 +204,18 @@ function RecipesContent() {
     setShowShareModal(true);
   };
 
+  // Lock body scroll when modal is open
+  React.useEffect(() => {
+    if (showShareModal) {
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+    return () => {
+      document.body.style.overflow = 'unset';
+    };
+  }, [showShareModal]);
+
   const handleNormalizeIngredients = async () => {
     if (!selectedRecipe) return;
     setIsNormalizing(true);
