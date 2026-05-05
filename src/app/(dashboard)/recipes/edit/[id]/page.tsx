@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from "react";
 import { 
-  ArrowLeft, 
+  ChevronLeft, 
   Save, 
   Plus, 
   Trash2, 
@@ -227,20 +227,20 @@ export default function EditRecipePage() {
 
   return (
     <div className="pb-24 animate-in fade-in slide-in-from-right-4 duration-500 overflow-x-hidden">
-      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-3 py-4 px-1 mb-6">
+      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-4 py-4 px-1 mb-6">
         <Link 
           href="/recipes"
-          className="p-2.5 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all"
+          className="w-[60px] h-[60px] bg-white rounded-2xl shadow-md border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all flex items-center justify-center"
         >
-          <ArrowLeft size={18} />
+          <ChevronLeft size={26} strokeWidth={2.5} />
         </Link>
-        <h2 className="text-xl font-bold text-gray-800 tracking-tight flex-1 truncate">Upraviť recept</h2>
+        <h2 className="text-2xl font-bold text-gray-800 tracking-tight flex-1 truncate">Upraviť recept</h2>
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-sage-500 text-white p-2.5 rounded-2xl shadow-lg active:scale-95 disabled:opacity-50 transition-all hover:bg-sage-600"
+          className="w-[60px] h-[60px] bg-sage-500 text-white rounded-2xl shadow-md active:scale-95 disabled:opacity-50 transition-all hover:bg-sage-600 flex items-center justify-center"
         >
-          {isSaving ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
+          {isSaving ? <Loader2 size={24} className="animate-spin" /> : <Save size={26} strokeWidth={2.5} />}
         </button>
       </header>
 

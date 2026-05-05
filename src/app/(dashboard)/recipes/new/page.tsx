@@ -279,17 +279,16 @@ export default function NewRecipePage() {
       <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-4 py-4 px-1 mb-6">
         <button 
           onClick={() => router.back()}
-          className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all"
+          className="w-[60px] h-[60px] bg-white rounded-2xl shadow-md border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all flex items-center justify-center"
         >
-          <ChevronLeft size={22} />
+          <ChevronLeft size={26} strokeWidth={2.5} />
         </button>
         <h2 className="text-2xl font-bold text-gray-800 tracking-tight flex-1">Nový recept</h2>
         <button 
           onClick={() => setIsImportModalOpen(true)}
-          className="p-3 bg-sage-500 text-white rounded-2xl shadow-lg active:scale-90 transition-all flex items-center gap-2"
+          className="w-[60px] h-[60px] bg-sage-500 text-white rounded-2xl shadow-md active:scale-90 transition-all flex items-center justify-center"
         >
-          <Sparkles size={20} />
-          <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Inteligentný import</span>
+          <Sparkles size={26} strokeWidth={2.5} />
         </button>
       </header>
 
