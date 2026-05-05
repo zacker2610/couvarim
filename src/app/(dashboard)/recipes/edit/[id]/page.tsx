@@ -438,9 +438,9 @@ export default function EditRecipePage() {
                 {ingredients.length > 1 && (
                   <button 
                     onClick={() => removeIngredient(index)}
-                    className="p-2 text-gray-300 hover:text-red-500 transition-colors"
+                    className="p-3 text-red-300 hover:text-red-500 active:scale-90 transition-all flex-shrink-0"
                   >
-                    <Trash2 size={16} />
+                    <Trash2 size={20} />
                   </button>
                 )}
               </div>
@@ -466,22 +466,22 @@ export default function EditRecipePage() {
 
           <div className="space-y-4">
             {steps.map((step, index) => (
-              <div key={index} className="flex gap-4 animate-in fade-in slide-in-from-bottom-2">
-                <div className="w-8 h-8 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center flex-shrink-0 font-bold text-xs mt-1">
+              <div key={index} className="flex items-start gap-3 animate-in fade-in slide-in-from-bottom-2">
+                <div className="w-7 h-7 bg-gray-50 text-gray-400 rounded-xl flex items-center justify-center flex-shrink-0 font-bold text-[10px] mt-2 border border-gray-100">
                   {index + 1}
                 </div>
                 <textarea 
                   value={step}
                   onChange={(e) => updateStep(index, e.target.value)}
                   placeholder="Napíšte inštrukcie pre tento krok..."
-                  className="flex-1 px-4 py-3 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-sage-500 outline-none transition-all text-sm text-gray-700 min-h-[80px] resize-none"
+                  className="flex-1 px-4 py-3.5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-sage-500 outline-none transition-all text-sm text-gray-700 min-h-[100px] resize-none"
                 />
                 {steps.length > 1 && (
                   <button 
                     onClick={() => removeStep(index)}
-                    className="p-1 text-gray-300 hover:text-red-500 transition-colors self-start mt-2"
+                    className="p-3 text-red-300 hover:text-red-500 active:scale-90 transition-all flex-shrink-0 mt-1"
                   >
-                    <CloseIcon size={18} />
+                    <Trash2 size={20} />
                   </button>
                 )}
               </div>
