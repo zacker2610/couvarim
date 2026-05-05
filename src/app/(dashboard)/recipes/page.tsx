@@ -23,7 +23,8 @@ import {
   Trash2,
   AlertTriangle,
   Share2,
-  ExternalLink
+  ExternalLink,
+  Camera
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { supabase } from "@/lib/supabase";
@@ -450,15 +451,18 @@ function RecipesContent() {
                           <span className="text-[10px] font-bold uppercase tracking-wider">Spoločný</span>
                         </div>
                       )}
-                      {recipe.image_url ? (
+                      {recipe.image_url && recipe.image_url.trim() !== "" ? (
                         <img 
                           src={recipe.image_url} 
                           alt={recipe.title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                       ) : (
-                        <div className="w-full h-full flex items-center justify-center text-sage-200">
-                          <ChefHat size={60} />
+                        <div className="w-full h-full flex flex-col items-center justify-center text-sage-200 gap-3">
+                          <div className="w-16 h-16 rounded-full bg-sage-50/50 flex items-center justify-center">
+                            <Camera size={32} strokeWidth={1.5} />
+                          </div>
+                          <span className="text-[9px] font-bold uppercase tracking-widest text-sage-300">Bez fotografie</span>
                         </div>
                       )}
                     </div>
@@ -526,15 +530,18 @@ function RecipesContent() {
 
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-20">
               <div className="h-72 relative bg-sage-50 flex items-center justify-center overflow-hidden">
-                {selectedRecipe.image_url ? (
+                {selectedRecipe.image_url && selectedRecipe.image_url.trim() !== "" ? (
                   <img 
                     src={selectedRecipe.image_url} 
                     alt={selectedRecipe.title}
                     className="w-full h-full object-cover"
                   />
                 ) : (
-                   <div className="w-full h-full flex items-center justify-center text-sage-100">
-                    <ChefHat size={80} />
+                   <div className="w-full h-full flex flex-col items-center justify-center text-sage-100 gap-4">
+                    <div className="w-24 h-24 rounded-full bg-sage-500/10 flex items-center justify-center">
+                      <Camera size={56} strokeWidth={1} />
+                    </div>
+                    <span className="text-xs font-bold uppercase tracking-[0.2em] text-sage-200">Recept bez fotografie</span>
                   </div>
                 )}
                 <div className="absolute top-4 left-4 z-10">
