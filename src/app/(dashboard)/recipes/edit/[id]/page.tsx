@@ -293,45 +293,40 @@ export default function EditRecipePage() {
             />
           </div>
 
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-3 gap-3">
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Príprava</label>
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Príprava (min)</label>
               <div className="relative">
-                <Clock className="absolute left-4 top-1/2 -translate-y-1/2 text-sage-500" size={18} />
+                <Clock className="absolute left-3 top-1/2 -translate-y-1/2 text-sage-500" size={16} />
                 <input 
                   type="number" 
-                  placeholder="20"
                   value={prepTime}
                   onChange={(e) => setPrepTime(e.target.value)}
-                  className="w-full pl-11 pr-12 py-4 rounded-2xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-medium text-gray-800"
+                  className="w-full pl-10 pr-2 py-3.5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-sage-500 outline-none transition-all font-bold text-gray-800 text-sm"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">min</span>
               </div>
             </div>
             <div className="space-y-1.5">
-              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Varenie</label>
+              <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Varenie (min)</label>
               <div className="relative">
-                <Flame className="absolute left-4 top-1/2 -translate-y-1/2 text-amber-500" size={18} />
+                <Flame className="absolute left-3 top-1/2 -translate-y-1/2 text-orange-500" size={16} />
                 <input 
                   type="number" 
-                  placeholder="45"
                   value={cookTime}
                   onChange={(e) => setCookTime(e.target.value)}
-                  className="w-full pl-11 pr-12 py-4 rounded-2xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-medium text-gray-800"
+                  className="w-full pl-10 pr-2 py-3.5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-sage-500 outline-none transition-all font-bold text-gray-800 text-sm"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-xs font-bold text-gray-400">min</span>
               </div>
             </div>
             <div className="space-y-1.5">
               <label className="text-[10px] font-bold text-gray-400 uppercase tracking-wider ml-1">Porcie</label>
               <div className="relative">
-                <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-blue-500" size={18} />
+                <Users className="absolute left-3 top-1/2 -translate-y-1/2 text-blue-500" size={16} />
                 <input 
                   type="number" 
-                  placeholder="1"
                   value={servings}
                   onChange={(e) => setServings(e.target.value)}
-                  className="w-full pl-11 pr-4 py-4 rounded-2xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-medium text-gray-800 text-center"
+                  className="w-full pl-10 pr-2 py-3.5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-sage-500 outline-none transition-all font-bold text-gray-800 text-sm"
                 />
               </div>
             </div>
