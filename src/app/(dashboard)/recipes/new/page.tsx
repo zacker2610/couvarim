@@ -261,7 +261,8 @@ export default function NewRecipePage() {
 
       const result = await saveRecipeAction(recipeData);
       if (result.success) {
-        router.push("/recipes");
+        router.push(`/recipes?id=${result.recipe.id}`);
+        router.refresh();
       } else {
         alert("Chyba pri ukladaní: " + result.error);
       }

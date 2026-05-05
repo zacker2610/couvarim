@@ -204,7 +204,7 @@ export default function EditRecipePage() {
       const result = await updateRecipeAction(recipeId, recipeData);
 
       if (result.success) {
-        router.push("/recipes");
+        router.push(`/recipes?id=${recipeId}`);
         router.refresh();
       } else {
         alert("Chyba pri ukladaní: " + result.error);

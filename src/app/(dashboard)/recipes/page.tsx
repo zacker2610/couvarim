@@ -62,6 +62,17 @@ function RecipesContent() {
   const searchParams = useSearchParams();
   const recipeIdFromUrl = searchParams.get("id");
 
+  // Auto-open recipe from URL param
+  useEffect(() => {
+    if (recipeIdFromUrl && recipes.length > 0) {
+      const recipe = recipes.find(r => r.id === recipeIdFromUrl);
+      if (recipe) {
+        setSelectedRecipe(recipe);
+        setView("detail");
+      }
+    }
+  }, [recipeIdFromUrl, recipes]);
+
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
