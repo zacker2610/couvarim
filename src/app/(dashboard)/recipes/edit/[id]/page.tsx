@@ -226,21 +226,21 @@ export default function EditRecipePage() {
   }
 
   return (
-    <div className="pb-24 animate-in fade-in slide-in-from-right-4 duration-500">
-      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-4 py-4 px-2 -mx-2 mb-6">
+    <div className="pb-24 animate-in fade-in slide-in-from-right-4 duration-500 overflow-x-hidden">
+      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-3 py-4 px-1 mb-6">
         <Link 
           href="/recipes"
-          className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all"
+          className="p-2.5 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all"
         >
-          <ArrowLeft size={20} />
+          <ArrowLeft size={18} />
         </Link>
-        <h2 className="text-2xl font-bold text-gray-800 tracking-tight flex-1">Upraviť recept</h2>
+        <h2 className="text-xl font-bold text-gray-800 tracking-tight flex-1 truncate">Upraviť recept</h2>
         <button 
           onClick={handleSave}
           disabled={isSaving}
-          className="bg-sage-500 text-white p-3 rounded-2xl shadow-lg active:scale-95 disabled:opacity-50 transition-all hover:bg-sage-600"
+          className="bg-sage-500 text-white p-2.5 rounded-2xl shadow-lg active:scale-95 disabled:opacity-50 transition-all hover:bg-sage-600"
         >
-          {isSaving ? <Loader2 size={24} className="animate-spin" /> : <Save size={24} />}
+          {isSaving ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
         </button>
       </header>
 
@@ -412,18 +412,18 @@ export default function EditRecipePage() {
 
           <div className="space-y-3">
             {ingredients.map((ing, index) => (
-              <div key={index} className="flex gap-2 animate-in fade-in slide-in-from-left-2">
+              <div key={index} className="flex items-center gap-1.5 animate-in fade-in slide-in-from-left-2">
                 <input 
                   type="text" 
                   placeholder="250"
                   value={ing.amount}
                   onChange={(e) => updateIngredient(index, "amount", e.target.value)}
-                  className="w-16 px-2 py-3.5 rounded-2xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-bold text-gray-800 text-center text-sm"
+                  className="w-12 px-1 py-3.5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-sage-500 outline-none font-bold text-gray-800 text-center text-xs"
                 />
                 <select 
                   value={ing.unit}
                   onChange={(e) => updateIngredient(index, "unit", e.target.value)}
-                  className="w-16 px-1 py-3.5 rounded-2xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-bold text-sage-600 text-[10px] text-center appearance-none cursor-pointer"
+                  className="w-12 px-0 py-3.5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-sage-500 outline-none font-bold text-sage-600 text-[10px] text-center appearance-none cursor-pointer"
                 >
                   <option>g</option>
                   <option>kg</option>
@@ -435,10 +435,10 @@ export default function EditRecipePage() {
                 </select>
                 <input 
                   type="text" 
-                  placeholder="Názov suroviny..."
+                  placeholder="Surovina..."
                   value={ing.name}
                   onChange={(e) => updateIngredient(index, "name", e.target.value)}
-                  className="flex-1 min-w-0 px-3 py-3.5 rounded-2xl bg-white border border-transparent focus:border-sage-500 outline-none shadow-sm font-medium text-gray-800 text-sm"
+                  className="flex-1 min-w-0 px-3 py-3.5 rounded-2xl bg-gray-50 border border-transparent focus:bg-white focus:border-sage-500 outline-none font-medium text-gray-800 text-xs"
                 />
                 {ingredients.length > 1 && (
                   <button 
