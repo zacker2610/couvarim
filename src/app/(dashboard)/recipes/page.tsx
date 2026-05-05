@@ -188,17 +188,18 @@ function RecipesContent() {
     const hoursSinceCreation = (now.getTime() - createdAt.getTime()) / (1000 * 60 * 60);
     const isFresh = hoursSinceCreation <= 24;
 
-    const initialChecked = selectedRecipe.ingredients
+    const initialToBuy = selectedRecipe.ingredients
       ?.filter((ing: any) => {
         const name = ing.item.toLowerCase();
         const isInPantry = userPantry.some(p => name.includes(p) || p.includes(name));
         const isOwned = isFresh && ing.owned;
-        const isStaple = name.includes("voda") || name.includes("soľ") || name.includes("korenie") || name.includes("soľ") || name.includes("voda");
-        return isInPantry || isOwned || isStaple;
+        const isStaple = name.includes("voda") || name.includes("soľ") || name.includes("korenie");
+        // We want to buy it if it's NOT in pantry, NOT owned, and NOT a staple
+        return !isInPantry && !isOwned && !isStaple;
       })
       .map((ing: any) => ing.item) || [];
     
-    setCheckedIngredients(initialChecked);
+    setCheckedIngredients(initialToBuy);
     setNormalizedIngredients(null); // Reset on open
     setShowShareModal(true);
   };
@@ -253,18 +254,24 @@ function RecipesContent() {
   const handleShareShoppingList = () => {
     if (!selectedRecipe) return;
     
-    // Use normalized ingredients if available, otherwise use unchecked ones
+    // Use normalized ingredients if available, otherwise use checked ones
     let itemsToShare = [];
     if (normalizedIngredients) {
+      // In normalization mode, we assume the list presented IS what the user wants to buy
+      // But let's stay consistent: only share items that match names of checked ones
       itemsToShare = normalizedIngredients
-        .filter((ing: any) => !ing.item.toLowerCase().includes("voda"))
+        .filter((ing: any) => {
+          // If we have normalized ingredients, they usually map 1:1 or are grouped
+          // For simplicity, if user is in normalization view, we share the normalized items
+          return !ing.item.toLowerCase().includes("voda");
+        })
         .map((ing: any) => `- ${ing.item}: ${ing.amount} ${ing.unit}`);
     } else {
       itemsToShare = selectedRecipe.ingredients
         .filter((ing: any) => {
-          const isChecked = checkedIngredients.includes(ing.item);
+          const isToBuy = checkedIngredients.includes(ing.item);
           const isWater = ing.item.toLowerCase().includes("voda");
-          return !isChecked && !isWater;
+          return isToBuy && !isWater;
         })
         .map((ing: any) => {
           // EXCLUSIVELY use buying units if available, fallback to original only if missing
@@ -753,8 +760,8 @@ function RecipesContent() {
             >
               <div className="p-6 border-b border-gray-100 flex items-center justify-between">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-800">Zdieľať nákup</h3>
-                  <p className="text-xs text-gray-400 font-medium">Vyberte, čo už máte doma</p>
+                  <h3 className="text-xl font-bold text-gray-800">Nákupný zoznam</h3>
+                  <p className="text-xs text-gray-400 font-medium">Označte, čo potrebujete dokúpiť</p>
                 </div>
                 <button 
                   onClick={() => setShowShareModal(false)}
@@ -863,7 +870,7 @@ function RecipesContent() {
 
               <div className="p-6 bg-gray-50 border-t border-gray-100 space-y-4">
                 <p className="text-[10px] text-gray-400 text-center italic">
-                  * Odznačené položky budú pridané do nákupného zoznamu.
+                  * Zaškrtnuté položky budú pridané do nákupného zoznamu.
                 </p>
                 <button 
                   onClick={() => {
