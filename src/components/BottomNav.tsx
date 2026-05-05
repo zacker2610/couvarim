@@ -36,7 +36,13 @@ export default function BottomNav() {
         return (
           <button
             key={item.href}
-            onClick={() => router.push(item.href)}
+            onClick={() => {
+              if (item.href === "/recipes" && pathname === "/recipes") {
+                window.location.href = "/recipes";
+              } else {
+                router.push(item.href);
+              }
+            }}
             className={cn(
               "flex flex-col items-center gap-0.5 transition-all duration-200 flex-1",
               isActive ? "text-sage-600" : "text-gray-400"

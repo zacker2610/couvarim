@@ -82,7 +82,13 @@ export default function Sidebar() {
           return (
             <button
               key={item.href}
-              onClick={() => router.push(item.href)}
+              onClick={() => {
+                if (item.href === "/recipes" && pathname === "/recipes") {
+                  window.location.href = "/recipes";
+                } else {
+                  router.push(item.href);
+                }
+              }}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-all duration-200 group text-left",
                 isActive 
