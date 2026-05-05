@@ -532,7 +532,7 @@ function RecipesContent() {
             key="detail" 
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
-            className="pb-24 bg-white sm:bg-transparent min-h-full"
+            className="pb-24 bg-white sm:rounded-[32px] sm:shadow-sm sm:border sm:border-gray-100 overflow-hidden min-h-full"
           >
             <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 flex items-center justify-between py-4 px-4 sm:rounded-t-3xl">
               <button 
