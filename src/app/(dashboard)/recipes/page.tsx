@@ -362,6 +362,11 @@ function RecipesContent() {
                   placeholder="Hľadať recept..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      e.currentTarget.blur();
+                    }
+                  }}
                   className="w-full pl-12 pr-12 h-12 bg-white border border-transparent focus:border-sage-500 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sage-500/10 transition-all shadow-md text-gray-700 font-medium"
                 />
                 <AnimatePresence>
