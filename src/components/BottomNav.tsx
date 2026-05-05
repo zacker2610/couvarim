@@ -37,10 +37,9 @@ export default function BottomNav() {
           <button
             key={item.href}
             onClick={() => {
-              if (item.href === "/recipes" && pathname === "/recipes") {
-                window.location.href = "/recipes";
-              } else {
-                router.push(item.href);
+              router.push(item.href);
+              if (item.href === "/recipes") {
+                window.dispatchEvent(new CustomEvent('clear-recipe-selection'));
               }
             }}
             className={cn(

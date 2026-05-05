@@ -106,6 +106,14 @@ function RecipesContent() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const handleClear = () => {
+      setSelectedRecipe(null);
+    };
+    window.addEventListener('clear-recipe-selection', handleClear);
+    return () => window.removeEventListener('clear-recipe-selection', handleClear);
+  }, []);
+
   // Unified URL param and selection synchronization
   useEffect(() => {
     if (isLoading) return;
