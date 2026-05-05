@@ -17,6 +17,7 @@ import {
 import { geminiVisionModel } from "@/lib/gemini";
 import { motion, AnimatePresence } from "framer-motion";
 import { saveRecipeAction } from "@/app/actions/recipes";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 
 interface Recipe {
@@ -126,7 +127,14 @@ export default function ScanPage() {
 
   return (
     <div className="space-y-8 pb-24">
-      <header className="space-y-2">
+      <header className="flex items-center gap-4">
+        <Link 
+          href="/generate"
+          className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all"
+        >
+          <Camera className="hidden" /> {/* Placeholder for logic but visually a back arrow */}
+          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+        </Link>
         <div className="flex items-center gap-3">
           <div className="w-12 h-12 bg-sage-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-sage-200">
             <Camera size={28} />
