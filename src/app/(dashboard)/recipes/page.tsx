@@ -334,7 +334,7 @@ function RecipesContent() {
   }
 
   return (
-    <div className="pb-12 space-y-6">
+    <div className="pb-12">
       <AnimatePresence mode="wait">
         {view === "list" ? (
           <motion.div 
@@ -342,7 +342,7 @@ function RecipesContent() {
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
             exit={{ opacity: 0 }}
-            className="space-y-8"
+            className="space-y-8 px-4 pt-6"
           >
             <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md py-4 px-2 -mx-2 mb-2 flex items-center justify-between">
               <div>
@@ -538,37 +538,36 @@ function RecipesContent() {
         ) : (
           <motion.div 
             key="detail" 
-            initial={{ opacity: 0, y: 20 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            exit={{ opacity: 0, y: -20 }}
-            className="space-y-6"
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            className="pb-32 bg-white min-h-screen"
           >
-            <header className="flex items-center gap-4 py-4 px-2 -mx-2">
+            <header className="sticky top-0 z-50 bg-white border-b border-gray-100 flex items-center justify-between py-4 px-4">
               <button 
                 onClick={() => router.push("/recipes")}
-                className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-600 active:scale-90 transition-all"
+                className="w-10 h-10 bg-gray-50 text-gray-500 rounded-xl active:scale-90 transition-all flex items-center justify-center"
               >
-                <ChevronLeft size={22} />
+                <ChevronLeft size={20} strokeWidth={2.5} />
               </button>
-              <h2 className="text-2xl font-bold text-gray-800 tracking-tight text-center flex-1">Detail</h2>
-              <div className="flex items-center gap-3">
+              <h2 className="text-gray-800 font-bold text-base">Detail receptu</h2>
+              <div className="flex gap-2">
                 <button 
                   onClick={() => handleExternalShare()}
-                  className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-400 active:scale-90 transition-all hover:text-sage-500"
+                  className="w-10 h-10 bg-gray-50 text-gray-400 rounded-xl active:scale-90 transition-all flex items-center justify-center hover:text-sage-500"
                 >
-                  <Share2 size={22} />
+                  <Share2 size={18} />
                 </button>
                 <Link 
                   href={`/recipes/edit/${selectedRecipe.id}`}
-                  className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-sage-600 active:scale-90 transition-all"
+                  className="w-10 h-10 bg-gray-50 text-sage-600 rounded-xl active:scale-90 transition-all flex items-center justify-center"
                 >
-                  <Pencil size={22} />
+                  <Pencil size={18} />
                 </Link>
               </div>
             </header>
 
-            <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-20">
-              <div className="h-72 relative bg-sage-50 flex items-center justify-center overflow-hidden">
+            <div className="relative">
+              <div className="w-full h-[40vh] sm:h-96 relative bg-sage-50 overflow-hidden">
                 {selectedRecipe.image_url && selectedRecipe.image_url.trim() !== "" && !selectedRecipe.image_url.includes("pollinations.ai") ? (
                   <img 
                     src={selectedRecipe.image_url} 
@@ -593,13 +592,13 @@ function RecipesContent() {
                     <Users size={18} />
                   </button>
                 </div>
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute bottom-8 left-8 right-8 text-center">
-                   <h3 className="text-3xl font-bold text-white leading-tight drop-shadow-md">{selectedRecipe.title}</h3>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
+                <div className="absolute bottom-6 left-6 right-6">
+                   <h3 className="text-2xl font-bold text-white leading-tight drop-shadow-md">{selectedRecipe.title}</h3>
                 </div>
               </div>
 
-              <div className="p-8 space-y-8">
+              <div className="p-6 space-y-8 max-w-2xl mx-auto">
                 {selectedRecipe.description && (
                   <p className="text-gray-500 text-sm italic leading-relaxed text-center px-6">
                     "{selectedRecipe.description}"
