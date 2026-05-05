@@ -277,7 +277,7 @@ export default function GeneratePage() {
         )}
 
         {step === "result" && generatedRecipe && !isRefining && (
-          <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pb-24 bg-transparent min-h-full max-w-4xl mx-auto">
+          <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pb-12 bg-transparent min-h-full max-w-4xl mx-auto">
             {/* Solid Header on top */}
             <header className="sticky md:static top-0 z-50 bg-[#F8F5F2]/80 md:bg-transparent backdrop-blur-md md:backdrop-blur-none flex items-center justify-between py-4 px-4">
               <button 
