@@ -12,7 +12,8 @@ import {
   ArrowRight,
   Save,
   CheckCircle2,
-  Clock
+  Clock,
+  ChevronLeft
 } from "lucide-react";
 import { geminiVisionModel } from "@/lib/gemini";
 import { motion, AnimatePresence } from "framer-motion";
@@ -127,21 +128,20 @@ export default function ScanPage() {
 
   return (
     <div className="space-y-8 pb-24">
-      <header className="flex items-center gap-4">
+      <header className="flex items-center gap-4 py-4">
         <Link 
           href="/generate"
           className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all"
         >
-          <Camera className="hidden" /> {/* Placeholder for logic but visually a back arrow */}
-          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          <ChevronLeft size={22} />
         </Link>
         <div className="flex items-center gap-3">
-          <div className="w-12 h-12 bg-sage-500 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-sage-200">
-            <Camera size={28} />
+          <div className="w-10 h-10 bg-sage-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-sage-200">
+            <Camera size={22} />
           </div>
           <div>
-            <h2 className="text-3xl font-black text-gray-800 tracking-tight">Skener</h2>
-            <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-0.5">Zistite, čo dnes uvariť</p>
+            <h2 className="text-2xl font-black text-gray-800 tracking-tight">Skener</h2>
+            <p className="text-gray-400 text-[9px] font-bold uppercase tracking-widest mt-0.5">Zistite, čo dnes uvariť</p>
           </div>
         </div>
       </header>
