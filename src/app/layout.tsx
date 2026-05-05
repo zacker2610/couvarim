@@ -22,7 +22,8 @@ export const metadata: Metadata = {
     title: "ČoUvarím",
   },
   icons: {
-    apple: "/icon-192x192.png",
+    apple: "/icon.svg",
+    icon: "/icon.svg",
   },
 };
 
