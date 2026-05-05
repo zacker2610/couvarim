@@ -488,8 +488,8 @@ export default function GeneratePage() {
         {step === "ai_ingredients" && (
           <motion.div key="ai_ingredients" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6">
             <header className="flex items-center gap-4 py-4">
-              <button onClick={() => setStep("hub")} className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-600 active:scale-90 transition-all">
-                <ChevronLeft size={22} />
+              <button onClick={() => setStep("hub")} className="w-12 h-12 bg-white rounded-2xl shadow-md border border-gray-100 text-gray-600 active:scale-90 transition-all flex items-center justify-center">
+                <ChevronLeft size={22} strokeWidth={2.5} />
               </button>
               <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Čo máte v kuchyni?</h2>
             </header>

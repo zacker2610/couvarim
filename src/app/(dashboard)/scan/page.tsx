@@ -131,9 +131,9 @@ export default function ScanPage() {
       <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-4 py-4 px-1 mb-6">
         <Link 
           href="/generate"
-          className="w-[60px] h-[60px] bg-white rounded-2xl shadow-md border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all flex items-center justify-center"
+          className="w-12 h-12 bg-white rounded-2xl shadow-md border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all flex items-center justify-center"
         >
-          <ChevronLeft size={26} strokeWidth={2.5} />
+          <ChevronLeft size={22} strokeWidth={2.5} />
         </Link>
         <h2 className="text-2xl font-bold text-gray-800 tracking-tight flex-1">Skener</h2>
       </header>
