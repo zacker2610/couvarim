@@ -69,8 +69,8 @@ export default function Sidebar() {
   return (
     <aside className="hidden md:flex fixed left-0 top-0 h-screen w-64 bg-white border-r border-sage-100 flex-col p-4 shadow-sm">
       <div className="flex items-center gap-3 px-2 mb-8 mt-2">
-        <div className="w-10 h-10 bg-sage-400 rounded-2xl flex items-center justify-center text-white shadow-md">
-          <ChefHat size={24} />
+        <div className="w-11 h-11 bg-sage-50 rounded-2xl flex items-center justify-center shadow-sm border border-sage-100 overflow-hidden">
+          <img src="/icon-192x192.png" alt="Logo" className="w-9 h-9 object-contain" />
         </div>
         <h1 className="text-xl font-bold text-sage-700 tracking-tight">ČoUvarím.sk</h1>
       </div>
