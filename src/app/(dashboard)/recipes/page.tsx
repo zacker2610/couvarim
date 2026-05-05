@@ -419,6 +419,7 @@ function RecipesContent() {
                             >
                               <Link 
                                 href={`/recipes/edit/${recipe.id}`}
+                                onClick={(e) => e.stopPropagation()}
                                 className="w-full px-4 py-2 text-left text-sm font-bold text-gray-600 hover:bg-sage-50 hover:text-sage-600 flex items-center gap-2 transition-colors"
                               >
                                 <Pencil size={14} /> Upraviť
