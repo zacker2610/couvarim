@@ -294,7 +294,7 @@ export async function updateRecipeAction(id: string, recipeData: any) {
         nutrition: recipeData.nutrition || {},
         ingredients: recipeData.ingredients,
         instructions: recipeData.instructions,
-        image_url: recipeData.image_url // Respect null/empty to allow deletion/placeholder
+        image_url: recipeData.image_url || null // Explicitly allow null for deletion
       })
       .eq("id", id)
       .select(); // Removed .single() to handle 0 rows gracefully
@@ -304,11 +304,15 @@ export async function updateRecipeAction(id: string, recipeData: any) {
     if (!data || data.length === 0) {
       return { 
         success: false, 
-        error: "Nemáte oprávnenie na úpravu tohto receptu alebo recept neexistuje. (Zdieľané recepty môže momentálne upravovať len ich pôvodný autor)" 
+        error: "Nemáte oprávnenie na úpravu tohto receptu alebo recept neexistuje." 
       };
     }
 
+    // Force revalidation of all related paths to clear aggressive caches
     revalidatePath("/recipes");
+    revalidatePath("/recipes/" + id);
+    revalidatePath("/", "layout"); 
+    
     return { success: true, recipe: data[0] };
   } catch (error: any) {
     console.error("Update Recipe Error:", error);
