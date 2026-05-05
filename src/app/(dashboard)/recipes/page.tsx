@@ -354,7 +354,15 @@ function RecipesContent() {
               </Link>
             </header>
 
-            <div className="flex gap-3">
+            <form 
+              onSubmit={(e) => {
+                e.preventDefault();
+                const target = e.target as HTMLFormElement;
+                const input = target.querySelector('input');
+                if (input) input.blur();
+              }}
+              className="flex gap-3"
+            >
               <div className="relative flex-1 group">
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-sage-500 transition-colors" size={22} />
                 <input 
@@ -362,16 +370,12 @@ function RecipesContent() {
                   placeholder="Hľadať recept..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      e.currentTarget.blur();
-                    }
-                  }}
                   className="w-full pl-12 pr-12 h-12 bg-white border border-transparent focus:border-sage-500 rounded-2xl focus:outline-none focus:ring-4 focus:ring-sage-500/10 transition-all shadow-md text-gray-700 font-medium"
                 />
                 <AnimatePresence>
                   {searchQuery && (
                     <motion.button
+                      type="button"
                       initial={{ opacity: 0, scale: 0.8 }}
                       animate={{ opacity: 1, scale: 1 }}
                       exit={{ opacity: 0, scale: 0.8 }}
@@ -383,10 +387,13 @@ function RecipesContent() {
                   )}
                 </AnimatePresence>
               </div>
-              <button className="w-12 h-12 bg-white text-gray-400 rounded-2xl border border-transparent hover:border-sage-100 hover:text-sage-600 transition-all shadow-md active:scale-95 flex items-center justify-center">
+              <button 
+                type="button"
+                className="w-12 h-12 bg-white text-gray-400 rounded-2xl border border-transparent hover:border-sage-100 hover:text-sage-600 transition-all shadow-md active:scale-95 flex items-center justify-center"
+              >
                 <Filter size={22} />
               </button>
-            </div>
+            </form>
 
             {filteredRecipes.length === 0 ? (
               <div className="bg-white rounded-2xl p-12 text-center space-y-6 border border-gray-100 shadow-sm">
