@@ -176,7 +176,7 @@ export default function GeneratePage() {
                 <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
                 <h2 className="text-lg font-bold text-gray-700">Pre koho varíme?</h2>
               </div>
-              <div className="flex bg-gray-50 p-1.5 rounded-2xl border border-gray-100 shadow-inner">
+              <div className="flex bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm">
                 <button 
                   onClick={() => setUseHousehold(false)} 
                   className={`flex-1 py-3.5 px-4 rounded-2xl text-xs font-bold transition-all flex items-center justify-center gap-2 ${
