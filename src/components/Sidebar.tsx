@@ -34,9 +34,16 @@ const menuItems = [
 export default function Sidebar() {
   const pathname = usePathname();
   const [deferredPrompt, setDeferredPrompt] = React.useState<any>(null);
+  const [isInstalled, setIsInstalled] = React.useState(false);
 
   React.useEffect(() => {
+    // Check if already installed
+    if (window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone) {
+      setIsInstalled(true);
+    }
+
     const handleBeforeInstallPrompt = (e: any) => {
+      console.log("PWA: beforeinstallprompt fired");
       e.preventDefault();
       setDeferredPrompt(e);
     };
@@ -54,6 +61,7 @@ export default function Sidebar() {
     const { outcome } = await deferredPrompt.userChoice;
     if (outcome === "accepted") {
       setDeferredPrompt(null);
+      setIsInstalled(true);
     }
   };
 
