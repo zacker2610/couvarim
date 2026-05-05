@@ -207,10 +207,11 @@ export default function EditRecipePage() {
         router.push("/recipes");
         router.refresh();
       } else {
-        alert(result.error);
+        alert("Chyba pri ukladaní: " + result.error);
       }
-    } catch (err) {
-      alert("Vyskytla sa chyba pri ukladaní.");
+    } catch (err: any) {
+      alert("Vyskytla sa nečakaná chyba pri ukladaní: " + (err?.message || JSON.stringify(err)));
+      console.error("Save error:", err);
     }
     setIsSaving(false);
   };

@@ -263,10 +263,11 @@ export default function NewRecipePage() {
       if (result.success) {
         router.push("/recipes");
       } else {
-        alert(result.error);
+        alert("Chyba pri ukladaní: " + result.error);
       }
-    } catch (err) {
-      alert("Vyskytla sa nečakaná chyba.");
+    } catch (err: any) {
+      alert("Vyskytla sa nečakaná chyba pri ukladaní: " + (err?.message || JSON.stringify(err)));
+      console.error("Save error:", err);
     }
     setIsSaving(false);
   };

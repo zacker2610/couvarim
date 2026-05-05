@@ -297,14 +297,19 @@ export async function updateRecipeAction(id: string, recipeData: any) {
         image_url: recipeData.image_url // Respect null/empty to allow deletion/placeholder
       })
       .eq("id", id)
-      .eq("user_id", user.id) // Security check: only owner can update
-      .select()
-      .single();
+      .select(); // Removed .single() to handle 0 rows gracefully
 
     if (error) throw error;
 
+    if (!data || data.length === 0) {
+      return { 
+        success: false, 
+        error: "Nemáte oprávnenie na úpravu tohto receptu alebo recept neexistuje. (Zdieľané recepty môže momentálne upravovať len ich pôvodný autor)" 
+      };
+    }
+
     revalidatePath("/recipes");
-    return { success: true, recipe: data };
+    return { success: true, recipe: data[0] };
   } catch (error: any) {
     console.error("Update Recipe Error:", error);
     return { success: false, error: error.message || "Nepodarilo sa aktualizovať recept." };
