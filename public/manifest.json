@@ -4,8 +4,8 @@
   "description": "Inteligentný asistent pre vaše varenie a nákupy",
   "start_url": "./",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#4f7c5e",
+  "background_color": "#9CAF88",
+  "theme_color": "#9CAF88",
   "icons": [
     {
       "src": "/icon-192x192.png",
