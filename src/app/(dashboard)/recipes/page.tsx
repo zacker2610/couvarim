@@ -60,17 +60,6 @@ function RecipesContent() {
   const searchParams = useSearchParams();
   const recipeIdFromUrl = searchParams.get("id");
 
-  // Auto-open recipe from URL param
-  useEffect(() => {
-    if (recipeIdFromUrl && recipes.length > 0) {
-      const recipe = recipes.find(r => r.id === recipeIdFromUrl);
-      if (recipe) {
-        setSelectedRecipe(recipe);
-        setView("detail");
-      }
-    }
-  }, [recipeIdFromUrl, recipes]);
-
   useEffect(() => {
     const fetchData = async () => {
       setIsLoading(true);
@@ -107,21 +96,28 @@ function RecipesContent() {
     fetchData();
   }, []);
 
-  // Handle URL ID parameter
+  // Unified URL param and view synchronization
   useEffect(() => {
-    if (recipeIdFromUrl && recipes.length > 0) {
+    if (isLoading) return;
+
+    if (recipeIdFromUrl) {
       const recipe = recipes.find(r => r.id === recipeIdFromUrl);
       if (recipe) {
         setSelectedRecipe(recipe);
         setView("detail");
         setActiveMenuId(null);
+      } else if (recipes.length > 0) {
+        // ID in URL but not found in recipes (might be deleted or wrong)
+        router.replace("/recipes");
       }
-    } else if (!recipeIdFromUrl && view === "detail") {
-      // If ID is removed from URL (e.g. clicking menu link), close detail
-      setView("list");
-      setSelectedRecipe(null);
+    } else {
+      // No ID in URL, must be list view
+      if (view === "detail") {
+        setView("list");
+        setSelectedRecipe(null);
+      }
     }
-  }, [recipeIdFromUrl, recipes, view]);
+  }, [recipeIdFromUrl, recipes, view, isLoading, router]);
 
   const handleOpenRecipe = (recipe: any) => {
     // Instead of setting state directly, update the URL
