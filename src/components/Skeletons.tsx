@@ -119,28 +119,60 @@ export function ProfileSkeleton() {
       </header>
 
       <div className="space-y-6">
+        {/* Personal Info */}
         <section className="bg-white rounded-2xl p-6 border border-gray-100/50">
-          <Skeleton className="h-6 w-32 mb-6" />
-          <div className="space-y-4">
+          <div className="flex items-center gap-2 mb-6">
+            <Skeleton className="w-8 h-8 rounded-2xl" />
+            <Skeleton className="h-5 w-32 rounded-lg" />
+          </div>
+          <div className="space-y-1.5">
+            <Skeleton className="h-3 w-24 ml-1 rounded-md" />
             <Skeleton className="h-12 w-full rounded-2xl" />
           </div>
         </section>
 
+        {/* Nutritional Goals */}
         <section className="bg-white rounded-2xl p-6 border border-gray-100/50">
-          <Skeleton className="h-6 w-48 mb-6" />
+          <div className="flex items-center gap-2 mb-6">
+            <Skeleton className="w-8 h-8 rounded-2xl" />
+            <Skeleton className="h-5 w-48 rounded-lg" />
+          </div>
           <div className="grid grid-cols-2 gap-4">
             {[1, 2, 3, 4].map((i) => (
-              <Skeleton key={i} className="h-16 w-full rounded-2xl" />
+              <div key={i} className="space-y-1.5">
+                <Skeleton className="h-3 w-20 ml-1 rounded-md" />
+                <Skeleton className="h-14 w-full rounded-2xl" />
+              </div>
             ))}
           </div>
         </section>
 
+        {/* Intolerances */}
         <section className="bg-white rounded-2xl p-6 border border-gray-100/50">
-          <Skeleton className="h-6 w-40 mb-6" />
+          <div className="flex items-center gap-2 mb-6">
+            <Skeleton className="w-8 h-8 rounded-2xl" />
+            <Skeleton className="h-5 w-40 rounded-lg" />
+          </div>
           <div className="flex flex-wrap gap-2">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <Skeleton key={i} className="h-8 w-24 rounded-full" />
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <Skeleton key={i} className="h-9 w-28 rounded-full" />
             ))}
+          </div>
+        </section>
+
+        {/* Pantry */}
+        <section className="bg-white rounded-2xl p-6 border border-gray-100/50">
+          <div className="flex items-center gap-2 mb-6">
+            <Skeleton className="w-8 h-8 rounded-2xl" />
+            <Skeleton className="h-5 w-56 rounded-lg" />
+          </div>
+          <div className="space-y-4">
+            <div className="flex flex-wrap gap-2">
+              {[1, 2, 3, 4].map((i) => (
+                <Skeleton key={i} className="h-8 w-20 rounded-2xl" />
+              ))}
+            </div>
+            <Skeleton className="h-14 w-full rounded-2xl" />
           </div>
         </section>
       </div>
