@@ -279,7 +279,7 @@ export default function GeneratePage() {
         {step === "result" && generatedRecipe && !isRefining && (
           <motion.div key="result" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="pb-24 bg-white sm:bg-transparent min-h-full max-w-4xl mx-auto">
             {/* Solid Header on top */}
-            <header className="sticky top-0 z-50 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center justify-between py-4 px-4">
+            <header className="sticky sm:static top-0 z-50 bg-[#F8F5F2]/80 sm:bg-transparent backdrop-blur-md sm:backdrop-blur-none flex items-center justify-between py-4 px-4">
               <button 
                 onClick={() => setStep("hub")} 
                 className="w-10 h-10 bg-white/50 text-gray-500 rounded-xl active:scale-90 transition-all flex items-center justify-center border border-white/50 shadow-sm"
