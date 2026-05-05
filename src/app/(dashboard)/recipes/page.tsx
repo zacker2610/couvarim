@@ -796,7 +796,6 @@ function RecipesContent() {
                 {/* TO BUY SECTION */}
                 <div className="space-y-4">
                   <div className="flex items-center gap-2 px-1">
-                    <div className="w-2 h-2 bg-blue-500 rounded-full" />
                     <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Dokúpiť</h4>
                     <div className="flex-1 border-t border-gray-100 ml-2" />
                   </div>
@@ -847,7 +846,6 @@ function RecipesContent() {
                 {/* AT HOME SECTION */}
                 <div className="space-y-4 opacity-70">
                   <div className="flex items-center gap-2 px-1">
-                    <div className="w-2 h-2 bg-gray-300 rounded-full" />
                     <h4 className="text-[11px] font-bold text-gray-400 uppercase tracking-widest">Mám doma</h4>
                     <div className="flex-1 border-t border-gray-100 ml-2" />
                   </div>
