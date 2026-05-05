@@ -297,7 +297,7 @@ export default function GeneratePage() {
               </div>
             </header>
 
-            <div className="relative">
+            <div className="relative px-4">
               {/* Hero Image - True Full Bleed */}
               <div className="w-full h-[40vh] sm:h-96 relative bg-sage-50 sm:rounded-[32px] overflow-hidden sm:mt-4">
                 <img 
@@ -312,7 +312,7 @@ export default function GeneratePage() {
                 </div>
               </div>
 
-              <div className="p-6 space-y-8 max-w-4xl mx-auto">
+              <div className="py-8 space-y-8 max-w-4xl mx-auto">
                 <p className="text-gray-500 text-sm italic leading-relaxed text-center px-6">
                   "{generatedRecipe.description}"
                 </p>

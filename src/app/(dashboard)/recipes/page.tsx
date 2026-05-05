@@ -581,7 +581,7 @@ function RecipesContent() {
               </div>
             </header>
 
-            <div className="relative">
+            <div className="relative px-4">
               <div className="w-full h-[40vh] sm:h-96 relative bg-sage-50 sm:rounded-[32px] overflow-hidden sm:mt-4">
                 {selectedRecipe.image_url && selectedRecipe.image_url.trim() !== "" && !selectedRecipe.image_url.includes("pollinations.ai") ? (
                   <img 
@@ -613,7 +613,7 @@ function RecipesContent() {
                 </div>
               </div>
 
-              <div className="p-6 space-y-8 max-w-4xl mx-auto">
+              <div className="py-8 space-y-8 max-w-4xl mx-auto">
                 {selectedRecipe.description && (
                   <p className="text-gray-500 text-sm italic leading-relaxed text-center px-6">
                     "{selectedRecipe.description}"
