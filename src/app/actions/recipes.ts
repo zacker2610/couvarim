@@ -294,7 +294,7 @@ export async function updateRecipeAction(id: string, recipeData: any) {
         nutrition: recipeData.nutrition || {},
         ingredients: recipeData.ingredients,
         instructions: recipeData.instructions,
-        image_url: recipeData.image_url || getAiGeneratedImage(recipeData.title)
+        image_url: recipeData.image_url // Respect null/empty to allow deletion/placeholder
       })
       .eq("id", id)
       .eq("user_id", user.id) // Security check: only owner can update
