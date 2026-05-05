@@ -551,15 +551,16 @@ function RecipesContent() {
             key="detail" 
             initial={{ opacity: 0 }} 
             animate={{ opacity: 1 }} 
-            className="pb-24 bg-white sm:bg-transparent min-h-full"
+            className="pb-24 bg-white sm:bg-transparent min-h-full max-w-4xl mx-auto"
           >
-            <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 flex items-center justify-between py-4 px-4 sm:rounded-t-3xl">
+            <header className="sticky top-0 z-50 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center justify-between py-4 px-4">
               <button 
                 onClick={() => {
                   setSelectedRecipe(null);
                   router.push("/recipes");
+                  window.dispatchEvent(new CustomEvent('clear-recipe-selection'));
                 }}
-                className="w-10 h-10 bg-gray-50 text-gray-500 rounded-xl active:scale-90 transition-all flex items-center justify-center"
+                className="w-10 h-10 bg-white/50 text-gray-500 rounded-xl active:scale-90 transition-all flex items-center justify-center border border-white/50 shadow-sm"
               >
                 <ChevronLeft size={20} strokeWidth={2.5} />
               </button>
@@ -567,13 +568,13 @@ function RecipesContent() {
               <div className="flex gap-2">
                 <button 
                   onClick={() => handleExternalShare()}
-                  className="w-10 h-10 bg-gray-50 text-gray-400 rounded-xl active:scale-90 transition-all flex items-center justify-center hover:text-sage-500"
+                  className="w-10 h-10 bg-white/50 text-gray-400 rounded-xl active:scale-90 transition-all flex items-center justify-center hover:text-sage-500 border border-white/50 shadow-sm"
                 >
                   <Share2 size={18} />
                 </button>
                 <Link 
                   href={`/recipes/edit/${selectedRecipe.id}`}
-                  className="w-10 h-10 bg-gray-50 text-sage-600 rounded-xl active:scale-90 transition-all flex items-center justify-center"
+                  className="w-10 h-10 bg-white/50 text-sage-600 rounded-xl active:scale-90 transition-all flex items-center justify-center border border-white/50 shadow-sm"
                 >
                   <Pencil size={18} />
                 </Link>
@@ -612,7 +613,7 @@ function RecipesContent() {
                 </div>
               </div>
 
-              <div className="p-6 space-y-8 max-w-2xl mx-auto">
+              <div className="p-6 space-y-8 max-w-4xl mx-auto">
                 {selectedRecipe.description && (
                   <p className="text-gray-500 text-sm italic leading-relaxed text-center px-6">
                     "{selectedRecipe.description}"
