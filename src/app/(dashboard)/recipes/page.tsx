@@ -475,11 +475,8 @@ function RecipesContent() {
                         />
                       ) : null}
                       {(!recipe.image_url || recipe.image_url.trim() === "" || recipe.image_url.includes("pollinations.ai")) && (
-                        <div className="w-full h-full flex flex-col items-center justify-center text-sage-200 gap-3">
-                          <div className="w-16 h-16 rounded-full bg-sage-50/50 flex items-center justify-center">
-                            <ChefHat size={32} strokeWidth={1.5} />
-                          </div>
-                          <span className="text-[9px] font-bold uppercase tracking-widest text-sage-300">Bez fotografie</span>
+                        <div className="w-full h-full flex items-center justify-center text-sage-200">
+                          <ChefHat size={48} strokeWidth={1.5} />
                         </div>
                       )}
                     </div>
@@ -558,11 +555,8 @@ function RecipesContent() {
                   />
                 ) : null}
                 {(!selectedRecipe.image_url || selectedRecipe.image_url.trim() === "" || selectedRecipe.image_url.includes("pollinations.ai")) && (
-                   <div className="w-full h-full flex flex-col items-center justify-center text-sage-100 gap-4">
-                    <div className="w-24 h-24 rounded-full bg-sage-500/10 flex items-center justify-center">
-                      <ChefHat size={56} strokeWidth={1} />
-                    </div>
-                    <span className="text-xs font-bold uppercase tracking-[0.2em] text-sage-200">Recept bez fotografie</span>
+                   <div className="w-full h-full flex items-center justify-center text-sage-100">
+                      <ChefHat size={80} strokeWidth={1} />
                   </div>
                 )}
                 <div className="absolute top-4 left-4 z-10">

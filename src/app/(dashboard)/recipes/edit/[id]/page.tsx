@@ -258,12 +258,8 @@ export default function EditRecipePage() {
               </button>
             </>
           ) : (
-            <label className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer hover:bg-sage-50 transition-colors">
-              <div className="w-16 h-16 bg-sage-100 text-sage-600 rounded-2xl flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                <ChefHat size={32} />
-              </div>
-              <span className="text-sm font-bold text-sage-700">Pridať alebo zmeniť fotku</span>
-              <span className="text-xs text-gray-400 mt-1">Klikni pre výber súboru</span>
+            <label className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-sage-50 transition-colors">
+              <ChefHat size={64} className="text-sage-200" />
               <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
             </label>
           )}
