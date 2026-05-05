@@ -299,7 +299,7 @@ export default function GeneratePage() {
 
             <div className="relative px-4">
               {/* Hero Image - True Full Bleed */}
-              <div className="w-full h-[30vh] md:h-80 relative bg-sage-50 rounded-[32px] overflow-hidden md:mt-4 shadow-sm border border-black/5">
+              <div className="w-full h-64 md:h-96 relative bg-sage-50 rounded-[32px] overflow-hidden md:mt-4 shadow-sm border border-black/5">
                 <img 
                   src={generatedRecipe.image_url} 
                   alt={generatedRecipe.title}

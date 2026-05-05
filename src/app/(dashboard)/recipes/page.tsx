@@ -584,7 +584,7 @@ function RecipesContent() {
             </header>
 
             <div className="relative px-4">
-              <div className="w-full h-[30vh] md:h-80 relative bg-sage-50 rounded-[32px] overflow-hidden md:mt-4 shadow-sm border border-black/5">
+              <div className="w-full h-64 md:h-96 relative bg-sage-50 rounded-[32px] overflow-hidden md:mt-4 shadow-sm border border-black/5">
                 {selectedRecipe.image_url && selectedRecipe.image_url.trim() !== "" && !selectedRecipe.image_url.includes("pollinations.ai") ? (
                   <img 
                     src={selectedRecipe.image_url} 
