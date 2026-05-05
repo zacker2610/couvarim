@@ -67,7 +67,7 @@ export default function RootLayout({
       </head>
       <body className="h-full bg-[#F8F5F2] text-gray-900 selection:bg-sage-100 selection:text-sage-900">
         <PWARegistration />
-        <main className="max-w-5xl mx-auto min-h-full bg-white sm:bg-[#F8F5F2]/50 relative">
+        <main className="max-w-screen-xl mx-auto min-h-full bg-white sm:bg-[#F8F5F2]/50 relative">
           <div className="pb-24">
             {children}
           </div>
