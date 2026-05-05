@@ -45,7 +45,6 @@ function RecipesContent() {
   const router = useRouter();
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [deleteConfirmRecipe, setDeleteConfirmRecipe] = useState<any | null>(null);
-  const [view, setView] = useState<"list" | "detail">("list");
   const [selectedRecipe, setSelectedRecipe] = useState<any>(null);
   const [userGoals, setUserGoals] = useState<any>(null);
   const [recipes, setRecipes] = useState<any[]>([]);
@@ -96,7 +95,7 @@ function RecipesContent() {
     fetchData();
   }, []);
 
-  // Unified URL param and view synchronization
+  // Unified URL param and selection synchronization
   useEffect(() => {
     if (isLoading) return;
 
@@ -104,20 +103,15 @@ function RecipesContent() {
       const recipe = recipes.find(r => r.id === recipeIdFromUrl);
       if (recipe) {
         setSelectedRecipe(recipe);
-        setView("detail");
         setActiveMenuId(null);
       } else if (recipes.length > 0) {
         // ID in URL but not found in recipes (might be deleted or wrong)
         router.replace("/recipes");
       }
     } else {
-      // No ID in URL, must be list view
-      if (view === "detail") {
-        setView("list");
-        setSelectedRecipe(null);
-      }
+      setSelectedRecipe(null);
     }
-  }, [recipeIdFromUrl, recipes, view, isLoading, router]);
+  }, [recipeIdFromUrl, recipes, isLoading, router]);
 
   const handleOpenRecipe = (recipe: any) => {
     // Instead of setting state directly, update the URL
@@ -329,10 +323,12 @@ function RecipesContent() {
     return <RecipesSkeleton />;
   }
 
+  const isDetail = !!recipeIdFromUrl && selectedRecipe;
+
   return (
     <div className="pb-12">
       <AnimatePresence mode="wait">
-        {view === "list" ? (
+        {!isDetail ? (
           <motion.div 
             key="list" 
             initial={{ opacity: 0 }} 
@@ -540,7 +536,10 @@ function RecipesContent() {
           >
             <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-100 flex items-center justify-between py-4 px-4 sm:rounded-t-3xl">
               <button 
-                onClick={() => router.push("/recipes")}
+                onClick={() => {
+                  setSelectedRecipe(null);
+                  router.push("/recipes");
+                }}
                 className="w-10 h-10 bg-gray-50 text-gray-500 rounded-xl active:scale-90 transition-all flex items-center justify-center"
               >
                 <ChevronLeft size={20} strokeWidth={2.5} />
