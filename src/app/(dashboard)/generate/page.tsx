@@ -25,7 +25,9 @@ import {
   Loader2,
   Check,
   Users,
-  User
+  User,
+  Share2,
+  Edit3
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -288,26 +290,39 @@ export default function GeneratePage() {
 
         {step === "result" && generatedRecipe && !isRefining && (
           <motion.div key="result" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-0 sm:space-y-6 pb-32">
-            <header className="flex items-center gap-4 py-4 px-4 sm:px-10">
-              <button onClick={() => setStep("hub")} className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-600 active:scale-90 transition-all">
-                <ChevronLeft size={22} />
-              </button>
-              <h2 className="text-2xl font-bold text-gray-800 tracking-tight text-center flex-1 pr-10">Váš recept</h2>
-            </header>
-
-            <div className="bg-white sm:rounded-2xl overflow-hidden shadow-sm border-y sm:border border-gray-100">
-              <div className="h-72 relative bg-sage-50 flex items-center justify-center overflow-hidden">
-                <img 
-                  src={generatedRecipe.image_url} 
-                  alt={generatedRecipe.title}
-                  className="w-full h-full object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-                <div className="absolute bottom-8 left-8 right-8 text-center">
-                   <span className="bg-sage-500 text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-3 inline-block">AI Inšpirácia</span>
-                   <h3 className="text-3xl font-bold text-white leading-tight drop-shadow-md">{generatedRecipe.title}</h3>
+            <div className="relative group">
+              {/* Floating Header */}
+              <header className="absolute top-0 left-0 right-0 z-20 flex items-center justify-between py-6 px-4 sm:px-10">
+                <button 
+                  onClick={() => setStep("hub")} 
+                  className="w-12 h-12 bg-black/10 backdrop-blur-md border border-white/20 rounded-2xl text-white active:scale-90 transition-all flex items-center justify-center shadow-lg"
+                >
+                  <ChevronLeft size={22} strokeWidth={2.5} />
+                </button>
+                <h2 className="text-white font-bold text-lg tracking-tight drop-shadow-lg">Detail</h2>
+                <div className="flex gap-2">
+                  <button className="w-12 h-12 bg-black/10 backdrop-blur-md border border-white/20 rounded-2xl text-white active:scale-90 transition-all flex items-center justify-center shadow-lg">
+                    <Share2 size={20} />
+                  </button>
+                  <button className="w-12 h-12 bg-black/10 backdrop-blur-md border border-white/20 rounded-2xl text-white active:scale-90 transition-all flex items-center justify-center shadow-lg">
+                    <Edit3 size={20} />
+                  </button>
                 </div>
-              </div>
+              </header>
+
+              <div className="bg-white sm:rounded-2xl overflow-hidden shadow-sm sm:border border-gray-100">
+                <div className="h-[45vh] sm:h-80 relative bg-sage-50 flex items-center justify-center overflow-hidden">
+                  <img 
+                    src={generatedRecipe.image_url} 
+                    alt={generatedRecipe.title}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-black/10" />
+                  <div className="absolute bottom-8 left-8 right-8 text-center">
+                     <span className="bg-sage-500/90 backdrop-blur-sm text-white px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest mb-3 inline-block border border-white/10">AI Inšpirácia</span>
+                     <h3 className="text-3xl font-bold text-white leading-tight drop-shadow-2xl">{generatedRecipe.title}</h3>
+                  </div>
+                </div>
 
               <div className="p-8 space-y-8">
                 <p className="text-gray-500 text-sm italic leading-relaxed text-center px-6">
@@ -445,7 +460,6 @@ export default function GeneratePage() {
                 </button>
               </div>
             </div>
-
             <div className="fixed bottom-20 left-4 right-4 z-50 space-y-2">
               <AnimatePresence>
                 {refineError && (
@@ -474,16 +488,17 @@ export default function GeneratePage() {
                   onKeyDown={(e) => e.key === "Enter" && handleGenerate("refine")}
                 />
                 <button 
-                  onClick={() => handleGenerate("refine")}
-                  disabled={!refineText.trim()}
-                  className="w-10 h-10 bg-sage-500 text-white rounded-2xl flex items-center justify-center active:scale-90 transition-all disabled:opacity-30"
+                  onClick={() => handleGenerate("refine")} 
+                  disabled={!refineText.trim()} 
+                  className="w-10 h-10 bg-sage-500 text-white rounded-2xl flex items-center justify-center active:scale-90 transition-all disabled:opacity-30" 
                 >
                   <Send size={18} />
                 </button>
               </div>
             </div>
-          </motion.div>
-        )}
+          </div>
+        </motion.div>
+      )}
 
         {step === "ai_ingredients" && (
           <motion.div key="ai_ingredients" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-6 px-4 sm:px-10">
