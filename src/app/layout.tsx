@@ -16,6 +16,14 @@ export const metadata: Metadata = {
   title: "ČoUvarím.sk - Inteligentná kuchyňa",
   description: "Generujte recepty pomocou AI na základe vašich surovín a preferencií.",
   manifest: "/manifest.json",
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: "default",
+    title: "ČoUvarím",
+  },
+  icons: {
+    apple: "/icon-192x192.png",
+  },
 };
 
 export const viewport = {
