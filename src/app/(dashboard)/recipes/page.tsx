@@ -33,10 +33,21 @@ import { deleteRecipeAction, toggleRecipeShareAction, normalizeShoppingListActio
 import Link from "next/link";
 import { RecipesSkeleton } from "@/components/Skeletons";
 
+function RecipesPageInner() {
+  const searchParams = useSearchParams();
+  const recipeId = searchParams.get("id");
+  
+  return (
+    <Suspense fallback={<RecipesSkeleton />}>
+      <RecipesContent key={recipeId || "list"} />
+    </Suspense>
+  );
+}
+
 export default function RecipesPage() {
   return (
     <Suspense fallback={<RecipesSkeleton />}>
-      <RecipesContent />
+      <RecipesPageInner />
     </Suspense>
   );
 }
