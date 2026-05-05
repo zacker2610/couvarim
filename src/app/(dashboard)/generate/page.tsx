@@ -491,7 +491,7 @@ export default function GeneratePage() {
               <button onClick={() => setStep("hub")} className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-600 active:scale-90 transition-all">
                 <ChevronLeft size={22} />
               </button>
-              <h2 className="text-xl font-bold text-gray-800 tracking-tight">Čo máte v kuchyni?</h2>
+              <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Čo máte v kuchyni?</h2>
             </header>
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
               <textarea 
@@ -514,7 +514,7 @@ export default function GeneratePage() {
               <button onClick={() => setStep("hub")} className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-600 active:scale-90 transition-all">
                 <ChevronLeft size={22} />
               </button>
-              <h2 className="text-xl font-bold text-gray-800 tracking-tight">Na čo máte chuť?</h2>
+              <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Na čo máte chuť?</h2>
             </header>
             <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 space-y-4">
               <input 

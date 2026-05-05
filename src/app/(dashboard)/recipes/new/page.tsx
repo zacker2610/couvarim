@@ -2,7 +2,7 @@
 
 import React, { useState, useRef } from "react";
 import { 
-  ArrowLeft, 
+  ChevronLeft, 
   Camera, 
   Plus, 
   Trash2, 
@@ -276,19 +276,19 @@ export default function NewRecipePage() {
   return (
     <div className="pb-24 animate-in fade-in slide-in-from-right-4 duration-500">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-4 py-4 px-2 -mx-2 mb-6">
+      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-4 py-4 px-1 mb-6">
         <button 
           onClick={() => router.back()}
-          className="p-2 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-600 active:scale-90 transition-all"
+          className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all"
         >
-          <ArrowLeft size={20} />
+          <ChevronLeft size={22} />
         </button>
-        <h2 className="text-xl font-bold text-gray-800 tracking-tight flex-1">Nový recept</h2>
+        <h2 className="text-2xl font-bold text-gray-800 tracking-tight flex-1">Nový recept</h2>
         <button 
           onClick={() => setIsImportModalOpen(true)}
-          className="p-2.5 bg-sage-500 text-white rounded-2xl shadow-lg active:scale-90 transition-all flex items-center gap-2"
+          className="p-3 bg-sage-500 text-white rounded-2xl shadow-lg active:scale-90 transition-all flex items-center gap-2"
         >
-          <Sparkles size={18} />
+          <Sparkles size={20} />
           <span className="text-xs font-bold uppercase tracking-wider hidden sm:inline">Inteligentný import</span>
         </button>
       </header>
