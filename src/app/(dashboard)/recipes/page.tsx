@@ -350,7 +350,7 @@ function RecipesContent() {
                 <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Moje recepty</h2>
                 <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-1">Zbierka vašich jedál</p>
               </div>
-              <Link href="/recipes/new" className="p-3 bg-sage-500 text-white rounded-2xl shadow-lg active:scale-90 transition-all">
+              <Link href="/generate" className="p-3 bg-sage-500 text-white rounded-2xl shadow-lg active:scale-90 transition-all">
                 <Plus size={24} />
               </Link>
             </header>
@@ -462,13 +462,19 @@ function RecipesContent() {
                           <span className="text-[10px] font-bold uppercase tracking-wider">Spoločný</span>
                         </div>
                       )}
-                      {recipe.image_url && recipe.image_url.trim() !== "" ? (
+                      {recipe.image_url && recipe.image_url.trim() !== "" && !recipe.image_url.includes("pollinations.ai") ? (
                         <img 
                           src={recipe.image_url} 
                           alt={recipe.title}
                           className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                          onError={(e) => {
+                            // If image fails to load, hide it to show placeholder
+                            (e.target as HTMLImageElement).style.display = 'none';
+                            (e.target as HTMLImageElement).parentElement?.classList.add('show-placeholder');
+                          }}
                         />
-                      ) : (
+                      ) : null}
+                      {(!recipe.image_url || recipe.image_url.trim() === "" || recipe.image_url.includes("pollinations.ai")) && (
                         <div className="w-full h-full flex flex-col items-center justify-center text-sage-200 gap-3">
                           <div className="w-16 h-16 rounded-full bg-sage-50/50 flex items-center justify-center">
                             <Camera size={32} strokeWidth={1.5} />
@@ -541,13 +547,17 @@ function RecipesContent() {
 
             <div className="bg-white rounded-2xl overflow-hidden shadow-sm border border-gray-100 mb-20">
               <div className="h-72 relative bg-sage-50 flex items-center justify-center overflow-hidden">
-                {selectedRecipe.image_url && selectedRecipe.image_url.trim() !== "" ? (
+                {selectedRecipe.image_url && selectedRecipe.image_url.trim() !== "" && !selectedRecipe.image_url.includes("pollinations.ai") ? (
                   <img 
                     src={selectedRecipe.image_url} 
                     alt={selectedRecipe.title}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = 'none';
+                    }}
                   />
-                ) : (
+                ) : null}
+                {(!selectedRecipe.image_url || selectedRecipe.image_url.trim() === "" || selectedRecipe.image_url.includes("pollinations.ai")) && (
                    <div className="w-full h-full flex flex-col items-center justify-center text-sage-100 gap-4">
                     <div className="w-24 h-24 rounded-full bg-sage-500/10 flex items-center justify-center">
                       <Camera size={56} strokeWidth={1} />
