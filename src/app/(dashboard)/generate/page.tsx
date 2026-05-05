@@ -171,7 +171,7 @@ export default function GeneratePage() {
               <p className="text-gray-400 text-sm font-medium">Vyberte si spôsob, ako vytvoriť recept</p>
             </header>
 
-            <div className="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm space-y-6">
+            <div className="space-y-6 py-2">
               <div className="flex items-center gap-3">
                 <div className="w-1.5 h-6 bg-sage-500 rounded-full" />
                 <h2 className="text-lg font-bold text-gray-700">Pre koho varíme?</h2>
