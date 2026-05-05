@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { 
   Search, 
   Users,
@@ -45,6 +45,7 @@ export default function RecipesPage() {
 }
 
 function RecipesContent() {
+  const router = useRouter();
   const [activeMenuId, setActiveMenuId] = useState<string | null>(null);
   const [deleteConfirmRecipe, setDeleteConfirmRecipe] = useState<any | null>(null);
   const [view, setView] = useState<"list" | "detail">("list");
@@ -114,15 +115,21 @@ function RecipesContent() {
     if (recipeIdFromUrl && recipes.length > 0) {
       const recipe = recipes.find(r => r.id === recipeIdFromUrl);
       if (recipe) {
-        handleOpenRecipe(recipe);
+        setSelectedRecipe(recipe);
+        setView("detail");
+        setActiveMenuId(null);
       }
+    } else if (!recipeIdFromUrl && view === "detail") {
+      // If ID is removed from URL (e.g. clicking menu link), close detail
+      setView("list");
+      setSelectedRecipe(null);
     }
-  }, [recipeIdFromUrl, recipes]);
+  }, [recipeIdFromUrl, recipes, view]);
 
   const handleOpenRecipe = (recipe: any) => {
-    setSelectedRecipe(recipe);
-    setView("detail");
-    setActiveMenuId(null);
+    // Instead of setting state directly, update the URL
+    // This makes the "Back" button work and keeps things in sync
+    router.push(`/recipes?id=${recipe.id}`);
   };
 
   const handleToggleShare = async (recipe: any) => {
@@ -520,7 +527,7 @@ function RecipesContent() {
           >
             <header className="flex items-center gap-4 py-4 px-2 -mx-2">
               <button 
-                onClick={() => setView("list")}
+                onClick={() => router.push("/recipes")}
                 className="p-3 bg-white rounded-2xl shadow-sm border border-gray-100 text-gray-600 active:scale-90 transition-all"
               >
                 <ChevronLeft size={22} />
