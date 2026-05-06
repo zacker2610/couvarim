@@ -15,9 +15,8 @@ import {
   Clock,
   ChevronLeft
 } from "lucide-react";
-import { geminiVisionModel } from "@/lib/gemini";
+import { saveRecipeAction, analyzeIngredientsImageAction } from "@/app/actions/recipes";
 import { motion, AnimatePresence } from "framer-motion";
-import { saveRecipeAction } from "@/app/actions/recipes";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -44,6 +43,7 @@ export default function ScanPage() {
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
+  const [useHousehold, setUseHousehold] = useState(true);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -62,42 +62,16 @@ export default function ScanPage() {
     
     setLoading(true);
     setRecipe(null);
-
+    
     try {
       const base64Data = image.split(",")[1];
+      const result = await analyzeIngredientsImageAction(base64Data, useHousehold);
       
-      const prompt = `Identifikuj všetky suroviny na tomto obrázku (napr. z chladničky alebo nákupu). 
-                      Následne z týchto surovín navrhni JEDEN chutný a originálny recept. 
-                      Odpovedaj VŽDY v slovenčine a výhradne ako čistý JSON v tomto formáte: 
-                      {
-                        "title": "Názov receptu",
-                        "description": "Stručný lákavý popis",
-                        "servings": 4,
-                        "prep_time": "15",
-                        "cook_time": "30",
-                        "difficulty": "Jednoduchá",
-                        "calories": 450,
-                        "nutrition": {"protein": 25, "carbs": 40, "fat": 15},
-                        "ingredients": [{"item": "názov", "amount": "100", "unit": "g", "owned": true}],
-                        "instructions": ["krok 1", "krok 2"]
-                      }`;
-
-      const result = await geminiVisionModel.generateContent([
-        prompt,
-        {
-          inlineData: {
-            data: base64Data,
-            mimeType: "image/jpeg",
-          },
-        },
-      ]);
-      
-      const response = await result.response;
-      const text = response.text();
-      
-      const cleanJson = text.replace(/```json|```/g, "").trim();
-      const data = JSON.parse(cleanJson);
-      setRecipe(data);
+      if (result.success) {
+        setRecipe(result.data);
+      } else {
+        alert(result.error);
+      }
     } catch (error) {
       console.error("Chyba pri analýze:", error);
       alert("Nepodarilo sa rozpoznať suroviny. Skúste to prosím znova s lepším svetlom.");
@@ -186,6 +160,29 @@ export default function ScanPage() {
               </p>
             </div>
 
+            <div className="flex bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm max-w-xs mx-auto">
+              <button 
+                onClick={() => setUseHousehold(false)} 
+                className={`flex-1 py-2.5 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                  !useHousehold 
+                    ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                Individuálne
+              </button>
+              <button 
+                onClick={() => setUseHousehold(true)} 
+                className={`flex-1 py-2.5 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
+                  useHousehold 
+                    ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+              >
+                Rodina
+              </button>
+            </div>
+
             <div 
               onClick={() => fileInputRef.current?.click()}
               className="group cursor-pointer bg-sage-50 hover:bg-sage-100 transition-all p-8 rounded-3xl border-2 border-dashed border-sage-200 flex flex-col items-center gap-4"
@@ -196,7 +193,7 @@ export default function ScanPage() {
               <span className="font-bold text-sage-600 uppercase text-[10px] tracking-widest">Kliknite pre nahranie alebo fotenie</span>
               <input 
                 type="file" 
-                accept="image/*" 
+                accept="image/jpeg,image/png,image/heic,image/heif" 
                 capture="environment"
                 className="hidden" 
                 ref={fileInputRef} 

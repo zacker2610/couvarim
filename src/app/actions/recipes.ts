@@ -435,6 +435,121 @@ export async function parseRecipeTextAction(rawText: string) {
 }
 
 /**
+ * Server Action to scan ingredients from an image and generate a recipe.
+ */
+export async function analyzeIngredientsImageAction(base64Image: string, useHousehold: boolean = true) {
+  try {
+    const supabase = await getServerSupabase();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    let constraintsPrompt = "";
+    
+    // Reuse the same preference logic as generateRecipeAction
+    if (user && useHousehold) {
+      const { data: household } = await supabase
+        .from("households")
+        .select("id")
+        .or(`owner_id.eq.${user.id}`)
+        .maybeSingle();
+      
+      if (household) {
+        const { data: members } = await supabase
+          .from("household_members")
+          .select(`
+            *,
+            profiles:user_id (preferences)
+          `)
+          .eq("household_id", household.id);
+        
+        if (members) {
+          const allIntolerances = new Set<string>();
+          const allDiets = new Set<string>();
+          const allDislikes = new Set<string>();
+          
+          members.forEach((m: any) => {
+            const prefs = m.user_id ? m.profiles?.preferences : m.preferences;
+            if (prefs) {
+              (prefs.intolerances || []).forEach((i: string) => allIntolerances.add(i));
+              (prefs.diet || []).forEach((d: string) => allDiets.add(d));
+              (prefs.disliked_ingredients || []).forEach((di: string) => allDislikes.add(di));
+            }
+          });
+          
+          if (allIntolerances.size > 0 || allDiets.size > 0 || allDislikes.size > 0) {
+            constraintsPrompt = `
+              DÔLEŽITÉ OBMEDZENIA (RODINNÝ REŽIM):
+              ${allIntolerances.size > 0 ? `- Alergie/Intolerancie: ${Array.from(allIntolerances).join(", ")}` : ""}
+              ${allDiets.size > 0 ? `- Stravovacie štýly: ${Array.from(allDiets).join(", ")}` : ""}
+              ${allDislikes.size > 0 ? `- Tieto suroviny NEPOUŽÍVAJ: ${Array.from(allDislikes).join(", ")}` : ""}
+            `;
+          }
+        }
+      }
+    } else if (user && !useHousehold) {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("preferences")
+        .eq("id", user.id)
+        .single();
+      
+      if (profile?.preferences) {
+        const p = profile.preferences;
+        if (p.intolerances?.length > 0 || p.diet?.length > 0 || p.disliked_ingredients?.length > 0) {
+          constraintsPrompt = `
+            DÔLEŽITÉ OBMEDZENIA (LEN PRE MŇA):
+            ${p.intolerances?.length > 0 ? `- Alergie/Intolerancie: ${p.intolerances.join(", ")}` : ""}
+            ${p.diet?.length > 0 ? `- Stravovacie štýly: ${p.diet.join(", ")}` : ""}
+            ${p.disliked_ingredients?.length > 0 ? `- Tieto suroviny NEPOUŽÍVAJ: ${p.disliked_ingredients.join(", ")}` : ""}
+          `;
+        }
+      }
+    }
+
+    const prompt = `Identifikuj všetky suroviny na tomto obrázku (napr. z chladničky alebo nákupu). 
+                    Následne z týchto surovín navrhni JEDEN chutný a originálny recept. 
+                    ${constraintsPrompt}
+                    Odpovedaj VŽDY v slovenčine a výhradne ako čistý JSON v tomto formáte: 
+                    {
+                      "title": "Názov receptu",
+                      "description": "Stručný lákavý popis",
+                      "servings": 4,
+                      "prep_time": "15",
+                      "cook_time": "30",
+                      "difficulty": "Jednoduchá",
+                      "calories": 450,
+                      "nutrition": {"protein": 25, "carbs": 40, "fat": 15},
+                      "ingredients": [{"item": "názov", "amount": "100", "unit": "g", "owned": true}],
+                      "instructions": ["krok 1", "krok 2"],
+                      "imagePrompt": "Detailed English description of the dish for AI image generation"
+                    }`;
+
+    const result = await geminiVisionModel.generateContent([
+      prompt,
+      {
+        inlineData: {
+          data: base64Image,
+          mimeType: "image/jpeg",
+        },
+      },
+    ]);
+
+    const response = await result.response;
+    const text = response.text();
+    
+    const cleanJson = text.replace(/```json|```/g, "").trim();
+    const data = JSON.parse(cleanJson);
+
+    // Add generated image URL
+    data.image_url = getAiGeneratedImage(data.imagePrompt || data.title);
+
+    return { success: true, data };
+  } catch (error: any) {
+    console.error("Analyze Ingredients Image Error:", error);
+    return { success: false, error: "AI sa nepodarilo rozpoznať suroviny. Skúste to prosím znova." };
+  }
+}
+
+/**
  * Server Action to scan recipe from an image using AI.
  */
 export async function scanRecipeImageAction(base64Image: string) {
