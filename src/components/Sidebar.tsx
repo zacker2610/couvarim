@@ -80,15 +80,10 @@ export default function Sidebar() {
         {menuItems.map((item) => {
           const isActive = pathname === item.href;
           return (
-            <button
+            <Link
               key={item.href}
-              onClick={() => {
-                if (item.href === "/recipes") {
-                  window.location.href = "/recipes";
-                } else {
-                  router.push(item.href);
-                }
-              }}
+              href={item.href}
+              prefetch={true}
               className={cn(
                 "w-full flex items-center gap-3 px-3 py-2.5 rounded-2xl transition-all duration-200 group text-left",
                 isActive 
@@ -101,7 +96,7 @@ export default function Sidebar() {
                 isActive ? "text-sage-600" : "text-gray-400 group-hover:text-sage-500"
               )} />
               <span className="font-medium">{item.label}</span>
-            </button>
+            </Link>
           );
         })}
       </nav>

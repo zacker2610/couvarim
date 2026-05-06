@@ -35,20 +35,40 @@
   }
 }
 
-@media (min-width: 1024px) {
-  html {
-    scrollbar-gutter: stable;
-  }
+* {
+  /* Prevent the grey highlight box on tap in mobile browsers */
+  -webkit-tap-highlight-color: transparent;
+  -webkit-touch-callout: none;
+}
+
+html, body {
+  /* Prevent bouncy scroll in Safari/Capacitor which screams 'web' */
+  overscroll-behavior: none;
+  height: 100%;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  -webkit-tap-highlight-color: transparent;
+  /* Standard font optimization for native feel */
+  font-feature-settings: "rlig" 1, "calt" 1;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
+/* Prevent text selection on UI elements like buttons and nav to feel like a real app */
 button, 
-a, 
-[role="button"] {
+nav, 
+a,
+[role="button"],
+.no-select {
+  user-select: none;
+  -webkit-user-select: none;
   cursor: pointer;
+}
+
+@media (min-width: 1024px) {
+  html {
+    scrollbar-gutter: stable;
+  }
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import useSWR, { mutate } from "swr";
 import { 
   User, 
   Settings, 
@@ -54,48 +55,59 @@ export default function ProfilePage() {
   const [tagInput, setTagInput] = useState("");
   const [pantryInput, setPantryInput] = useState("");
 
+  // Fetchers for SWR
+  const profileFetcher = async () => {
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) return null;
+    setUser(authUser);
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("*")
+      .eq("id", authUser.id)
+      .single();
+    if (error) throw error;
+    return data;
+  };
+
+  const householdFetcher = async () => {
+    const { data: { user: authUser } } = await supabase.auth.getUser();
+    if (!authUser) return null;
+    const hResult = await getOrCreateHouseholdAction(false);
+    if (hResult.success) return hResult.household;
+    return null;
+  };
+
+  // SWR for profile and household
+  const { data: swrProfile, isLoading: profileLoading } = useSWR("user-profile", profileFetcher);
+  const { data: swrHousehold, isLoading: householdLoading } = useSWR("user-household", householdFetcher);
+
   useEffect(() => {
-    const fetchProfile = async () => {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      if (authUser) {
-        setUser(authUser);
-        const { data: profileData } = await supabase
-          .from("profiles")
-          .select("*")
-          .eq("id", authUser.id)
-          .single();
-
-        if (profileData) {
-          setProfile({
-            full_name: profileData.full_name || "",
-            preferences: {
-              intolerances: profileData.preferences?.intolerances || [],
-              diet: profileData.preferences?.diet || [],
-              disliked_ingredients: profileData.preferences?.disliked_ingredients || [],
-              goals: profileData.preferences?.goals || {
-                calories: "",
-                protein: "",
-                carbs: "",
-                fat: ""
-              }
-            },
-            pantry: profileData.pantry || []
-          });
-        }
-      
-        // Fetch household status
-        const hResult = await getOrCreateHouseholdAction(false);
-        if (hResult.success && hResult.household) {
-          setHousehold(hResult.household);
-          setIsOwner(hResult.household.owner_id === authUser.id);
-        }
-      }
-
+    if (swrProfile) {
+      setProfile({
+        full_name: swrProfile.full_name || "",
+        preferences: {
+          intolerances: swrProfile.preferences?.intolerances || [],
+          diet: swrProfile.preferences?.diet || [],
+          disliked_ingredients: swrProfile.preferences?.disliked_ingredients || [],
+          goals: swrProfile.preferences?.goals || {
+            calories: "",
+            protein: "",
+            carbs: "",
+            fat: ""
+          }
+        },
+        pantry: swrProfile.pantry || []
+      });
       setLoading(false);
-    };
+    }
+  }, [swrProfile]);
 
-    fetchProfile();
-  }, []);
+  useEffect(() => {
+    if (swrHousehold && user) {
+      setHousehold(swrHousehold);
+      setIsOwner(swrHousehold.owner_id === user.id);
+    }
+  }, [swrHousehold, user]);
 
   useEffect(() => {
     if (showSuccess) {

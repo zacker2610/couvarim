@@ -34,17 +34,12 @@ export default function BottomNav() {
       {navItems.map((item) => {
         const isActive = pathname === item.href;
         return (
-          <button
+          <Link
             key={item.href}
-            onClick={() => {
-              if (item.href === "/recipes") {
-                window.location.href = "/recipes";
-              } else {
-                router.push(item.href);
-              }
-            }}
+            href={item.href}
+            prefetch={true}
             className={cn(
-              "flex flex-col items-center gap-0.5 transition-all duration-200 flex-1",
+              "flex flex-col items-center gap-0.5 transition-all duration-200 flex-1 active:scale-90",
               isActive ? "text-sage-600" : "text-gray-400"
             )}
           >
@@ -55,7 +50,7 @@ export default function BottomNav() {
               <item.icon size={20} strokeWidth={isActive ? 2.5 : 2} />
             </div>
             <span className="text-[9px] font-bold uppercase tracking-tight">{item.label}</span>
-          </button>
+          </Link>
         );
       })}
     </nav>

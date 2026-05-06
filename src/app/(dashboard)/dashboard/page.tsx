@@ -1,3 +1,5 @@
+"use client";
+
 import React from "react";
 import { 
   Sparkles, 
@@ -7,16 +9,29 @@ import {
   Camera,
   Utensils,
   Flame,
-  ChefHat
+  ChefHat,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
-import { getLatestRecipesAction } from "@/app/actions/recipes";
+import useSWR from "swr";
+import { supabase } from "@/lib/supabase";
 
-export const dynamic = 'force-dynamic';
+export default function DashboardPage() {
+  // Fetcher for SWR
+  const latestRecipesFetcher = async () => {
+    const { data, error } = await supabase
+      .from("recipes")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(6);
+    if (error) throw error;
+    return data;
+  };
 
-export default async function DashboardPage() {
-  const result = await getLatestRecipesAction();
-  const recipes = result.success && result.recipes ? result.recipes : [];
+  const { data: recipes, isLoading } = useSWR("latest-recipes", latestRecipesFetcher, {
+    revalidateOnFocus: true,
+    dedupingInterval: 10000,
+  });
 
   return (
     <div className="space-y-10">
@@ -63,7 +78,12 @@ export default async function DashboardPage() {
           </Link>
         </div>
         
-        {recipes.length === 0 ? (
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center p-12 bg-white rounded-2xl border border-sage-100 shadow-sm animate-pulse">
+            <Loader2 className="w-8 h-8 text-sage-200 animate-spin mb-4" />
+            <p className="text-gray-400 font-medium">Načítavam recepty...</p>
+          </div>
+        ) : !recipes || recipes.length === 0 ? (
           <div className="bg-white rounded-2xl border border-sage-100 p-12 text-center shadow-sm">
             <div className="inline-flex items-center justify-center w-16 h-16 bg-sage-50 text-sage-200 rounded-full mb-4">
               <Clock size={32} />

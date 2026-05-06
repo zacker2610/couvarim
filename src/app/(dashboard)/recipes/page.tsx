@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect, Suspense, useRef } from "react";
+import useSWR, { mutate } from "swr";
 import { useSearchParams, useRouter } from "next/navigation";
 import { 
   Search, 
@@ -70,9 +71,37 @@ function RecipesContent() {
   const searchParams = useSearchParams();
   const recipeIdFromUrl = searchParams.get("id");
 
+  // Fetcher for SWR
+  const recipesFetcher = async () => {
+    const { data, error } = await supabase
+      .from("recipes")
+      .select("*")
+      .order("created_at", { ascending: false });
+    if (error) throw error;
+    return data;
+  };
+
+  // SWR for recipes caching
+  const { data: swrRecipes, error: swrError, isLoading: swrLoading } = useSWR(
+    "user-recipes",
+    recipesFetcher,
+    {
+      revalidateOnFocus: true,
+      dedupingInterval: 5000,
+    }
+  );
+
+  // Sync SWR data to local recipes state for compatibility with existing logic
+  useEffect(() => {
+    if (swrRecipes) {
+      setRecipes(swrRecipes);
+      setIsLoading(false);
+    }
+  }, [swrRecipes]);
+
   useEffect(() => {
     const fetchData = async () => {
-      setIsLoading(true);
+      // Only fetch profile data here, recipes are handled by SWR
       const { data: { user } } = await supabase.auth.getUser();
       
       if (user) {
@@ -90,18 +119,7 @@ function RecipesContent() {
         if (profileData?.pantry) {
           setUserPantry((profileData.pantry as string[]).map(p => p.toLowerCase()));
         }
-
-        // Fetch recipes
-        const { data: dbRecipes, error } = await supabase
-          .from("recipes")
-          .select("*")
-          .order("created_at", { ascending: false });
-
-        if (!error && dbRecipes) {
-          setRecipes(dbRecipes);
-        }
       }
-      setIsLoading(false);
     };
     fetchData();
   }, []);
@@ -186,14 +204,20 @@ function RecipesContent() {
     if (!deleteConfirmRecipe) return;
     
     const id = deleteConfirmRecipe.id;
-    const result = await deleteRecipeAction(id);
-    if (result.success) {
-      setRecipes(recipes.filter(r => r.id !== id));
-      setDeleteConfirmRecipe(null);
-    } else {
-      console.error(result.error);
-    }
+    
+    // Optimistic UI Update
+    const remainingRecipes = recipes.filter(r => r.id !== id);
+    setRecipes(remainingRecipes);
+    mutate("user-recipes", remainingRecipes, false); // Update SWR cache without revalidation
+    setDeleteConfirmRecipe(null);
     setActiveMenuId(null);
+
+    const result = await deleteRecipeAction(id);
+    if (!result.success) {
+      // Rollback if failed
+      alert("Nepodarilo sa vymazať recept.");
+      mutate("user-recipes"); // Revalidate from server
+    }
   };
 
   const calculatePercent = (value: number, goal: any) => {
