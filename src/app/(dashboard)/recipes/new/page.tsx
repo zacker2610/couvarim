@@ -693,24 +693,24 @@ export default function NewRecipePage() {
                 <div className="flex gap-3">
                   <button 
                     onClick={() => setIsImportModalOpen(false)}
-                    className="flex-1 py-4 bg-white text-gray-600 rounded-2xl font-bold border border-gray-200 active:scale-95 transition-all"
+                    className="flex-1 py-4 bg-white text-gray-600 rounded-2xl font-bold border border-gray-200 active:scale-95 transition-all flex items-center justify-center text-sm"
                   >
                     Zrušiť
                   </button>
                   <button 
                     onClick={handleSmartImport}
                     disabled={isParsing || !jsonInput.trim()}
-                    className="flex-1 py-4 bg-sage-500 text-white rounded-2xl font-bold shadow-xl flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-50"
+                    className="flex-1 py-4 bg-sage-500 text-white rounded-2xl font-bold shadow-xl flex items-center justify-center gap-2 active:scale-95 transition-all disabled:opacity-50 text-sm text-center leading-tight px-2"
                   >
                     {isParsing ? (
                       <>
-                        <Loader2 className="animate-spin" size={20} />
-                        AI spracováva...
+                        <Loader2 className="animate-spin flex-shrink-0" size={18} />
+                        <span>Spracúvam...</span>
                       </>
                     ) : (
                       <>
-                        <Check size={20} />
-                        Importovať recept
+                        <Check size={18} className="flex-shrink-0" />
+                        <span>Importovať recept</span>
                       </>
                     )}
                   </button>
