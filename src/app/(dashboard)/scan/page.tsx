@@ -183,18 +183,40 @@ export default function ScanPage() {
               </button>
             </div>
 
-            <div 
-              onClick={() => fileInputRef.current?.click()}
-              className="group cursor-pointer bg-sage-50 hover:bg-sage-100 transition-all p-8 rounded-3xl border-2 border-dashed border-sage-200 flex flex-col items-center gap-4"
-            >
-              <div className="w-16 h-16 bg-white text-sage-500 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
-                <Upload size={32} />
-              </div>
-              <span className="font-bold text-sage-600 uppercase text-[10px] tracking-widest">Kliknite pre nahranie alebo fotenie</span>
+            <div className="flex flex-col gap-4">
+              <button 
+                onClick={() => {
+                  if (fileInputRef.current) {
+                    fileInputRef.current.capture = "environment";
+                    fileInputRef.current.click();
+                  }
+                }}
+                className="group cursor-pointer bg-sage-500 hover:bg-sage-600 transition-all p-6 rounded-3xl shadow-xl shadow-sage-200 flex flex-col items-center gap-3 border-2 border-sage-400"
+              >
+                <div className="w-14 h-14 bg-white/20 text-white rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                  <Camera size={32} />
+                </div>
+                <span className="font-bold text-white uppercase text-[10px] tracking-widest">Odfotiť suroviny</span>
+              </button>
+
+              <button 
+                onClick={() => {
+                  if (fileInputRef.current) {
+                    fileInputRef.current.capture = "";
+                    fileInputRef.current.click();
+                  }
+                }}
+                className="group cursor-pointer bg-white hover:bg-gray-50 transition-all p-6 rounded-3xl border-2 border-dashed border-gray-200 flex flex-col items-center gap-3"
+              >
+                <div className="w-14 h-14 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
+                  <Upload size={32} />
+                </div>
+                <span className="font-bold text-gray-400 uppercase text-[10px] tracking-widest">Vybrať z galérie</span>
+              </button>
+
               <input 
                 type="file" 
                 accept="image/jpeg,image/png,image/heic,image/heif" 
-                capture="environment"
                 className="hidden" 
                 ref={fileInputRef} 
                 onChange={handleImageUpload}

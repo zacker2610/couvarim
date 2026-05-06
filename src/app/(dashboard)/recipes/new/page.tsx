@@ -18,7 +18,8 @@ import {
   Sparkles,
   Wand2,
   Loader2,
-  Users
+  Users,
+  Upload
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -314,16 +315,43 @@ export default function NewRecipePage() {
               </button>
             </>
           ) : (
-            <label className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-sage-50 transition-colors">
-              <Camera size={64} className="text-sage-200" />
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-gray-50/50">
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => {
+                    const input = document.getElementById('main-image-input') as HTMLInputElement;
+                    if (input) {
+                      input.capture = "environment";
+                      input.click();
+                    }
+                  }}
+                  className="w-20 h-20 bg-white text-sage-500 rounded-2xl flex flex-col items-center justify-center shadow-md active:scale-95 transition-all hover:bg-sage-50"
+                >
+                  <Camera size={28} />
+                  <span className="text-[8px] font-bold uppercase mt-1">Foťák</span>
+                </button>
+                <button 
+                  onClick={() => {
+                    const input = document.getElementById('main-image-input') as HTMLInputElement;
+                    if (input) {
+                      input.capture = "";
+                      input.click();
+                    }
+                  }}
+                  className="w-20 h-20 bg-white text-gray-400 rounded-2xl flex flex-col items-center justify-center shadow-md active:scale-95 transition-all hover:bg-gray-50"
+                >
+                  <Upload size={28} />
+                  <span className="text-[8px] font-bold uppercase mt-1">Galéria</span>
+                </button>
+              </div>
               <input 
+                id="main-image-input"
                 type="file" 
                 accept="image/jpeg,image/png,image/heic,image/heif" 
-                capture="environment"
                 className="hidden" 
                 onChange={handleImageUpload} 
               />
-            </label>
+            </div>
           )}
         </section>
 
@@ -598,27 +626,41 @@ export default function NewRecipePage() {
 
                 <div className="space-y-4">
                   <div className="flex flex-col gap-4">
-                    <button 
-                      onClick={() => scanInputRef.current?.click()}
-                      disabled={isScanning || isParsing}
-                      className="w-full py-8 bg-white border-2 border-dashed border-sage-200 rounded-3xl flex flex-col items-center justify-center gap-3 hover:bg-sage-50 transition-all active:scale-95 group disabled:opacity-50"
-                    >
-                      <div className="w-14 h-14 bg-sage-100 text-sage-600 rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
-                        {isScanning ? <Loader2 className="animate-spin" size={28} /> : <Camera size={28} />}
-                      </div>
-                      <div className="text-center">
-                        <span className="block text-sm font-black text-sage-700 uppercase tracking-widest">Odfotiť recept</span>
-                        <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest mt-1">Papier, kniha alebo poznámky</span>
-                      </div>
-                      <input 
-                        type="file" 
-                        accept="image/jpeg,image/png,image/heic,image/heif" 
-                        capture="environment"
-                        className="hidden" 
-                        ref={scanInputRef}
-                        onChange={handleScanRecipe}
-                      />
-                    </button>
+                    <div className="grid grid-cols-2 gap-3 w-full">
+                      <button 
+                        onClick={() => {
+                          if (scanInputRef.current) {
+                            scanInputRef.current.capture = "environment";
+                            scanInputRef.current.click();
+                          }
+                        }}
+                        disabled={isScanning || isParsing}
+                        className="py-6 bg-sage-500 text-white rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-sage-600 transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-sage-100"
+                      >
+                        <Camera size={24} />
+                        <span className="text-[10px] font-black uppercase tracking-wider">Odfotiť</span>
+                      </button>
+                      <button 
+                        onClick={() => {
+                          if (scanInputRef.current) {
+                            scanInputRef.current.capture = "";
+                            scanInputRef.current.click();
+                          }
+                        }}
+                        disabled={isScanning || isParsing}
+                        className="py-6 bg-white border border-gray-200 text-gray-400 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-gray-50 transition-all active:scale-95 disabled:opacity-50"
+                      >
+                        <Upload size={24} />
+                        <span className="text-[10px] font-black uppercase tracking-wider">Galéria</span>
+                      </button>
+                    </div>
+                    <input 
+                      type="file" 
+                      accept="image/jpeg,image/png,image/heic,image/heif" 
+                      className="hidden" 
+                      ref={scanInputRef}
+                      onChange={handleScanRecipe}
+                    />
                   </div>
 
                   <div className="relative py-2 flex items-center gap-4">
