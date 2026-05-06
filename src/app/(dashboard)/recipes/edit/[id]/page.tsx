@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { 
   ChevronLeft, 
   Save, 
@@ -31,6 +31,8 @@ export default function EditRecipePage() {
 
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [prepTime, setPrepTime] = useState("");
@@ -262,37 +264,37 @@ export default function EditRecipePage() {
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-gray-50/50">
               <div className="flex gap-4">
                 <button 
-                  onClick={() => {
-                    const input = document.getElementById('edit-image-input') as HTMLInputElement;
-                    if (input) {
-                      input.capture = "environment";
-                      input.click();
-                    }
-                  }}
+                  onClick={() => cameraInputRef.current?.click()}
                   className="w-20 h-20 bg-white text-sage-500 rounded-2xl flex flex-col items-center justify-center shadow-md active:scale-95 transition-all hover:bg-sage-50"
                 >
                   <Camera size={28} />
                   <span className="text-[8px] font-bold uppercase mt-1">Foťák</span>
                 </button>
                 <button 
-                  onClick={() => {
-                    const input = document.getElementById('edit-image-input') as HTMLInputElement;
-                    if (input) {
-                      input.capture = "";
-                      input.click();
-                    }
-                  }}
+                  onClick={() => galleryInputRef.current?.click()}
                   className="w-20 h-20 bg-white text-gray-400 rounded-2xl flex flex-col items-center justify-center shadow-md active:scale-95 transition-all hover:bg-gray-50"
                 >
                   <Upload size={28} />
                   <span className="text-[8px] font-bold uppercase mt-1">Galéria</span>
                 </button>
               </div>
+              
+              {/* Edit Camera Input */}
               <input 
-                id="edit-image-input"
+                type="file" 
+                accept="image/jpeg,image/png,image/heic,image/heif" 
+                capture="environment"
+                className="hidden" 
+                ref={cameraInputRef}
+                onChange={handleImageUpload} 
+              />
+              
+              {/* Edit Gallery Input */}
+              <input 
                 type="file" 
                 accept="image/jpeg,image/png,image/heic,image/heif" 
                 className="hidden" 
+                ref={galleryInputRef}
                 onChange={handleImageUpload} 
               />
             </div>

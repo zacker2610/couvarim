@@ -44,7 +44,8 @@ export default function ScanPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
   const [useHousehold, setUseHousehold] = useState(true);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -185,12 +186,7 @@ export default function ScanPage() {
 
             <div className="flex flex-col gap-4">
               <button 
-                onClick={() => {
-                  if (fileInputRef.current) {
-                    fileInputRef.current.capture = "environment";
-                    fileInputRef.current.click();
-                  }
-                }}
+                onClick={() => cameraInputRef.current?.click()}
                 className="group cursor-pointer bg-sage-500 hover:bg-sage-600 transition-all p-6 rounded-3xl shadow-xl shadow-sage-200 flex flex-col items-center gap-3 border-2 border-sage-400"
               >
                 <div className="w-14 h-14 bg-white/20 text-white rounded-2xl flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
@@ -200,12 +196,7 @@ export default function ScanPage() {
               </button>
 
               <button 
-                onClick={() => {
-                  if (fileInputRef.current) {
-                    fileInputRef.current.capture = "";
-                    fileInputRef.current.click();
-                  }
-                }}
+                onClick={() => galleryInputRef.current?.click()}
                 className="group cursor-pointer bg-white hover:bg-gray-50 transition-all p-6 rounded-3xl border-2 border-dashed border-gray-200 flex flex-col items-center gap-3"
               >
                 <div className="w-14 h-14 bg-gray-50 text-gray-400 rounded-2xl flex items-center justify-center shadow-sm group-hover:scale-110 transition-transform">
@@ -214,11 +205,22 @@ export default function ScanPage() {
                 <span className="font-bold text-gray-400 uppercase text-[10px] tracking-widest">Vybrať z galérie</span>
               </button>
 
+              {/* Camera Input */}
+              <input 
+                type="file" 
+                accept="image/jpeg,image/png,image/heic,image/heif" 
+                capture="environment"
+                className="hidden" 
+                ref={cameraInputRef} 
+                onChange={handleImageUpload}
+              />
+              
+              {/* Gallery Input */}
               <input 
                 type="file" 
                 accept="image/jpeg,image/png,image/heic,image/heif" 
                 className="hidden" 
-                ref={fileInputRef} 
+                ref={galleryInputRef} 
                 onChange={handleImageUpload}
               />
             </div>

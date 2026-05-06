@@ -55,7 +55,10 @@ export default function NewRecipePage() {
   const [importError, setImportError] = useState<string | null>(null);
   const [isParsing, setIsParsing] = useState(false);
   const [isScanning, setIsScanning] = useState(false);
-  const scanInputRef = useRef<HTMLInputElement>(null);
+  const scanCameraInputRef = useRef<HTMLInputElement>(null);
+  const scanGalleryInputRef = useRef<HTMLInputElement>(null);
+  const mainCameraInputRef = useRef<HTMLInputElement>(null);
+  const mainGalleryInputRef = useRef<HTMLInputElement>(null);
 
   const applyImportedData = (data: any) => {
     if (data.title) setName(data.title);
@@ -318,37 +321,37 @@ export default function NewRecipePage() {
             <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-gray-50/50">
               <div className="flex gap-4">
                 <button 
-                  onClick={() => {
-                    const input = document.getElementById('main-image-input') as HTMLInputElement;
-                    if (input) {
-                      input.capture = "environment";
-                      input.click();
-                    }
-                  }}
+                  onClick={() => mainCameraInputRef.current?.click()}
                   className="w-20 h-20 bg-white text-sage-500 rounded-2xl flex flex-col items-center justify-center shadow-md active:scale-95 transition-all hover:bg-sage-50"
                 >
                   <Camera size={28} />
                   <span className="text-[8px] font-bold uppercase mt-1">Foťák</span>
                 </button>
                 <button 
-                  onClick={() => {
-                    const input = document.getElementById('main-image-input') as HTMLInputElement;
-                    if (input) {
-                      input.capture = "";
-                      input.click();
-                    }
-                  }}
+                  onClick={() => mainGalleryInputRef.current?.click()}
                   className="w-20 h-20 bg-white text-gray-400 rounded-2xl flex flex-col items-center justify-center shadow-md active:scale-95 transition-all hover:bg-gray-50"
                 >
                   <Upload size={28} />
                   <span className="text-[8px] font-bold uppercase mt-1">Galéria</span>
                 </button>
               </div>
+              
+              {/* Main Camera Input */}
               <input 
-                id="main-image-input"
+                type="file" 
+                accept="image/jpeg,image/png,image/heic,image/heif" 
+                capture="environment"
+                className="hidden" 
+                ref={mainCameraInputRef}
+                onChange={handleImageUpload} 
+              />
+              
+              {/* Main Gallery Input */}
+              <input 
                 type="file" 
                 accept="image/jpeg,image/png,image/heic,image/heif" 
                 className="hidden" 
+                ref={mainGalleryInputRef}
                 onChange={handleImageUpload} 
               />
             </div>
@@ -628,12 +631,7 @@ export default function NewRecipePage() {
                   <div className="flex flex-col gap-4">
                     <div className="grid grid-cols-2 gap-3 w-full">
                       <button 
-                        onClick={() => {
-                          if (scanInputRef.current) {
-                            scanInputRef.current.capture = "environment";
-                            scanInputRef.current.click();
-                          }
-                        }}
+                        onClick={() => scanCameraInputRef.current?.click()}
                         disabled={isScanning || isParsing}
                         className="py-6 bg-sage-500 text-white rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-sage-600 transition-all active:scale-95 disabled:opacity-50 shadow-lg shadow-sage-100"
                       >
@@ -641,12 +639,7 @@ export default function NewRecipePage() {
                         <span className="text-[10px] font-black uppercase tracking-wider">Odfotiť</span>
                       </button>
                       <button 
-                        onClick={() => {
-                          if (scanInputRef.current) {
-                            scanInputRef.current.capture = "";
-                            scanInputRef.current.click();
-                          }
-                        }}
+                        onClick={() => scanGalleryInputRef.current?.click()}
                         disabled={isScanning || isParsing}
                         className="py-6 bg-white border border-gray-200 text-gray-400 rounded-2xl flex flex-col items-center justify-center gap-2 hover:bg-gray-50 transition-all active:scale-95 disabled:opacity-50"
                       >
@@ -654,11 +647,23 @@ export default function NewRecipePage() {
                         <span className="text-[10px] font-black uppercase tracking-wider">Galéria</span>
                       </button>
                     </div>
+                    
+                    {/* Scan Camera Input */}
+                    <input 
+                      type="file" 
+                      accept="image/jpeg,image/png,image/heic,image/heif" 
+                      capture="environment"
+                      className="hidden" 
+                      ref={scanCameraInputRef}
+                      onChange={handleScanRecipe}
+                    />
+                    
+                    {/* Scan Gallery Input */}
                     <input 
                       type="file" 
                       accept="image/jpeg,image/png,image/heic,image/heif" 
                       className="hidden" 
-                      ref={scanInputRef}
+                      ref={scanGalleryInputRef}
                       onChange={handleScanRecipe}
                     />
                   </div>
