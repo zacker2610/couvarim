@@ -15,7 +15,8 @@ import {
   Loader2,
   Flame,
   Camera,
-  Users
+  Users,
+  Upload
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useParams } from "next/navigation";
@@ -258,10 +259,43 @@ export default function EditRecipePage() {
               </button>
             </>
           ) : (
-            <label className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-sage-50 transition-colors">
-              <Camera size={64} className="text-sage-200" />
-              <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-            </label>
+            <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 bg-gray-50/50">
+              <div className="flex gap-4">
+                <button 
+                  onClick={() => {
+                    const input = document.getElementById('edit-image-input') as HTMLInputElement;
+                    if (input) {
+                      input.capture = "environment";
+                      input.click();
+                    }
+                  }}
+                  className="w-20 h-20 bg-white text-sage-500 rounded-2xl flex flex-col items-center justify-center shadow-md active:scale-95 transition-all hover:bg-sage-50"
+                >
+                  <Camera size={28} />
+                  <span className="text-[8px] font-bold uppercase mt-1">Foťák</span>
+                </button>
+                <button 
+                  onClick={() => {
+                    const input = document.getElementById('edit-image-input') as HTMLInputElement;
+                    if (input) {
+                      input.capture = "";
+                      input.click();
+                    }
+                  }}
+                  className="w-20 h-20 bg-white text-gray-400 rounded-2xl flex flex-col items-center justify-center shadow-md active:scale-95 transition-all hover:bg-gray-50"
+                >
+                  <Upload size={28} />
+                  <span className="text-[8px] font-bold uppercase mt-1">Galéria</span>
+                </button>
+              </div>
+              <input 
+                id="edit-image-input"
+                type="file" 
+                accept="image/jpeg,image/png,image/heic,image/heif" 
+                className="hidden" 
+                onChange={handleImageUpload} 
+              />
+            </div>
           )}
         </section>
         <section className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100/50 space-y-5">
