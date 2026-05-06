@@ -28,7 +28,6 @@ import { Trash2 } from "lucide-react";
 import { ProfileSkeleton } from "@/components/Skeletons";
 
 export default function ProfilePage() {
-  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [user, setUser] = useState<any>(null);
@@ -98,7 +97,6 @@ export default function ProfilePage() {
         },
         pantry: swrProfile.pantry || []
       });
-      setLoading(false);
     }
   }, [swrProfile]);
 
@@ -247,7 +245,8 @@ export default function ProfilePage() {
     setLeaveConfirmHousehold(false);
   };
 
-  if (loading) {
+  // Show skeleton ONLY if we have no data at all and we are loading
+  if (profileLoading && !swrProfile) {
     return <ProfileSkeleton />;
   }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
+import useSWR, { mutate } from "swr";
 import { 
   Users, 
   UserPlus,
@@ -40,7 +41,6 @@ export default function HouseholdPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [household, setHousehold] = useState<any>(null);
   const [members, setMembers] = useState<any[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sharedRecipes, setSharedRecipes] = useState<any[]>([]);
   const [deleteConfirmMember, setDeleteConfirmMember] = useState<any | null>(null);
@@ -56,36 +56,46 @@ export default function HouseholdPage() {
   const [dislikedIngredients, setDislikedIngredients] = useState<string[]>([]);
   const [dislikeInput, setDislikeInput] = useState("");
 
-  useEffect(() => {
-    fetchData();
-  }, []);
-
-  const fetchData = async () => {
-    setIsLoading(true);
-    
-    // Get current user for comparison
+  // Fetchers for SWR
+  const householdFetcher = async () => {
     const { data: { user } } = await supabase.auth.getUser();
     setCurrentUser(user);
-
-    // Don't create by default, just check
-    const hResult = await getOrCreateHouseholdAction(false);
-    if (hResult.success && hResult.household) {
-      setHousehold(hResult.household);
-      const mResult = await getHouseholdMembersAction(hResult.household.id);
-      if (mResult.success && mResult.members) {
-        setMembers(mResult.members);
-      }
-      
-      const rResult = await getHouseholdSharedRecipesAction(hResult.household.id);
-      if (rResult.success && rResult.recipes) {
-        setSharedRecipes(rResult.recipes);
-      }
-    } else {
-      setHousehold(null);
-      setMembers([]);
-    }
-    setIsLoading(false);
+    const result = await getOrCreateHouseholdAction(false);
+    return result.success ? result.household : null;
   };
+
+  const membersFetcher = async (householdId: string) => {
+    const result = await getHouseholdMembersAction(householdId);
+    return result.success ? result.members : [];
+  };
+
+  const recipesFetcher = async (householdId: string) => {
+    const result = await getHouseholdSharedRecipesAction(householdId);
+    return result.success ? result.recipes : [];
+  };
+
+  // SWR Hooks
+  const { data: swrHousehold, isLoading: hLoading } = useSWR("household-data", householdFetcher);
+  const { data: swrMembers, isLoading: mLoading } = useSWR(
+    swrHousehold ? `members-${swrHousehold.id}` : null,
+    () => membersFetcher(swrHousehold!.id)
+  );
+  const { data: swrRecipes, isLoading: rLoading } = useSWR(
+    swrHousehold ? `shared-recipes-${swrHousehold.id}` : null,
+    () => recipesFetcher(swrHousehold!.id)
+  );
+
+  useEffect(() => {
+    if (swrHousehold) setHousehold(swrHousehold);
+  }, [swrHousehold]);
+
+  useEffect(() => {
+    if (swrMembers) setMembers(swrMembers);
+  }, [swrMembers]);
+
+  useEffect(() => {
+    if (swrRecipes) setSharedRecipes(swrRecipes);
+  }, [swrRecipes]);
 
   const isOwner = household?.owner_id === currentUser?.id;
 
@@ -139,7 +149,9 @@ export default function HouseholdPage() {
       });
 
       if (result.success) {
-        await fetchData();
+        mutate("household-data");
+        mutate(`members-${household?.id}`);
+        mutate(`shared-recipes-${household?.id}`);
         handleCloseModal();
       } else {
         console.error(result.error);
@@ -169,11 +181,15 @@ export default function HouseholdPage() {
               });
             } catch (err) {}
           }
-          await fetchData();
+          mutate("household-data");
+        mutate(`members-${household?.id}`);
+        mutate(`shared-recipes-${household?.id}`);
           setIsSubmitting(false);
           return;
         }
-        await fetchData();
+        mutate("household-data");
+        mutate(`members-${household?.id}`);
+        mutate(`shared-recipes-${household?.id}`);
         handleCloseModal();
       } else {
         console.error(result?.error || "Neznáma chyba");
@@ -197,13 +213,20 @@ export default function HouseholdPage() {
   };
 
   const handleRemoveMember = async () => {
-    if (!deleteConfirmMember || !isOwner) return;
+    if (!deleteConfirmMember || !isOwner || !household) return;
     
     const memberId = deleteConfirmMember.id;
+    
+    // Optimistic UI Update
+    const updatedMembers = members.filter(m => m.id !== memberId);
+    setMembers(updatedMembers);
+    mutate(`members-${household.id}`, updatedMembers, false);
+    setDeleteConfirmMember(null);
+
     const result = await removeHouseholdMemberAction(memberId);
-    if (result.success) {
-      setMembers(members.filter(m => m.id !== memberId));
-      setDeleteConfirmMember(null);
+    if (!result.success) {
+      alert("Nepodarilo sa odstrániť člena.");
+      mutate(`members-${household.id}`); // Rollback
     }
   };
 
@@ -230,7 +253,8 @@ export default function HouseholdPage() {
     })
   ));
 
-  if (isLoading) {
+  // Show skeleton ONLY if we have no household data at all and we are loading
+  if (hLoading && !swrHousehold) {
     return <HouseholdSkeleton />;
   }
 
