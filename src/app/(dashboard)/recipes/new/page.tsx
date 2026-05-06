@@ -708,10 +708,7 @@ export default function NewRecipePage() {
                         <span>Spracúvam...</span>
                       </>
                     ) : (
-                      <>
-                        <Check size={18} className="flex-shrink-0" />
-                        <span>Importovať recept</span>
-                      </>
+                      "Importovať recept"
                     )}
                   </button>
                 </div>
