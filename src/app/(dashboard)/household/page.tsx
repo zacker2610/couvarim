@@ -57,9 +57,12 @@ export default function HouseholdPage() {
   const [dislikeInput, setDislikeInput] = useState("");
 
   // Fetchers for SWR
-  const householdFetcher = async () => {
+  const userFetcher = async () => {
     const { data: { user } } = await supabase.auth.getUser();
-    setCurrentUser(user);
+    return user;
+  };
+
+  const householdFetcher = async () => {
     const result = await getOrCreateHouseholdAction(false);
     return result.success ? result.household : null;
   };
@@ -75,6 +78,7 @@ export default function HouseholdPage() {
   };
 
   // SWR Hooks
+  const { data: swrUser } = useSWR("current-user", userFetcher);
   const { data: swrHousehold, isLoading: hLoading } = useSWR("household-data", householdFetcher);
   const { data: swrMembers, isLoading: mLoading } = useSWR(
     swrHousehold ? `members-${swrHousehold.id}` : null,
@@ -84,6 +88,11 @@ export default function HouseholdPage() {
     swrHousehold ? `shared-recipes-${swrHousehold.id}` : null,
     () => recipesFetcher(swrHousehold!.id)
   );
+
+  // Sync SWR data to local state
+  useEffect(() => {
+    if (swrUser) setCurrentUser(swrUser);
+  }, [swrUser]);
 
   useEffect(() => {
     if (swrHousehold) setHousehold(swrHousehold);
