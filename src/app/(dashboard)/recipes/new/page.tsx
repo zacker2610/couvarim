@@ -137,8 +137,8 @@ export default function NewRecipePage() {
       img.src = base64Str;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        const MAX_WIDTH = 1200;
-        const MAX_HEIGHT = 1200;
+        const MAX_WIDTH = 2000;
+        const MAX_HEIGHT = 2000;
         let width = img.width;
         let height = img.height;
 
@@ -171,7 +171,7 @@ export default function NewRecipePage() {
       const reader = new FileReader();
       reader.onloadend = async () => {
         const base64 = reader.result as string;
-        if (base64.length > 500000) { // If larger than ~500KB, compress
+        if (base64.length > 1000000) { // If larger than ~1MB, compress
           const compressed = await compressImage(base64);
           setImage(compressed);
         } else {
@@ -219,8 +219,8 @@ export default function NewRecipePage() {
       reader.onloadend = async () => {
         let base64 = reader.result as string;
         
-        // Compress if larger than 500KB
-        if (base64.length > 500000) {
+        // Compress if larger than 1MB
+        if (base64.length > 1000000) {
           base64 = await compressImage(base64);
         }
 

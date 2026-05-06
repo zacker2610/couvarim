@@ -536,13 +536,21 @@ export async function analyzeIngredientsImageAction(base64Image: string, useHous
     const response = await result.response;
     const text = response.text();
     
-    const cleanJson = text.replace(/```json|```/g, "").trim();
-    const data = JSON.parse(cleanJson);
+    try {
+      const cleanJson = text.replace(/```json|```/g, "").trim();
+      const data = JSON.parse(cleanJson);
 
-    // Add generated image URL
-    data.image_url = getAiGeneratedImage(data.imagePrompt || data.title);
+      // Add generated image URL
+      data.image_url = getAiGeneratedImage(data.imagePrompt || data.title);
 
-    return { success: true, data };
+      return { success: true, data };
+    } catch (parseError) {
+      console.error("JSON Parse Error (Analyze Ingredients):", text);
+      return { 
+        success: false, 
+        error: text.length < 200 ? text : "AI sa nepodarilo analyzovať obrázok. Skúste to prosím znova." 
+      };
+    }
   } catch (error: any) {
     console.error("Analyze Ingredients Image Error:", error);
     return { success: false, error: "AI sa nepodarilo rozpoznať suroviny. Skúste to prosím znova." };
@@ -598,11 +606,19 @@ export async function scanRecipeImageAction(base64Image: string) {
     const response = await result.response;
     const responseText = response.text();
     
-    // Clean JSON response
-    const cleanedJson = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
-    const recipeData = JSON.parse(cleanedJson);
+    try {
+      // Clean JSON response
+      const cleanedJson = responseText.replace(/```json/g, "").replace(/```/g, "").trim();
+      const recipeData = JSON.parse(cleanedJson);
 
-    return { success: true, data: recipeData };
+      return { success: true, data: recipeData };
+    } catch (parseError) {
+      console.error("JSON Parse Error (Scan Recipe):", responseText);
+      return { 
+        success: false, 
+        error: responseText.length < 200 ? responseText : "AI sa nepodarilo prečítať recept z fotky. Skúste fotku urobiť znova s lepším svetlom." 
+      };
+    }
   } catch (error: any) {
     console.error("Scan Image Error:", error);
     return { success: false, error: "AI sa nepodarilo prečítať recept z fotky. Skúste fotku urobiť znova s lepším svetlom." };
