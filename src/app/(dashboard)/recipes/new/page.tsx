@@ -213,8 +213,15 @@ export default function NewRecipePage() {
     try {
       const reader = new FileReader();
       reader.onloadend = async () => {
-        const base64 = (reader.result as string).split(",")[1];
-        const result = await scanRecipeImageAction(base64);
+        let base64 = reader.result as string;
+        
+        // Compress if larger than 500KB
+        if (base64.length > 500000) {
+          base64 = await compressImage(base64);
+        }
+
+        const base64Data = base64.split(",")[1];
+        const result = await scanRecipeImageAction(base64Data);
         
         if (result.success) {
           applyImportedData(result.data);
@@ -226,6 +233,7 @@ export default function NewRecipePage() {
       };
       reader.readAsDataURL(file);
     } catch (err: any) {
+      console.error("Scan error:", err);
       setImportError("Chyba pri spracovaní fotky.");
       setIsScanning(false);
     }
@@ -308,7 +316,13 @@ export default function NewRecipePage() {
           ) : (
             <label className="absolute inset-0 flex items-center justify-center cursor-pointer hover:bg-sage-50 transition-colors">
               <Camera size={64} className="text-sage-200" />
-              <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+              <input 
+                type="file" 
+                accept="image/jpeg,image/png,image/heic,image/heif" 
+                capture="environment"
+                className="hidden" 
+                onChange={handleImageUpload} 
+              />
             </label>
           )}
         </section>
@@ -598,7 +612,8 @@ export default function NewRecipePage() {
                       </div>
                       <input 
                         type="file" 
-                        accept="image/*" 
+                        accept="image/jpeg,image/png,image/heic,image/heif" 
+                        capture="environment"
                         className="hidden" 
                         ref={scanInputRef}
                         onChange={handleScanRecipe}
