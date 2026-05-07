@@ -219,7 +219,7 @@ function ScanContent() {
 
             <div className="flex items-center justify-center gap-2 px-6 py-2 bg-sage-50 text-sage-600 rounded-2xl text-[10px] font-bold uppercase tracking-widest border border-sage-100 mx-auto w-fit">
               {useHousehold ? <Users size={14} /> : <User size={14} />}
-              Režim: {useHousehold ? "Rodina" : "Individuálne"}
+              Režim: {useHousehold ? "Domácnosť" : "Len pre mňa"}
             </div>
 
             <div className="flex flex-col gap-4">
