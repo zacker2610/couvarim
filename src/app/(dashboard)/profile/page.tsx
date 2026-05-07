@@ -252,7 +252,7 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center justify-between py-4 px-4 -mx-4 mb-2">
+      <header className="sticky top-0 z-40 bg-[#F8F5F2] flex items-center justify-between py-4 px-4 -mx-4 mb-2 border-b border-gray-100/50 shadow-sm">
         <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Nastavenia</h2>
         <button 
           onClick={handleSave}

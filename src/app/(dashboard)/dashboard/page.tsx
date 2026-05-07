@@ -35,13 +35,11 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-10">
-      <header>
-        <h2 className="text-3xl font-bold text-gray-800 tracking-tight">
+      <header className="sticky top-0 z-40 bg-[#F8F5F2] py-4 px-4 -mx-4 mb-4 border-b border-gray-100/50 shadow-sm">
+        <h2 className="text-3xl font-bold text-gray-800 tracking-tight leading-tight">
           Vitaj v kuchyni! 👋
         </h2>
-        <p className="text-gray-500 mt-2 text-lg">
-          Na čo máš dnes chuť? Vyber si suroviny a Gemini ti vyčaruje recept.
-        </p>
+        <p className="text-gray-400 text-sm font-medium mt-1">Čo dnes dobré ukuchtíme?</p>
       </header>
 
       {/* Quick Actions */}

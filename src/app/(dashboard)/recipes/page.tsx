@@ -381,7 +381,7 @@ function RecipesContent() {
             exit={{ opacity: 0 }}
             className="space-y-8"
           >
-            <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md py-4 mb-2 flex items-center justify-between px-4 -mx-4">
+            <header className="sticky top-0 z-40 bg-[#F8F5F2] py-4 mb-2 flex items-center justify-between px-4 -mx-4 border-b border-gray-100/50 shadow-sm">
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Moje recepty</h2>
                 <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-1">Zbierka vašich jedál</p>
@@ -579,7 +579,7 @@ function RecipesContent() {
             animate={{ opacity: 1 }} 
             className="bg-transparent min-h-full max-w-4xl mx-auto"
           >
-            <header className="sticky md:static top-0 z-50 bg-[#F8F5F2]/80 md:bg-transparent backdrop-blur-md md:backdrop-blur-none flex items-center justify-between py-4 px-4 -mx-4 md:px-0 md:mx-0">
+            <header className="sticky md:static top-0 z-50 bg-[#F8F5F2] md:bg-transparent flex items-center justify-between py-4 px-4 -mx-4 md:px-0 md:mx-0 border-b border-gray-100/50 md:border-none shadow-sm md:shadow-none">
               <button 
                 onClick={() => {
                   setSelectedRecipe(null);

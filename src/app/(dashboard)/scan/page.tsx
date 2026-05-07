@@ -13,12 +13,14 @@ import {
   Save,
   CheckCircle2,
   Clock,
-  ChevronLeft
+  ChevronLeft,
+  Users,
+  User
 } from "lucide-react";
 import { saveRecipeAction, analyzeIngredientsImageAction } from "@/app/actions/recipes";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface Recipe {
   title: string;
@@ -38,12 +40,15 @@ interface Recipe {
 
 export default function ScanPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const householdParam = searchParams.get("household");
+  
   const [image, setImage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [recipe, setRecipe] = useState<Recipe | null>(null);
   const [isSaving, setIsSaving] = useState(false);
   const [saveSuccess, setSaveSuccess] = useState(false);
-  const [useHousehold, setUseHousehold] = useState(true);
+  const [useHousehold, setUseHousehold] = useState(householdParam === "true" || householdParam === null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
 
@@ -144,7 +149,7 @@ export default function ScanPage() {
 
   return (
     <div className="space-y-8">
-      <header className="sticky top-0 z-40 bg-[#F8F5F2]/80 backdrop-blur-md flex items-center gap-4 py-4 mb-6">
+      <header className="sticky top-0 z-40 bg-[#F8F5F2] flex items-center gap-4 py-4 px-4 -mx-4 mb-6 border-b border-gray-100/50 shadow-sm">
         <Link 
           href="/generate"
           className="w-12 h-12 bg-white rounded-2xl shadow-md border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all flex items-center justify-center"
@@ -202,27 +207,9 @@ export default function ScanPage() {
               </p>
             </div>
 
-            <div className="flex bg-white p-1.5 rounded-2xl border border-gray-100 shadow-sm max-w-xs mx-auto">
-              <button 
-                onClick={() => setUseHousehold(false)} 
-                className={`flex-1 py-2.5 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
-                  !useHousehold 
-                    ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
-                    : 'text-gray-400 hover:text-gray-600'
-                }`}
-              >
-                Individuálne
-              </button>
-              <button 
-                onClick={() => setUseHousehold(true)} 
-                className={`flex-1 py-2.5 px-4 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all flex items-center justify-center gap-2 ${
-                  useHousehold 
-                    ? 'bg-sage-500 text-white shadow-lg shadow-sage-200' 
-                    : 'text-gray-400 hover:text-gray-600'
-                }`}
-              >
-                Rodina
-              </button>
+            <div className="flex items-center justify-center gap-2 px-6 py-2 bg-sage-50 text-sage-600 rounded-2xl text-[10px] font-bold uppercase tracking-widest border border-sage-100 mx-auto w-fit">
+              {useHousehold ? <Users size={14} /> : <User size={14} />}
+              Režim: {useHousehold ? "Rodina" : "Individuálne"}
             </div>
 
             <div className="flex flex-col gap-4">
