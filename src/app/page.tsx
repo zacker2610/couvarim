@@ -1,10 +1,16 @@
 import Link from "next/link";
 import { ChefHat, ArrowRight, Sparkles } from "lucide-react";
 import { getServerSupabase } from "@/lib/supabase-server";
+import { redirect } from "next/navigation";
 
 export default async function LandingPage() {
   const supabase = await getServerSupabase();
   const { data: { user } } = await supabase.auth.getUser();
+
+  // If user is already logged in, skip the landing page and go straight to dashboard
+  if (user) {
+    redirect("/dashboard");
+  }
 
   return (
     <div className="min-h-screen bg-[#F8F5F2] flex flex-col overflow-hidden">
