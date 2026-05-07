@@ -49,6 +49,15 @@ export default function ProfilePage() {
   
   const [household, setHousehold] = useState<any>(null);
   const [leaveConfirmHousehold, setLeaveConfirmHousehold] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   const [isOwner, setIsOwner] = useState(false);
   
   const [tagInput, setTagInput] = useState("");
@@ -252,7 +261,9 @@ export default function ProfilePage() {
 
   return (
     <div className="space-y-6 max-w-4xl mx-auto">
-      <header className="sticky top-0 z-40 bg-[#F8F5F2] flex items-center justify-between py-4 px-4 -mx-4 mb-2 border-b border-gray-100/50 shadow-sm">
+      <header className={`sticky top-0 z-40 bg-[#F8F5F2] flex items-center justify-between py-4 px-4 -mx-4 mb-2 transition-all duration-300 ${
+        scrolled ? 'shadow-md border-b border-gray-100' : ''
+      }`}>
         <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Nastavenia</h2>
         <button 
           onClick={handleSave}

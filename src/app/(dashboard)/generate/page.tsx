@@ -60,7 +60,16 @@ export default function GeneratePage() {
   const [isRefining, setIsRefining] = useState(false);
   const [refineError, setRefineError] = useState<string | null>(null);
   const [useHousehold, setUseHousehold] = useState<boolean>(true);
+  const [scrolled, setScrolled] = useState(false);
   const [userGoals, setUserGoals] = useState<any>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   useEffect(() => {
     const fetchGoals = async () => {
@@ -166,7 +175,9 @@ export default function GeneratePage() {
       <AnimatePresence mode="wait">
         {step === "hub" && (
           <motion.div key="hub" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6 max-w-4xl mx-auto">
-            <header className="sticky top-0 z-40 bg-[#F8F5F2] py-4 px-4 -mx-4 mb-2 flex flex-col gap-1 border-b border-gray-100/50 shadow-sm">
+            <header className={`sticky top-0 z-40 bg-[#F8F5F2] py-4 px-4 -mx-4 mb-2 flex flex-col gap-1 transition-all duration-300 ${
+              scrolled ? 'shadow-md border-b border-gray-100' : ''
+            }`}>
               <h1 className="text-3xl font-bold text-gray-800 tracking-tight leading-tight">Vymyslime niečo!</h1>
               <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-1">Vyberte si spôsob, ako vytvoriť recept</p>
             </header>

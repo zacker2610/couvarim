@@ -1,7 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let response = NextResponse.next()
 
   const supabase = createServerClient(
@@ -34,7 +34,9 @@ export async function proxy(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/register') ||
     request.nextUrl.pathname.startsWith('/auth/callback') ||
-    request.nextUrl.pathname.startsWith('/invite')
+    request.nextUrl.pathname.startsWith('/invite') ||
+    request.nextUrl.pathname === '/manifest.json' ||
+    request.nextUrl.pathname === '/sw.js'
 
   // If not authenticated and trying to access a protected route
   if (!user && !isPublicRoute) {

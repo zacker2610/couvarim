@@ -61,6 +61,15 @@ function ScanContent() {
   const [useHousehold, setUseHousehold] = useState(householdParam === "true" || householdParam === null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
   const galleryInputRef = useRef<HTMLInputElement>(null);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const compressImage = (base64Str: string): Promise<string> => {
     return new Promise((resolve) => {
@@ -159,7 +168,9 @@ function ScanContent() {
 
   return (
     <div className="space-y-8">
-      <header className="sticky top-0 z-40 bg-[#F8F5F2] flex items-center gap-4 py-4 px-4 -mx-4 mb-6 border-b border-gray-100/50 shadow-sm">
+      <header className={`sticky top-0 z-40 bg-[#F8F5F2] flex items-center gap-4 py-4 px-4 -mx-4 mb-6 transition-all duration-300 ${
+        scrolled ? 'shadow-md border-b border-gray-100' : ''
+      }`}>
         <Link 
           href="/generate"
           className="w-12 h-12 bg-white rounded-2xl shadow-md border border-gray-100 text-gray-400 hover:text-gray-600 active:scale-90 transition-all flex items-center justify-center"

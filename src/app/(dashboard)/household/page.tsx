@@ -41,6 +41,16 @@ export default function HouseholdPage() {
   const [currentUser, setCurrentUser] = useState<any>(null);
   const [household, setHousehold] = useState<any>(null);
   const [members, setMembers] = useState<any[]>([]);
+  const [isNormalizing, setIsNormalizing] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrolled(window.scrollY > 10);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sharedRecipes, setSharedRecipes] = useState<any[]>([]);
   const [deleteConfirmMember, setDeleteConfirmMember] = useState<any | null>(null);
