@@ -179,3 +179,27 @@ export function ProfileSkeleton() {
     </div>
   );
 }
+
+export function ScanSkeleton() {
+  return (
+    <div className="space-y-8 animate-in fade-in duration-500">
+      <header className="sticky top-0 z-40 bg-[#F8F5F2] flex items-center gap-4 py-4 px-4 -mx-4 mb-6 border-b border-gray-100/50 shadow-sm">
+        <Skeleton className="h-12 w-12 rounded-2xl" />
+        <Skeleton className="h-8 w-32 rounded-xl" />
+      </header>
+
+      <section className="bg-white p-10 rounded-[40px] border border-gray-100 shadow-sm space-y-8 text-center">
+        <Skeleton className="h-24 w-24 rounded-[30px] mx-auto" />
+        <div className="space-y-3">
+          <Skeleton className="h-8 w-64 mx-auto rounded-xl" />
+          <Skeleton className="h-4 w-48 mx-auto rounded-lg" />
+        </div>
+        <Skeleton className="h-10 w-40 mx-auto rounded-2xl" />
+        <div className="flex flex-col gap-4 max-w-sm mx-auto">
+          <Skeleton className="h-32 w-full rounded-3xl" />
+          <Skeleton className="h-32 w-full rounded-3xl" />
+        </div>
+      </section>
+    </div>
+  );
+}
