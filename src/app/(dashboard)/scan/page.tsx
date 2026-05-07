@@ -21,6 +21,8 @@ import { saveRecipeAction, analyzeIngredientsImageAction } from "@/app/actions/r
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { Suspense } from "react";
+import { ScanSkeleton } from "@/components/Skeletons";
 
 interface Recipe {
   title: string;
@@ -39,6 +41,14 @@ interface Recipe {
 }
 
 export default function ScanPage() {
+  return (
+    <Suspense fallback={<ScanSkeleton />}>
+      <ScanContent />
+    </Suspense>
+  );
+}
+
+function ScanContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const householdParam = searchParams.get("household");
