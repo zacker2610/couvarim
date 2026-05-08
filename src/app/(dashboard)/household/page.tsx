@@ -272,8 +272,8 @@ export default function HouseholdPage() {
     })
   ));
 
-  // Show skeleton ONLY if we have no household data at all and we are loading
-  if (hLoading && !swrHousehold) {
+  // Show skeleton if we are loading household OR if we have household but are loading members
+  if (hLoading || (swrHousehold && mLoading)) {
     return <HouseholdSkeleton />;
   }
 
