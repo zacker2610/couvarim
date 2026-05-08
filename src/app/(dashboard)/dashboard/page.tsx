@@ -45,8 +45,8 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-10">
-      <header className={`sticky top-0 z-40 bg-[#F8F5F2] py-4 px-4 -mx-4 mb-4 transition-all duration-300 ${
-        scrolled ? 'shadow-md border-b border-gray-100' : ''
+      <header className={`sticky md:static top-0 z-40 bg-[#F8F5F2] py-4 px-4 -mx-4 mb-4 transition-all duration-300 ${
+        scrolled ? 'shadow-md border-b border-gray-100 md:shadow-none md:border-none' : ''
       }`}>
         <h2 className="text-3xl font-bold text-gray-800 tracking-tight leading-tight">
           Vitaj v kuchyni! 👋

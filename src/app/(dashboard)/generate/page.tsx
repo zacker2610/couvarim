@@ -175,8 +175,8 @@ export default function GeneratePage() {
       <AnimatePresence mode="wait">
         {step === "hub" && (
           <motion.div key="hub" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6 max-w-4xl mx-auto">
-            <header className={`sticky top-0 z-40 bg-[#F8F5F2] py-4 px-4 -mx-4 mb-2 flex flex-col gap-1 transition-all duration-300 ${
-              scrolled ? 'shadow-md border-b border-gray-100' : ''
+            <header className={`sticky md:static top-0 z-40 bg-[#F8F5F2] py-4 px-4 -mx-4 mb-2 flex flex-col gap-1 transition-all duration-300 ${
+              scrolled ? 'shadow-md border-b border-gray-100 md:shadow-none md:border-none' : ''
             }`}>
               <h1 className="text-3xl font-bold text-gray-800 tracking-tight leading-tight">Vymyslime niečo!</h1>
               <p className="text-gray-400 text-[10px] font-bold uppercase tracking-widest mt-1">Vyberte si spôsob, ako vytvoriť recept</p>

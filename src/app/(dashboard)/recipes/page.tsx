@@ -390,8 +390,8 @@ function RecipesContent() {
             exit={{ opacity: 0 }}
             className="space-y-8"
           >
-            <header className={`sticky top-0 z-40 bg-[#F8F5F2] py-4 mb-2 flex items-center justify-between px-4 -mx-4 transition-all duration-300 ${
-              scrolled ? 'shadow-md border-b border-gray-100' : ''
+            <header className={`sticky md:static top-0 z-40 bg-[#F8F5F2] py-4 mb-2 flex items-center justify-between px-4 -mx-4 transition-all duration-300 ${
+              scrolled ? 'shadow-md border-b border-gray-100 md:shadow-none md:border-none' : ''
             }`}>
               <div>
                 <h2 className="text-2xl font-bold text-gray-800 tracking-tight">Moje recepty</h2>

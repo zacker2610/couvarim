@@ -279,8 +279,8 @@ export default function HouseholdPage() {
 
   return (
     <div className="space-y-6">
-      <header className={`sticky top-0 z-40 bg-[#F8F5F2] flex items-center justify-between py-4 px-4 -mx-4 mb-2 transition-all duration-300 ${
-        scrolled ? 'shadow-md border-b border-gray-100' : ''
+      <header className={`sticky md:static top-0 z-40 bg-[#F8F5F2] flex items-center justify-between py-4 px-4 -mx-4 mb-2 transition-all duration-300 ${
+        scrolled ? 'shadow-md border-b border-gray-100 md:shadow-none md:border-none' : ''
       }`}>
         <h2 className="text-2xl font-bold text-gray-800 tracking-tight">
           {isAlone ? "Spoločná Domácnosť" : (household?.name || "Moja Domácnosť")}

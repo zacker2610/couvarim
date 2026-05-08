@@ -168,8 +168,8 @@ function ScanContent() {
 
   return (
     <div className="space-y-8">
-      <header className={`sticky top-0 z-40 bg-[#F8F5F2] flex items-center gap-4 py-4 px-4 -mx-4 mb-6 transition-all duration-300 ${
-        scrolled ? 'shadow-md border-b border-gray-100' : ''
+      <header className={`sticky md:static top-0 z-40 bg-[#F8F5F2] flex items-center gap-4 py-4 px-4 -mx-4 mb-6 transition-all duration-300 ${
+        scrolled ? 'shadow-md border-b border-gray-100 md:shadow-none md:border-none' : ''
       }`}>
         <Link 
           href="/generate"
