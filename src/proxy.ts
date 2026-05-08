@@ -36,7 +36,11 @@ export async function proxy(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/auth/callback') ||
     request.nextUrl.pathname.startsWith('/invite') ||
     request.nextUrl.pathname === '/manifest.json' ||
-    request.nextUrl.pathname === '/sw.js'
+    request.nextUrl.pathname === '/manifest.webmanifest' ||
+    request.nextUrl.pathname === '/sw.js' ||
+    request.nextUrl.pathname.startsWith('/icon-') ||
+    request.nextUrl.pathname.endsWith('.png') ||
+    request.nextUrl.pathname.endsWith('.ico')
 
   // If not authenticated and trying to access a protected route
   if (!user && !isPublicRoute) {
@@ -63,7 +67,8 @@ export const config = {
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
      * - api (we handle api routes separately or they have their own auth)
+     * - PWA assets (manifest, sw, icons)
      */
-    '/((?!_next/static|_next/image|favicon.ico|api|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+    '/((?!_next/static|_next/image|favicon.ico|api|manifest\\.json|manifest\\.webmanifest|sw\\.js|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)',
   ],
 }
