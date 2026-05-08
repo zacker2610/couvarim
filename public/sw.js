@@ -11,5 +11,11 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('fetch', (event) => {
   // We need a fetch handler to satisfy PWA criteria
   // For now, we just let requests through to the network
-  event.respondWith(fetch(event.request));
+  event.respondWith(
+    fetch(event.request).catch((err) => {
+      // Quietly fail or handle offline scenario if needed
+      console.warn('[SW] Fetch failed:', event.request.url);
+      return new Response('Network error', { status: 408 });
+    })
+  );
 });
